@@ -1,42 +1,67 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f1115"><title>Winter Arc Tracker</title>
-<style>
-:root{--bg:#0f1115;--card:#181b22;--tx:#e8eaf0;--mu:#8b93a3;--ac:#4f8cff;--gr:#22c55e;--ye:#eab308;--re:#ef4444;--gy:#2a2f3a}
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Winter Arc Tracker</title>
+<style>:root{--bg:#0d0f14;--card:#161a22;--card2:#1c212b;--bd:#242a36;--tx:#eef0f6;--mu:#8a93a6;--ac:#5b8cff;--gr:#22c55e;--ye:#eab308;--re:#ef4444;--gy:#262c38;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:auto;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;padding:14px 14px 96px;max-width:560px}
-h1{font-size:22px;margin:4px 0 12px}h2{font-size:18px;margin:16px 0 8px}
-.card{background:var(--card);border-radius:14px;padding:14px;margin:10px 0}
-.mu{color:var(--mu);font-size:14px}
+html{background:radial-gradient(900px 420px at 50% -160px,#1b2646,transparent),var(--bg);min-height:100%}
+body{margin:auto;background:transparent;color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 104px;max-width:560px}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:6px 0 14px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+h2{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);margin:22px 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0}
+.card .row{background:var(--card2)}
+.mu{color:var(--mu);font-size:13.5px}
 button,input,select{font:inherit;color:inherit}
-button{background:var(--ac);border:0;border-radius:12px;min-height:52px;padding:0 16px;font-weight:600;width:100%;margin:6px 0;cursor:pointer}
-button.sec{background:var(--gy)}button.dng{background:var(--re)}
-input[type=text],input[type=number],select{width:100%;min-height:52px;background:var(--bg);border:1px solid var(--gy);border-radius:12px;padding:0 12px;margin:4px 0}
-.row{display:flex;align-items:center;gap:14px;min-height:60px;padding:6px 14px;margin:8px 0;background:var(--card);border-radius:14px;font-size:17px}
-input[type=checkbox]{width:30px;height:30px;accent-color:var(--gr);flex:none}
-.bar{height:12px;background:var(--gy);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
-.warn{background:#3b1418;border:1px solid var(--re);color:#ffb4b4;border-radius:12px;padding:12px;margin:10px 0;font-weight:600}
-.warn.ok{background:#12301f;border-color:var(--gr);color:#a7f3c0}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stats div{background:var(--card);border-radius:14px;padding:12px;text-align:center}.stats b{font-size:26px;display:block}
-.tabs{display:flex;gap:8px;margin-bottom:10px}.tabs button{background:var(--gy)}.tabs .on{background:var(--ac)}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.grid i{text-align:center;color:var(--mu);font-style:normal}
-.grid button{min-height:46px;padding:0;margin:0;border-radius:10px}
-.cg{background:var(--gy)!important;color:var(--mu)}.cgr{background:var(--gr)!important}.cy{background:var(--ye)!important;color:#000}.cr{background:var(--re)!important}.sel{outline:3px solid #fff}
-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#12151b;border-top:1px solid var(--gy);padding-bottom:env(safe-area-inset-bottom)}
-nav button{background:none;border-radius:0;margin:0;min-height:62px;font-size:12px;color:var(--mu);padding:0}nav .on{color:var(--ac)}
+button{background:linear-gradient(135deg,#5b8cff,#7a5cff);border:0;border-radius:14px;min-height:50px;padding:0 16px;font-weight:600;width:100%;margin:6px 0;cursor:pointer;transition:transform .08s,filter .15s}
+button:active{transform:scale(.98);filter:brightness(.92)}
+button.sec{background:var(--card2);border:1px solid var(--bd);color:var(--tx)}
+button.dng{background:transparent;border:1px solid #5a2229;color:#ff8f8f}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two button{margin:0}
+input[type=text],input[type=number],select{width:100%;min-height:50px;background:#11141a;border:1px solid var(--bd);border-radius:14px;padding:0 14px;margin:5px 0;outline:0;transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=number]:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,140,255,.22)}
+input[type=number]{-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.row{display:flex;align-items:center;gap:14px;min-height:62px;padding:8px 14px;margin:8px 0;background:var(--card);border:1px solid var(--bd);border-radius:16px;font-size:16.5px;transition:background .2s,border-color .2s}
+.row:has(input[type=checkbox]:checked){background:#13231a;border-color:#1f4a31}
+.row:has(input[type=checkbox]:checked)>span{color:#c4ecd3}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;border:2px solid #3b4252;background:transparent;display:grid;place-content:center;flex:none;cursor:pointer;margin:0;transition:background .15s,border-color .15s}
+input[type=checkbox]::after{content:"";width:12px;height:7px;border:solid #fff;border-width:0 0 3px 3px;transform:rotate(-45deg) scale(0);margin-top:-2px;transition:transform .12s}
+input[type=checkbox]:checked{background:var(--gr);border-color:var(--gr)}
+input[type=checkbox]:checked::after{transform:rotate(-45deg) scale(1)}
+input[type=checkbox]:disabled{opacity:.55;cursor:default}
+.row input.tm{width:84px;min-height:44px;margin:0 0 0 auto;padding:0 8px;text-align:center;flex:none;background:#11141a}
+.row button.plus{width:46px;min-height:46px;margin:0 0 0 auto;padding:0;font-size:26px;border-radius:50%;flex:none}
+.bar{height:10px;background:var(--gy);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#5b8cff,#22c55e)}
+.hero{background:linear-gradient(135deg,#1d2b52,#161a22 70%);border-color:#2a3660}
+.hero .big{font-size:44px;line-height:1.1;margin:2px 0 12px;background:linear-gradient(90deg,#fff,#a9c1ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .big{font-size:40px;font-weight:800}
+.warn{background:#35151a;border:1px solid #7a2630;color:#ffb4b4;border-radius:14px;padding:12px 14px;margin:12px 0;font-weight:600}
+.warn.ok{background:#12301f;border-color:#1f6b3d;color:#a7f3c0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.stats div{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px;text-align:center;font-size:13px;color:var(--mu)}
+.stats b{font-size:28px;display:block;color:var(--tx)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{background:var(--card2);border:1px solid var(--bd);margin:0}.tabs .on{background:linear-gradient(135deg,#5b8cff,#7a5cff);border-color:transparent}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.grid i{text-align:center;color:var(--mu);font-style:normal;font-size:13px;font-weight:600}
+.grid button{min-height:44px;padding:0;margin:0;border-radius:12px;font-weight:600;font-size:15px}
+.cg{background:var(--card2)!important;border:1px solid var(--bd);color:var(--mu)}.cg:disabled{opacity:.45}
+.cgr{background:#1fa34d!important;color:#fff}.cy{background:#e0ad0b!important;color:#111}.cr{background:#d93a3a!important;color:#fff}
+.td{box-shadow:0 0 0 2px var(--ac)}.sel{outline:3px solid #fff;outline-offset:1px}
+nav{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;display:flex;background:rgba(18,21,28,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--bd);border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;border-radius:0;margin:0;min-height:64px;font-size:11px;font-weight:600;color:var(--mu);padding:6px 0 0;position:relative}
+nav .ic{display:block;font-size:21px;line-height:1.25}
+nav .on{color:var(--ac)}nav .on::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 4px 4px;background:var(--ac)}
+summary{list-style:none;cursor:pointer;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;font-weight:600;margin:14px 0 4px}
+summary::-webkit-details-marker{display:none}details[open]>summary{border-color:var(--ac)}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
 <nav>
-<button data-a="nav" data-v="today">✅<br>Today</button><button data-a="nav" data-v="cal">🗓<br>Calendar</button>
-<button data-a="nav" data-v="week">📊<br>Weekly</button><button data-a="nav" data-v="rules">📌<br>Rules</button><button data-a="nav" data-v="syl">📚<br>Syllabus</button>
-<button data-a="nav" data-v="words">🔤<br>Words</button></nav>
+<button data-a="nav" data-v="today"><span class="ic">✅</span>Today</button><button data-a="nav" data-v="cal"><span class="ic">🗓</span>Calendar</button>
+<button data-a="nav" data-v="week"><span class="ic">📊</span>Weekly</button><button data-a="nav" data-v="rules"><span class="ic">📌</span>Rules</button><button data-a="nav" data-v="syl"><span class="ic">📚</span>Syllabus</button>
+<button data-a="nav" data-v="words"><span class="ic">🔤</span>Words</button></nav>
 <script>
 /* ===== CONFIG ===== */
 const S0='2026-10-01',E0='2026-12-31',KEY='winterArc.v1';
-const T=['wo','wd','sp','fr','rd','bd'];               // 6 daily tasks
+const T=['wo','wd','sp','fr','rd'];               // 5 daily tasks
 const MN={10:'Oct',11:'Nov',12:'Dec'};
 const SY={
  Oct:['Python basics','Python OOP','Files / JSON / errors','JavaScript revision','HTML / CSS','SQL (SELECT / JOIN / GROUP BY)','Git and GitHub','Install bench + first DocType','Project 1: Python CLI Lead Tracker'],
@@ -62,55 +87,80 @@ const dow=s=>pd(s).getDay();
 const isRest=s=>dow(s)===0||dow(s)===3;                 // Sun + Wed
 const wlab=w=>pd(w).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const WEEKS=[];for(let w='2026-10-04';w<='2026-12-27';w=add(w,7))WEEKS.push(w); // Sundays (must come after helpers)
-let view='today',calM='10',calSel=null,wkSel=null,test=null;
+let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,setOpen=false;
 
 /* ===== DAY LOGIC ===== */
+const hm=m=>{m=Math.round(m);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m'};
+const tmt=s=>hm(['wo','sp','fr'].reduce((a,k)=>a+(+(st.days[s]&&st.days[s].t&&st.days[s].t[k])||0),0));
 const isDone=(s,k)=>k==='wo'&&isRest(s)?true:!!(st.days[s]&&st.days[s][k]);  // rest day = workout done
 const cnt=s=>T.filter(k=>isDone(s,k)).length;
 const ok=s=>!!((st.days[s]&&st.days[s].min)||cnt(s)>=3);    // "not missed": minimum toggle OR 3+ tasks
-function col(s){if(s>today())return'cg';const c=cnt(s);return c===6?'cgr':(c>=3||(st.days[s]&&st.days[s].min))?'cy':'cr'}
+function col(s){if(s>today())return'cg';const c=cnt(s);return c===T.length?'cgr':(c>=3||(st.days[s]&&st.days[s].min))?'cy':'cr'}
 function streaks(){                                         // current + best streak
  const t=clamp(today()),r=today();let run=0,best=0;
  for(let s=S0;s<=t&&s<=r;s=add(s,1)){if(ok(s)){run++;best=Math.max(best,run)}else if(s<r)run=0}
  return{cur:run,best}}
 function book(s){return s<='2026-10-30'?'Book 1: The Power of Your Subconscious Mind':s<='2026-11-25'?'Book 2: The Alchemist':s<='2026-12-28'?'Book 3: Rich Dad Poor Dad':'Buffer: review and catch up'}
 
+/* ===== BOOKS / PRIVATE / CONTROLS ===== */
+const bks=()=>{if(!st.books)st.books=['The Power of Your Subconscious Mind','The Alchemist','Rich Dad Poor Dad'];if(typeof st.bi!=='number')st.bi=0;return st.books};
+function bookCard(){const b=bks(),i=st.bi,dn=i>=b.length;
+ return `<div class="card">📖 ${dn?'All '+b.length+' books completed 🎉':'Book '+(i+1)+' of '+b.length+': '+E(b[i])}<div class="mu" style="margin:4px 0">Completed: ${Math.min(i,b.length)}/${b.length}</div>${dn?'':'<button class="sec" data-a="bkdone">Book completed ✓ (go to next)</button>'}<button class="sec" data-a="bkadd">+ Add a book</button></div>`}
+function pst(){const r=today();let run=0,best=0;for(let s=S0;s<=r;s=add(s,1)){if(st.days[s]&&st.days[s].np){run++;best=Math.max(best,run)}else if(s<r)run=0}return{cur:run,best}}
+function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
+function ctl(k,s,rest){const d=st.days[s]||{};
+ if(k==='wd')return '<button class="plus" data-a="gow">+</button>';
+ if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}">`;
+ if(rest)return '';
+ return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}">`}
+
+const IC={wo:'💪',wd:'🔤',sp:'🎤',fr:'💻',rd:'📖'};
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
 function editor(s){
  const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
  const L={wo:['Workout','10 min workout'],wd:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
-  fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages'],bd:['In bed by 10','In bed by 10']};
+  fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
  let h=`<label class="row"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
-  h+=`<label class="row"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${rest?'Rest day ✓':L[k][+m]}</span></label>`});
- return h+`<div class="mu">${cnt(s)}/6 done</div>`}
+  h+=`<label class="row"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
+ if(showP)h+=privRow(s);
+ return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
 
 /* ===== TODAY ===== */
 function notifySetup(){
- const n=st.notify||{enabled:false,next:0};
- return `<div class="card"><h2 style="margin-top:0">🔔 2-Hour Notifications</h2>
- <div class="mu">Get a reminder every 2 hours while this tracker is open.</div>
- <button class="${n.enabled?'dng':'pri'}" data-a="notif">${n.enabled?'Turn OFF reminders':'Turn ON 2-hour reminders'}</button>
- ${n.enabled&&n.next?`<div class="mu" style="margin-top:8px">Next reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}
- </div>`;
-}
+ const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
+ const msg=!sup?'Not supported here. iPhone: Share → Add to Home Screen, then open from the icon.':pm==='denied'?'Blocked. Allow notifications for this site in your browser settings.':!on?'Turn ON to get a reminder every 2 hours (6 AM to 11 PM).':n.sub?'✅ Phone push ready. Copy the device code and save it in GitHub (see README).':'Reminders work while this app is open. For closed-app push, open it from your https website.';
+ return `<div class="card"><h2 style="margin-top:0">🔔 Notifications</h2><div class="mu">${msg}</div>
+ <button class="${on?'dng':'pri'}" data-a="notif">${on?'Turn OFF reminders':'Turn ON reminders'}</button>
+ ${on?`<div class="two"><button class="sec" data-a="tnot">Send test</button>${n.sub?'<button class="sec" data-a="csub">Copy device code</button>':'<span></span>'}</div>`:''}
+ ${on&&n.next?`<div class="mu" style="margin-top:8px">Next in-app reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>`}
+const VAPID='BCRAi9qZMGFQU0moiQTCXgtxdNuXX3C9MZF0wbU5aYP2luosQLnD-b00rRDuxzBUjaSLDZyTjHsQT1l9uaVAkO8';
+const u8=b=>{const r=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(r),c=>c.charCodeAt(0))};
+async function showN(t,b){const o={body:b,icon:'icon-192.png',badge:'icon-192.png',tag:'winter-arc'};
+ const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)return r.showNotification(t,o);new Notification(t,o)}
+async function pushOn(){
+ try{
+  if(!('Notification' in window))return alert('Notifications are not supported here. iPhone: Share → Add to Home Screen first.');
+  const p=await Notification.requestPermission();if(p!=='granted')return alert('Notifications are blocked. Allow them in site settings.');
+  let sub=null;const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+  if(reg&&'PushManager' in window){await navigator.serviceWorker.ready;
+   sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)}))}
+  st.notify={enabled:true,next:Date.now()+72e5,sub:sub?sub.toJSON():null};save();render()
+ }catch(e){alert('Could not turn on: '+e.message)}}
+async function pushOff(){
+ try{const r=await navigator.serviceWorker.getRegistration(),s=r&&await r.pushManager.getSubscription();if(s)await s.unsubscribe()}catch(e){}
+ st.notify={enabled:false,next:0,sub:null};save();render()}
 function checkNotify(){
- if(!st.notify?.enabled)return;
- if(!('Notification' in window))return;
- if(Date.now()>=Number(st.notify.next||0)){
-  if(Notification.permission==='granted'){
-   new Notification('Winter Arc Reminder',{body:'2 hours are up. Check your Winter Arc tasks and keep going.'});
-  }
-  st.notify.next=Date.now()+2*60*60*1000; save();
-  if(view==='today')render();
- }
-}
+ if(!st.notify||!st.notify.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
+ if(Date.now()<Number(st.notify.next||0))return;
+ const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
+ st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
 function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
- let h=`<h1>Winter Arc Tracker</h1><div class="card"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
+ let h=`<h1>Winter Arc Tracker</h1><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=`<div class="stats"><div><b>${sk.cur}</b>Streak</div><div><b>${sk.best}</b>Best streak</div></div><div class="card">📖 ${book(s)}</div>`+editor(s);
- return h+notifySetup()+`<h2>Data</h2><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button><button class="dng" data-a="rst">Reset all data</button>`}
+ h+=`<div class="stats"><div><b>${sk.cur}</b>Streak</div><div><b>${sk.best}</b>Best streak</div></div>${bookCard()}`+editor(s);
+ return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: notifications and backup</summary>`+notifySetup()+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
 function vCal(){
@@ -119,20 +169,20 @@ function vCal(){
  const off=(pd('2026-'+calM+'-01').getDay()+6)%7,dim=new Date(2026,+calM,0).getDate();
  for(let i=0;i<off;i++)h+='<i></i>';
  for(let d=1;d<=dim;d++){const s=`2026-${calM}-${String(d).padStart(2,'0')}`;
-  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}</button>`}
- h+='</div><div class="mu" style="margin:10px 0">Green: all 6 · Yellow: 3-5 · Red: 0-2 · Grey: future</div>';
+  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}</button>`}
+ h+='</div><div class="mu" style="margin:10px 0">Green: all 5 · Yellow: 3-4 · Red: 0-2 · Grey: future</div>';
  return h+(calSel?`<h2>${pd(calSel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</h2>`+editor(calSel):'')}
 
 /* ===== WEEKLY ===== */
 function wk(w){                                             // auto stats + score for a week ending Sunday w
  const D=[];for(let i=-6;i<=0;i++){const s=add(w,i);if(inPlan(s))D.push(s)}
  const n=D.length,wd=D.filter(s=>!isRest(s)),m=st.weeks[w]||{},max=w==='2026-10-04'?30:60,
- c=k=>D.filter(s=>isDone(s,k)).length,wo=wd.filter(s=>isDone(s,'wo')).length,fh=+m.fh||0,sc=+m.sc||0,
+ c=k=>D.filter(s=>isDone(s,k)).length,wo=wd.filter(s=>isDone(s,'wo')).length,pgA=D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].pg)||0),0),wn=st.words.filter(w=>D.includes(w.date)).length,tm=k=>D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].t&&st.days[s].t[k])||0),0),fh=Math.round((tm('fr')/60||+m.fh||0)*10)/10,sc=+m.sc||0,
  P={fr:Math.min(fh/(8.5*n/7),1)*30,wo:wo/wd.length*20,sp:c('sp')/n*15,sc:Math.min(sc/max,1)*15,rd:c('rd')/n*10,co:D.filter(s=>ok(s)).length/n*10}; // 8.5h = 6x70min + 90min
- return{wo,fr:c('fr'),sp:c('sp'),rd:c('rd'),max,fh,sc,pg:m.pg||0,m,P,score:Math.round(Object.values(P).reduce((a,b)=>a+b,0)),missed:D.filter(s=>s<today()&&!ok(s)).length}}
+ return{wo,fr:c('fr'),sp:c('sp'),rd:c('rd'),max,fh,sc,pg:pgA||+m.pg||0,wn,tmx:{wo:tm('wo'),wd:tm('wd'),sp:tm('sp'),fr:tm('fr'),rd:tm('rd')},m,P,score:Math.round(Object.values(P).reduce((a,b)=>a+b,0)),missed:D.filter(s=>s<today()&&!ok(s)).length}}
 function wkOut(w){
  const c=wk(w),p=WEEKS[WEEKS.indexOf(w)-1],started=add(w,-6)<=today();
- let h=`<div class="stats"><div><b>${c.wo}/5</b>Workouts</div><div><b>${c.fr}</b>Frappe days</div><div><b>${c.sp}/7</b>Speaking days</div><div><b>${c.rd}</b>Reading days</div></div>`+
+ let h=`<div class="stats"><div><b>${c.wo}/5</b>Workouts</div><div><b>${c.fr}</b>Frappe days</div><div><b>${c.sp}/7</b>Speaking days</div><div><b>${c.rd}</b>Reading days</div></div><div class="card"><b>Time this week (auto)</b><div class="mu" style="margin-top:6px">Workout ${hm(c.tmx.wo)} · Words ${c.wn} added · Speaking ${hm(c.tmx.sp)} · Frappe ${hm(c.tmx.fr)} · Reading ${c.pg} pages</div></div>`+
  `<div class="card">Score<div class="big">${c.score}/100</div><div class="mu">Frappe ${c.P.fr|0}/30, Workout ${c.P.wo|0}/20, Speaking ${c.P.sp|0}/15, Spelling ${c.P.sc|0}/15, Reading ${c.P.rd|0}/10, Consistency ${c.P.co|0}/10</div></div>`;
  if(c.missed>=3)h+='<div class="warn">FAIL WEEK - repeat this week\'s Frappe topic</div>';
  if(started&&c.score<70)h+='<div class="warn">Score below 70. Fix it next week.</div>';
@@ -145,7 +195,7 @@ function vWeek(){
  const m=st.weeks[wkSel]||{},max=wkSel==='2026-10-04'?30:60;
  const f=(k,l,t)=>`<div class="mu" style="margin-top:8px">${l}</div><input type="${t}" ${t==='number'?'inputmode="decimal"':''} data-w="${k}" value="${E(m[k])}">`;
  return `<h1>Weekly review</h1><select data-a="wsel">${WEEKS.map(w=>`<option value="${w}" ${w===wkSel?'selected':''}>Week ending ${wlab(w)}</option>`).join('')}</select><div id="wko">${wkOut(wkSel)}</div>`+
- f('fh','Frappe hours','number')+f('pg','Pages read','number')+f('sc',`Spelling test score (/${max})`,'number')+f('built','What I built','text')+f('excuse','Biggest excuse','text')+
+ f('sc',`Spelling test score (/${max})`,'number')+f('built','What I built','text')+f('excuse','Biggest excuse','text')+
  `<button data-a="copy">Copy Sunday report</button>`}
 
 /* ===== RULES ===== */
@@ -156,7 +206,7 @@ const RULES=[
 'Missed 2 days in a row: +30 min extra on Sunday and write the REAL reason.',
 'Missed 3+ days in a week = FAIL week. Repeat that week’s Frappe topic.',
 'Real sickness: rest and tell your coach. Not a fail.',
-'Weekly targets: Workouts 5/5, new words 60, speaking 7/7, Frappe 7 hours+, reading 50 pages, in bed by 10 for 6/7 nights, GitHub push at least once.',
+'Weekly targets: Workouts 5/5, new words 60, speaking 7/7, Frappe 7 hours+, reading 50 pages, GitHub push at least once.',
 'Score: Frappe 30, Workout 20, Speaking 15, Spelling 15, Reading 10, Consistency 10.',
 'Below 70 = warning. Below 50 two weeks in a row = goals get cut.',
 'Every Sunday report: workouts /5, Frappe hours, pages read, speaking /7, spelling test, what I built, biggest excuse.',
@@ -195,7 +245,7 @@ function vTest(){
 function render(){
  $('#app').innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords}[view]();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
- const a=$('#ans');if(a)a.focus()}
+ const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}}
 
 /* ===== EVENTS ===== */
 document.addEventListener('click',e=>{
@@ -217,16 +267,12 @@ document.addEventListener('click',e=>{
   if(test.res)test.right++;else{w.mistake=true;save()}}
  else if(a==='nxt'){test.i++;test.res=null}
  else if(a==='tend')test=null;
- else if(a==='notif'){
- if(!st.notify)st.notify={enabled:false,next:0};
- if(st.notify.enabled){st.notify.enabled=false;st.notify.next=0;save();render();return}
- if(!('Notification' in window))return alert('Browser notifications are not supported here.');
- Notification.requestPermission().then(p=>{
-  if(p!=='granted')return alert('Please allow notifications in your browser.');
-  st.notify={enabled:true,next:Date.now()+2*60*60*1000};save();render();
- });
- return;
- }
+ else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true}
+ else if(a==='bkdone'){bks();if(!confirm('Mark this book as completed?'))return;st.bi++;save()}
+ else if(a==='bkadd'){const t=prompt('Book title?');if(!t||!t.trim())return;bks().push(t.trim());save()}
+ else if(a==='notif'){(st.notify&&st.notify.enabled?pushOff():pushOn());return}
+ else if(a==='tnot'){showN('Winter Arc test','Notifications work ✅');return}
+ else if(a==='csub'){const t=JSON.stringify(st.notify.sub);(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('Copied')):Promise.reject()).catch(()=>prompt('Copy this code:',t));return}
  else if(a==='copy'){const t=report(wkSel),done=()=>alert('Copied');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(done).catch(()=>{
    const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()});return}
@@ -243,6 +289,7 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  if(a==='wsel')wkSel=t.value;
  else if(a==='tk')day()[t.dataset.k]=t.checked;
  else if(a==='min')day().min=t.checked;
+ else if(a==='np')day().np=t.checked;
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
  else if(a==='ms')st.words.find(w=>w.id===t.dataset.id).mistake=t.checked;
  save();render()});
@@ -250,6 +297,19 @@ document.addEventListener('change',e=>{                     // checkboxes + week
 document.addEventListener('input',e=>{                      // weekly manual inputs (no re-render, keeps focus)
  const k=e.target.dataset.w;if(!k)return;
  (st.weeks[wkSel]=st.weeks[wkSel]||{})[k]=e.target.value;save();$('#wko').innerHTML=wkOut(wkSel)});
+
+document.addEventListener('input',e=>{                      // daily minutes (no re-render, keeps focus)
+ const k=e.target.dataset.t;if(!k)return;
+ const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};d.t=d.t||{};
+ const v=parseFloat(e.target.value);if(v>0)d.t[k]=v;else delete d.t[k];
+ save();const x=document.getElementById('tt-'+s);if(x)x.textContent=tmt(s)});
+
+document.addEventListener('input',e=>{                      // reading pages (no re-render)
+ if(!e.target.dataset.pg)return;const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};
+ const v=parseFloat(e.target.value);if(v>0)d.pg=v;else delete d.pg;save()});
+
+let tapN=0,tapT=0;                                          // triple-tap a page title = show/hide private row
+document.addEventListener('click',e=>{if(!e.target.closest('h1'))return;const n=Date.now();tapN=n-tapT<700?tapN+1:1;tapT=n;if(tapN>=3){tapN=0;showP=!showP;render()}});
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ans')$('[data-a=chk]').click()});
 
@@ -261,6 +321,8 @@ $('#file').addEventListener('change',e=>{                   // import backup
  r.readAsText(f);e.target.value=''});
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='today')render()}); // new day rollover
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+document.addEventListener('toggle',e=>{if(e.target.id==='set')setOpen=e.target.open},true);
 setInterval(checkNotify,60000);
 render();
 </script></body></html>
