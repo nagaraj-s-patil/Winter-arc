@@ -261,7 +261,7 @@ function vStats(){
 /* ===== AI VOCABULARY (Gemini) ===== */
 const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
 const SC=['Your manager asks you to finish a task by Friday. Reply to your manager.','A customer calls and is angry about a late delivery. Reply to the customer.','You are on a sales call and the client asks about the price. Reply.','In a team meeting your lead asks for your update. Give your update.','Write one or two lines of an email to a client about a new meeting time.','A user asks for help with an IT ticket. Reply to the user.','A friend asks what you did yesterday. Answer in a daily conversation.'];
-let aiBusy=false,aiErr=false,aiMsg='';
+let aiBusy=false,aiErr=false,aiMsg='',fillBusy=false;
 const aiGet=()=>{let o={key:'',model:'gemini-flash-latest',status:'none'};try{Object.assign(o,JSON.parse(localStorage.getItem(AIK)||'{}'))}catch(e){}if(o.model==='gemini-2.5-flash')o.model='gemini-flash-latest';return o};
 const aiSet=o=>{try{localStorage.setItem(AIK,JSON.stringify(Object.assign(aiGet(),o)))}catch(e){}};
 const isSun=s=>dow(s||today())===0,mon=s=>add(s,isSun(s)?-6:-(dow(s)-1)),gw=id=>st.words.find(w=>w.id===id);
@@ -330,7 +330,7 @@ function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
   return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><div class="two"><button class="sec" data-a="gow">Add words</button><button class="sec" data-a="spstart">🔊 Spelling</button></div></div>`}
-function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add a new word</h2><input type="text" id="nw" placeholder="Word" autocapitalize="off"><input type="text" id="nm" placeholder="Meaning (optional)"><input type="text" id="ns" placeholder="Example sentence (optional)"><button data-a="addw">Add word</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
 function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
  return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
@@ -338,7 +338,7 @@ function aiHome(){const c=aiGet(),n=wkWords(today()).length;
 function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
  let h=`<h1>${q2?'Weak Word Retest':'Sunday AI Vocabulary Test'}</h1><div class="card hero w"><div class="mu">Progress</div><div class="big2">Question ${i+1} / ${L.length}</div><div class="bar" style="margin-top:10px"><i style="width:${i/L.length*100}%"></i></div></div><div class="stats"><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div><div><b>${lg.filter(e=>e.sp).length}</b>Spelling mistakes</div></div><div class="card"><div class="mu">${TN[q.t]}</div><div class="aq">${b.text}</div>`;
  if(f)h+=`<div class="fb ${f.r}">${{c:'✅ Correct',p:'🟡 Partly correct',w:'❌ Wrong'}[f.r]}<div style="font-weight:500;margin-top:4px">${E(f.note)}</div></div><button data-a="ainext">${i+1>=L.length?'Finish':'Next →'}</button>`;
- else{h+=`<input type="text" id="aians" placeholder="Your answer" autocomplete="off" autocapitalize="off" spellcheck="false" value="${E(v.pend||'')}" ${aiBusy?'disabled':''}>`;
+ else{h+=`<input type="text" id="aians" placeholder="Your answer" ${(q.t==='spell'||q.t==='blank')?NOSUG:'autocomplete="off" autocapitalize="off" spellcheck="false"'} value="${E(v.pend||'')}" ${aiBusy?'disabled':''}>`;
   if(aiErr)h+=`<div class="warn">${aiErr==='nokey'?'⚠️ Add your Gemini API key in Settings → AI Vocabulary.':'❌ AI connection failed. Check your API key and internet connection.'}${aiErr==='fail'?'<div class="mu" style="margin-top:4px;font-weight:500">'+E(aiMsg)+'</div>':''}</div><button data-a="airetry">Try Again</button>`+(aiErr==='nokey'?'<button class="sec" data-a="aigoset">Open Settings</button>':'');
   else h+=`<button data-a="aians" ${aiBusy?'disabled':''}>${aiBusy?'Checking…':'Submit answer'}</button>`}
  return h+`</div><button class="sec" data-a="aiquit">Save and exit</button>`}
@@ -352,6 +352,7 @@ function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r===
  return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
 function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
 /* ===== SPELLING CHECK (listen and write) ===== */
+const NOSUG='autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" enterkeyhint="done" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"';
 const canSay='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';let lastSay='',sp=null;
 function say(t,rate){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.8;const v=speechSynthesis.getVoices().find(x=>/^en[-_](US|GB|IN)/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
 function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
@@ -359,6 +360,27 @@ function sayWord(m){const w=curWord();if(!w)return;if(m==='s'&&w.sent)say(w.word
 function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
 function markSp(w,a){st.sm=st.sm||{};st.sm[w.id]=1;w.mistake=true;w.wrong=a}
 function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
+async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
+ if(!aiGet().key){toast('Add your Gemini API key in Settings to get meaning and example');return}
+ fillBusy=true;render();
+ try{const o=await gem('You help an English learner in India (beginner level). For each word below give a very simple meaning (max 10 words) and one short simple example sentence (max 12 words) that uses the exact word. Words: '+JSON.stringify(ws.map(w=>w.word))+'. Reply ONLY a JSON array like [{"word":"...","mean":"...","sent":"..."}]');
+  const arr=Array.isArray(o)?o:(o.words||[]);let n=0;
+  arr.forEach(x=>{const w=ws.find(y=>y.word.toLowerCase()===String(x.word||'').trim().toLowerCase());if(w&&x.mean){w.mean=String(x.mean);w.sent=String(x.sent||'');n++}});
+  save();toast('✨ AI wrote meaning and example for '+n+' word'+(n===1?'':'s'))
+ }catch(e){toast('❌ AI failed: '+aiWhy(e))}
+ fillBusy=false;render()}
+async function addWords(){if(isSun())return alert('Sunday is test day. No new words.');
+ const el=$('#nw'),have=new Set(st.words.map(w=>w.word.toLowerCase())),seen=new Set(),
+  list=(el?el.value:'').split(/[,\n;]+/).map(x=>x.trim()).filter(x=>x&&!seen.has(x.toLowerCase())&&seen.add(x.toLowerCase())),
+  fresh=list.filter(x=>!have.has(x.toLowerCase())),left=10-st.words.filter(x=>x.date===today()).length;
+ if(!list.length)return alert('Write the word first.');
+ if(!fresh.length)return alert('You already have this word.');
+ if(left<=0)return alert('You already added 10 words today. Great job!');
+ const take=fresh.slice(0,left),ids=take.map(x=>{const id=Date.now()+Math.random().toString(36).slice(2,6);st.words.push({id,date:today(),word:x,mean:'',sent:'',mistake:false});return id});
+ save();if(fresh.length>take.length)toast('Only '+take.length+' added. Daily limit is 10.');
+ await fillAI(ids);if(!fillBusy)render()}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nw'){e.preventDefault();addWords()}});
+const pendingN=()=>st.words.filter(w=>!w.mean||!w.sent).length;
 function spStart(){const mk=st.sm||{},ws=wkWords(today());if(!ws.length)return alert('Add some words first.');
  sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,20).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false};view='spell';animNext=true;render()}
 function spCheck(){const el=$('#spans'),a=el?el.value.trim():'';if(!a||!sp||sp.fb)return;const w=gw(sp.q[sp.i]),ok=nm(a)===nm(w.word);st.sm=st.sm||{};
@@ -373,7 +395,7 @@ function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothin
  const w=gw(sp.q[sp.i]),f=sp.fb;
  let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
  if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
- else h+=`<input type="text" id="spans" placeholder="Type the spelling" autocomplete="off" autocapitalize="off" spellcheck="false" style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
+ else h+=`<input type="text" id="spans" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
  return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
 function editor(s){
@@ -500,7 +522,7 @@ function vWords(){
  `${addBox()}`;
  if(!st.words.length)h+=`<div class="empty">📝<br>No words yet.<br><span class="mu">Add your first word above.</span></div>`;
  st.words.forEach(w=>(by[w.date]=by[w.date]||[]).push(w));
- Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean||'')}</div><div class="mu">${E(w.sent)}</div>${w.mistake&&w.wrong?'<div class="sperr">✍️ Spelling mistake: '+E(w.wrong)+' → '+E(w.word)+'</div>':''}<label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Spelling mistake</label></div>`).join('')});
+ Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b>${w.mean?'<div>'+E(w.mean)+'</div>':'<div class="mu">⏳ Meaning pending. Tap Fill meaning with AI.</div>'}<div class="mu">${E(w.sent)}</div>${w.mistake&&w.wrong?'<div class="sperr">✍️ Spelling mistake: '+E(w.wrong)+' → '+E(w.word)+'</div>':''}<label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Spelling mistake</label></div>`).join('')});
  return h}
 function vTest(){
  const q=test.q;
@@ -526,12 +548,8 @@ document.addEventListener('click',e=>{
  if(a==='nav'){view=v;test=null;calSel=null;animNext=true}
  else if(a==='cm'){calM=v;calSel=null;animNext=true}
  else if(a==='cd')calSel=b.dataset.d;
- else if(a==='addw'){
-  if(isSun())return alert('Sunday is test day. No new words.');
-  const w=$('#nw').value.trim(),m=$('#nm').value.trim(),s=$('#ns').value.trim();
-  if(!w)return alert('Write the word first.');
-  if(st.words.filter(x=>x.date===today()).length>=10)return alert('You already added 10 words today. Great job!');
-  st.words.push({id:Date.now()+Math.random().toString(36).slice(2,6),date:today(),word:w,mean:m,sent:s,mistake:false});save()}
+ else if(a==='addw'){addWords();return}
+ else if(a==='fillai'){fillAI(st.words.filter(w=>!w.mean||!w.sent).slice(0,15).map(w=>w.id));return}
  else if(a==='tst'){
   const pool=st.words.filter(w=>w.date>=add(today(),-6));
   if(!pool.length)return alert('No words from the last 7 days.');
