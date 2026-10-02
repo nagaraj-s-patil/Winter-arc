@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0f1115"><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -151,6 +151,8 @@ html[data-theme=cyber] .hero{background:linear-gradient(135deg,#00382b,#2a0a3d);
 .aq{font-size:19px;font-weight:600;line-height:1.5;margin:6px 0 12px}
 .fb{border-radius:16px;padding:14px;margin:12px 0;font-weight:700}
 .fb.c{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}.fb.p{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.5)}.fb.w{background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.5)}
+.say{width:110px;height:110px;min-height:0;border-radius:50%;font-size:46px;margin:6px auto;display:block;padding:0;animation:sayp 2s infinite}
+@keyframes sayp{50%{box-shadow:0 0 0 16px rgba(124,58,237,0)}}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -188,7 +190,7 @@ const dow=s=>pd(s).getDay();
 const isRest=s=>dow(s)===0||dow(s)===3;                 // Sun + Wed
 const wlab=w=>pd(w).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const WEEKS=[];for(let w='2026-10-04';w<='2026-12-27';w=add(w,7))WEEKS.push(w); // Sundays (must come after helpers)
-let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null,setOpen=false;
+let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null;
 
 /* ===== DAY LOGIC ===== */
 const hm=m=>{m=Math.round(m);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m'};
@@ -285,12 +287,12 @@ function aiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('
  if(c==='404')return 'No working Gemini model found for this key. Check the key in Google AI Studio.';
  if(c==='429')return 'Too many requests or free quota used. Wait 1 minute.';
  return 'Error '+c+(d?': '+d:'')}
-function judge(t,w,ans,sc){const P={mean:`Word: "${w.word}". Correct meaning: "${w.mean}". Learner's answer: "${ans}". Does the learner's answer show the right meaning?`,sent:`Word: "${w.word}" (meaning: ${w.mean}). Learner's sentence: "${ans}". Check: word used correctly, sentence makes sense, grammar reasonably correct.`,work:`Word: "${w.word}" (meaning: ${w.mean}). Situation: ${sc}. Learner's reply: "${ans}". Check: word used naturally and correctly here, reply makes sense, grammar reasonably correct.`}[t];
+function judge(t,w,ans,sc){const P={mean:`Word: "${w.word}". Correct meaning: "${w.mean||'standard meaning'}". Learner's answer: "${ans}". Does the learner's answer show the right meaning?`,sent:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Learner's sentence: "${ans}". Check: word used correctly, sentence makes sense, grammar reasonably correct.`,work:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Situation: ${sc}. Learner's reply: "${ans}". Check: word used naturally and correctly here, reply makes sense, grammar reasonably correct.`}[t];
  return gem('You are a kind English teacher for a beginner learner. '+P+' Reply ONLY JSON: {"r":"correct" or "partial" or "wrong","note":"max 20 words, simple English, give the fix if not fully correct"}')}
-function mkQ(ws,off){const TY=Object.keys(TN);return shuf(ws).map((w,i)=>({id:w.id,t:(st.sm&&st.sm[w.id])?'spell':TY[(i+off)%5],s:Math.floor(Math.random()*SC.length)}))}
+function mkQ(ws,off){const TY=Object.keys(TN);return shuf(ws).map((w,i)=>{let t=(st.sm&&st.sm[w.id])?'spell':TY[(i+off)%5];if(t==='blank'&&!w.sent)t='sent';return{id:w.id,t,s:Math.floor(Math.random()*SC.length)}})}
 function bld(q,w){const W=E(w.word);
  if(q.t==='mean')return{text:`What does <b>${W}</b> mean?`};
- if(q.t==='spell')return{text:`Spell the word that means: <b>${E(w.mean)}</b><div class="mu">Hint: starts with "${E(w.word[0])}", ${w.word.length} letters</div>`,x:w.word};
+ if(q.t==='spell')return canSay?{text:`🔊 Listen and type the spelling.<div class="mu">${w.word.length} letters</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="w">🔊 Hear word</button><button class="sec" data-a="say" data-v="s">💬 In a sentence</button></div>`,x:w.word}:{text:`Spell the word that means: <b>${E(w.mean||'')}</b><div class="mu">${w.word.length} letters, starts with "${E(w.word[0])}"</div>`,x:w.word};
  if(q.t==='blank'){const re=new RegExp('\\b'+w.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\w*','i'),m=(w.sent||'').match(re);
   return m?{text:E(w.sent.replace(re,'________'))+`<div class="mu">Hint: ${E(w.mean)}</div>`,x:m[0]}:{text:`________ <div class="mu">Meaning: ${E(w.mean)}</div>`,x:w.word}}
  if(q.t==='sent')return{text:`Make a sentence using: <b>${W}</b>`};
@@ -326,8 +328,8 @@ const chipsOf=(ws,c)=>ws.length?`<div class="chips">${ws.map(w=>`<span style="--
 function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
   return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
- return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><button class="sec" data-a="gow">Add words</button></div>`}
-function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div>`:`<div class="card"><h2 style="margin-top:0">✨ Add a new word</h2><input type="text" id="nw" placeholder="Word" autocapitalize="off"><input type="text" id="nm" placeholder="Meaning"><input type="text" id="ns" placeholder="Example sentence"><button data-a="addw">Add word</button></div>`}
+ return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><div class="two"><button class="sec" data-a="gow">Add words</button><button class="sec" data-a="spstart">🔊 Spelling</button></div></div>`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add a new word</h2><input type="text" id="nw" placeholder="Word" autocapitalize="off"><input type="text" id="nm" placeholder="Meaning (optional)"><input type="text" id="ns" placeholder="Example sentence (optional)"><button data-a="addw">Add word</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
 function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
  return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
@@ -348,6 +350,28 @@ function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
 function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
  return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
 function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
+/* ===== SPELLING CHECK (listen and write) ===== */
+const canSay='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';let lastSay='',sp=null;
+function say(t,rate){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.8;const v=speechSynthesis.getVoices().find(x=>/^en[-_](US|GB|IN)/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
+function sayWord(m){const w=curWord();if(!w)return;if(m==='s'&&w.sent)say(w.word+'. '+w.sent+'. '+w.word,.85);else say(w.word,m==='slow'?.5:.75)}
+function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
+function spStart(){const mk=st.sm||{},ws=wkWords(today());if(!ws.length)return alert('Add some words first.');
+ sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,20).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false};view='spell';animNext=true;render()}
+function spCheck(){const el=$('#spans'),a=el?el.value.trim():'';if(!a||!sp||sp.fb)return;const w=gw(sp.q[sp.i]),ok=nm(a)===nm(w.word);st.sm=st.sm||{};
+ if(ok){sp.ok++;delete st.sm[w.id]}else{sp.bad.push({id:w.id,ans:a});st.sm[w.id]=1}sp.fb={ok,ans:a};save();render()}
+function spAct(a){if(a==='spstart')return spStart();if(a==='spchk')return spCheck();
+ if(a==='spnext'){sp.fb=null;sp.i++;if(sp.i>=sp.q.length)sp.done=true;return render()}
+ if(a==='spquit'){view='words';sp=null;animNext=true;return render()}
+ if(a==='spagain'){sp={q:shuf(sp.bad.map(e=>e.id)),i:0,ok:0,bad:[],fb:null,done:false};render()}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='spans'){e.preventDefault();spCheck()}});
+function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothing to practice yet.</div>';
+ if(sp.done){const n=sp.q.length;return `<h1>Spelling Result</h1><div class="card hero w"><div class="mu">Score</div><div class="big2">${sp.ok} / ${n}</div></div>`+(sp.bad.length?`<h2>✍️ Spelling mistakes</h2>`+sp.bad.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join('')+`<button data-a="spagain">🔁 Practice mistakes again</button>`:'<div class="card">🎉 All spelled correctly!</div>')+`<button class="sec" data-a="spstart">New round</button><button class="sec" data-a="spquit">Back to Words</button>`}
+ const w=gw(sp.q[sp.i]),f=sp.fb;
+ let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
+ if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
+ else h+=`<input type="text" id="spans" placeholder="Type the spelling" autocomplete="off" autocapitalize="off" spellcheck="false" style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
+ return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
 function editor(s){
  const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
@@ -361,39 +385,30 @@ function editor(s){
 
 /* ===== TODAY ===== */
 function notifySetup(){
- const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
- const msg=!sup?'Not supported here. iPhone: Share → Add to Home Screen, then open from the icon.':pm==='denied'?'Blocked. Allow notifications for this site in your browser settings.':!on?'Turn ON to get a reminder every 2 hours (6 AM to 11 PM).':n.sub?'✅ Phone push ready. Copy the device code and save it in GitHub (see README).':'Reminders work while this app is open. For closed-app push, open it from your https website.';
- return `<div class="card"><h2 style="margin-top:0">🔔 Notifications</h2><div class="mu">${msg}</div>
- <button class="${on?'dng':'pri'}" data-a="notif">${on?'Turn OFF reminders':'Turn ON reminders'}</button>
- ${on?`<div class="two"><button class="sec" data-a="tnot">Send test</button>${n.sub?'<button class="sec" data-a="csub">Copy device code</button>':'<span></span>'}</div>`:''}
- ${on&&n.next?`<div class="mu" style="margin-top:8px">Next in-app reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>`}
-const VAPID='BCRAi9qZMGFQU0moiQTCXgtxdNuXX3C9MZF0wbU5aYP2luosQLnD-b00rRDuxzBUjaSLDZyTjHsQT1l9uaVAkO8';
-const u8=b=>{const r=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(r),c=>c.charCodeAt(0))};
-async function showN(t,b){const o={body:b,icon:'icon-192.png',badge:'icon-192.png',tag:'winter-arc'};
- const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)return r.showNotification(t,o);new Notification(t,o)}
-async function pushOn(){
- try{
-  if(!('Notification' in window))return alert('Notifications are not supported here. iPhone: Share → Add to Home Screen first.');
-  const p=await Notification.requestPermission();if(p!=='granted')return alert('Notifications are blocked. Allow them in site settings.');
-  let sub=null;const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
-  if(reg&&'PushManager' in window){await navigator.serviceWorker.ready;
-   sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)}))}
-  st.notify={enabled:true,next:Date.now()+72e5,sub:sub?sub.toJSON():null};save();render()
- }catch(e){alert('Could not turn on: '+e.message)}}
-async function pushOff(){
- try{const r=await navigator.serviceWorker.getRegistration(),s=r&&await r.pushManager.getSubscription();if(s)await s.unsubscribe()}catch(e){}
- st.notify={enabled:false,next:0,sub:null};save();render()}
+ const n=st.notify||{enabled:false,next:0};
+ return `<div class="card"><h2 style="margin-top:0">🔔 2-Hour Notifications</h2>
+ <div class="mu">Get a reminder every 2 hours while this tracker is open.</div>
+ <button class="${n.enabled?'dng':'pri'}" data-a="notif">${n.enabled?'Turn OFF reminders':'Turn ON 2-hour reminders'}</button>
+ ${n.enabled&&n.next?`<div class="mu" style="margin-top:8px">Next reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}
+ </div>`;
+}
 function checkNotify(){
- if(!st.notify||!st.notify.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
- if(Date.now()<Number(st.notify.next||0))return;
- const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
- st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
+ if(!st.notify?.enabled)return;
+ if(!('Notification' in window))return;
+ if(Date.now()>=Number(st.notify.next||0)){
+  if(Notification.permission==='granted'){
+   new Notification('Winter Arc Reminder',{body:'2 hours are up. Check your Winter Arc tasks and keep going.'});
+  }
+  st.notify.next=Date.now()+2*60*60*1000; save();
+  if(view==='today')render();
+ }
+}
 function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
  h+=playerCard(s,sk)+motiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
- return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
+ return h+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button>`}
 
 /* ===== CALENDAR ===== */
 function vCal(){
@@ -486,11 +501,11 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- document.documentElement.dataset.theme=st.theme||'dark';const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI}[view]();
+ document.documentElement.dataset.theme=st.theme||'dark';const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI,spell:vSpell}[view]();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
- const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'){const x=$('#aians');if(x)x.focus()}checkAch()}
+ const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'||view==='spell'){const x=$('#aians')||$('#spans');if(x)x.focus()}autoSay();checkAch()}
 
 /* ===== EVENTS ===== */
 document.addEventListener('click',e=>{
@@ -502,7 +517,7 @@ document.addEventListener('click',e=>{
  else if(a==='addw'){
   if(isSun())return alert('Sunday is test day. No new words.');
   const w=$('#nw').value.trim(),m=$('#nm').value.trim(),s=$('#ns').value.trim();
-  if(!w||!m)return alert('Add the word and its meaning.');
+  if(!w)return alert('Write the word first.');
   if(st.words.filter(x=>x.date===today()).length>=10)return alert('You already added 10 words today. Great job!');
   st.words.push({id:Date.now()+Math.random().toString(36).slice(2,6),date:today(),word:w,mean:m,sent:s,mistake:false});save()}
  else if(a==='tst'){
@@ -517,15 +532,24 @@ document.addEventListener('click',e=>{
  else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
  else if(a==='ftx'){st.ft=null;save()}
  else if(a==='gr'){grN=+v;animNext=true}
+ else if(a==='say'){sayWord(v);return}
+ else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
  else if(a==='snd'){st.mute=v==='0';save()}
  else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true;animNext=true}
  else if(a==='bkdone'){bks();if(!confirm('Mark this book as completed?'))return;st.bi++;save()}
  else if(a==='bkadd'){const t=prompt('Book title?');if(!t||!t.trim())return;bks().push(t.trim());save()}
- else if(a==='notif'){(st.notify&&st.notify.enabled?pushOff():pushOn());return}
- else if(a==='tnot'){showN('Winter Arc test','Notifications work ✅');return}
- else if(a==='csub'){const t=JSON.stringify(st.notify.sub);(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('Copied')):Promise.reject()).catch(()=>prompt('Copy this code:',t));return}
+ else if(a==='notif'){
+ if(!st.notify)st.notify={enabled:false,next:0};
+ if(st.notify.enabled){st.notify.enabled=false;st.notify.next=0;save();render();return}
+ if(!('Notification' in window))return alert('Browser notifications are not supported here.');
+ Notification.requestPermission().then(p=>{
+  if(p!=='granted')return alert('Please allow notifications in your browser.');
+  st.notify={enabled:true,next:Date.now()+2*60*60*1000};save();render();
+ });
+ return;
+ }
  else if(a==='copy'){const t=report(wkSel),done=()=>alert('Copied');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(done).catch(()=>{
    const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()});return}
@@ -575,8 +599,6 @@ $('#file').addEventListener('change',e=>{                   // import backup
  r.readAsText(f);e.target.value=''});
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='today')render()}); // new day rollover
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-document.addEventListener('toggle',e=>{if(e.target.id==='set')setOpen=e.target.open},true);
 
 render();
 </script></body></html>
