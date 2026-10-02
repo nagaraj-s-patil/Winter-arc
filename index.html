@@ -146,6 +146,11 @@ html[data-theme=cyber] .hero{background:linear-gradient(135deg,#00382b,#2a0a3d);
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:120;max-width:92vw;padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#ec4899);color:#fff;font-weight:700;box-shadow:0 10px 30px rgba(236,72,153,.45);animation:drop .5s cubic-bezier(.2,1.4,.4,1) both,out .4s 2.8s both;pointer-events:none}
 @keyframes drop{from{transform:translate(-50%,-90px);opacity:0}}
 @keyframes out{to{opacity:0;transform:translate(-50%,-30px)}}
+.hd{display:flex;align-items:center;justify-content:space-between}
+.gear{width:44px;min-height:44px;border-radius:50%;padding:0;margin:0;font-size:20px;background:var(--card2);border:1px solid var(--bd);box-shadow:none;flex:none}
+.aq{font-size:19px;font-weight:600;line-height:1.5;margin:6px 0 12px}
+.fb{border-radius:16px;padding:14px;margin:12px 0;font-weight:700}
+.fb.c{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}.fb.p{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.5)}.fb.w{background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.5)}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -205,7 +210,7 @@ function bookCard(){const b=bks(),i=st.bi,dn=i>=b.length;
 function pst(){const r=today();let run=0,best=0;for(let s=S0;s<=r;s=add(s,1)){if(st.days[s]&&st.days[s].np){run++;best=Math.max(best,run)}else if(s<r)run=0}return{cur:run,best}}
 function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
 function ctl(k,s,rest){const d=st.days[s]||{};
- if(k==='wd')return '<button class="plus" data-a="gow">+</button>';
+ if(k==='wd')return isSun(s)?'<button class="plus" data-a="aistart">▶</button>':'<button class="plus" data-a="gow">+</button>';
  if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}">`;
  if(rest)return '';
  return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}">`}
@@ -250,14 +255,107 @@ function vStats(){
  h+=`<h2>🏅 Achievements · ${B.filter(b=>b[2]>=b[3]).length}/${B.length}</h2><div class="bd">`+B.map(([e,t,v,gl],i)=>`<div class="bg ${v>=gl?'on':''}" style="--k:${i}"><span>${e}</span><b>${t}</b><small>${v>=gl?'Unlocked':Math.min(v,gl)+'/'+gl}</small></div>`).join('')+'</div>';
  const th=st.theme||'dark';
  return h+`<h2>🎨 Theme</h2><div class="tabs">`+[['dark','🌙 Dark'],['cyber','⚡ Cyber'],['minimal','☀️ Minimal']].map(([k,l])=>`<button class="${th===k?'on':''}" data-a="th" data-v="${k}">${l}</button>`).join('')+'</div>'+`<h2>🔊 Sound</h2><div class="tabs"><button class="${st.mute?'':'on'}" data-a="snd" data-v="1">🔊 On</button><button class="${st.mute?'on':''}" data-a="snd" data-v="0">🔇 Off</button></div>`}
+/* ===== AI VOCABULARY (Gemini) ===== */
+const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
+const SC=['Your manager asks you to finish a task by Friday. Reply to your manager.','A customer calls and is angry about a late delivery. Reply to the customer.','You are on a sales call and the client asks about the price. Reply.','In a team meeting your lead asks for your update. Give your update.','Write one or two lines of an email to a client about a new meeting time.','A user asks for help with an IT ticket. Reply to the user.','A friend asks what you did yesterday. Answer in a daily conversation.'];
+let aiBusy=false,aiErr=false,aiMsg='';
+const aiGet=()=>{let o={key:'',model:'gemini-flash-latest',status:'none'};try{Object.assign(o,JSON.parse(localStorage.getItem(AIK)||'{}'))}catch(e){}if(o.model==='gemini-2.5-flash')o.model='gemini-flash-latest';return o};
+const aiSet=o=>{try{localStorage.setItem(AIK,JSON.stringify(Object.assign(aiGet(),o)))}catch(e){}};
+const isSun=s=>dow(s||today())===0,mon=s=>add(s,isSun(s)?-6:-(dow(s)-1)),gw=id=>st.words.find(w=>w.id===id);
+const wkWords=s=>{const m=mon(s),e=add(m,5);return st.words.filter(w=>w.date>=m&&w.date<=e)};
+const wkTarget=s=>{const m=mon(s);let n=0;for(let i=0;i<6;i++){const d=add(m,i);if(d>=S0&&d<=E0)n++}return n*10};
+const nm=x=>String(x).trim().toLowerCase().replace(/[.!?,]+$/,''),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+async function gem(p,retry=1,picked=false){const c=aiGet();if(!c.key)throw new Error('nokey');
+ const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model||'gemini-flash-latest')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':c.key},body:JSON.stringify({contents:[{parts:[{text:p}]}],generationConfig:{responseMimeType:'application/json'}})});
+ if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gem(p,retry,true)}}
+ if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gem(p,retry-1,picked)}
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(r.status+'|'+((j.error&&j.error.message)||r.statusText||''))}
+ const j=await r.json(),cd=j.candidates&&j.candidates[0],t=cd&&cd.content&&cd.content.parts?cd.content.parts.map(x=>x.text||'').join(''):'';
+ if(!t)throw new Error('0|Empty reply'+(cd&&cd.finishReason?' ('+cd.finishReason+')':''));
+ return JSON.parse(t.replace(/```json|```/g,'').trim())}
+async function pickModel(){const c=aiGet(),r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':c.key}});if(!r.ok)return null;
+ const j=await r.json(),ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));
+ return ['gemini-3.5-flash','gemini-flash-latest','gemini-3.1-flash-lite','gemini-3-flash-preview','gemini-2.5-flash'].find(p=>ok.includes(p))||ok.find(n=>/flash/.test(n)&&!/image|tts|live|audio|embed|thinking/.test(n))||null}
+function aiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,90);
+ if(e&&e.message==='nokey')return 'No API key saved.';
+ if(e instanceof TypeError)return 'Cannot reach Google. Check internet, VPN or ad-blocker.';
+ if(e instanceof SyntaxError)return 'AI reply was not understood. Try again.';
+ if(c==='400')return /key/i.test(d)?'API key is not valid. Paste it again.':'Bad request: '+d;
+ if(c==='403')return 'Key not allowed (restricted, blocked, or API not enabled).';
+ if(c==='404')return 'No working Gemini model found for this key. Check the key in Google AI Studio.';
+ if(c==='429')return 'Too many requests or free quota used. Wait 1 minute.';
+ return 'Error '+c+(d?': '+d:'')}
+function judge(t,w,ans,sc){const P={mean:`Word: "${w.word}". Correct meaning: "${w.mean}". Learner's answer: "${ans}". Does the learner's answer show the right meaning?`,sent:`Word: "${w.word}" (meaning: ${w.mean}). Learner's sentence: "${ans}". Check: word used correctly, sentence makes sense, grammar reasonably correct.`,work:`Word: "${w.word}" (meaning: ${w.mean}). Situation: ${sc}. Learner's reply: "${ans}". Check: word used naturally and correctly here, reply makes sense, grammar reasonably correct.`}[t];
+ return gem('You are a kind English teacher for a beginner learner. '+P+' Reply ONLY JSON: {"r":"correct" or "partial" or "wrong","note":"max 20 words, simple English, give the fix if not fully correct"}')}
+function mkQ(ws,off){const TY=Object.keys(TN);return shuf(ws).map((w,i)=>({id:w.id,t:(st.sm&&st.sm[w.id])?'spell':TY[(i+off)%5],s:Math.floor(Math.random()*SC.length)}))}
+function bld(q,w){const W=E(w.word);
+ if(q.t==='mean')return{text:`What does <b>${W}</b> mean?`};
+ if(q.t==='spell')return{text:`Spell the word that means: <b>${E(w.mean)}</b><div class="mu">Hint: starts with "${E(w.word[0])}", ${w.word.length} letters</div>`,x:w.word};
+ if(q.t==='blank'){const re=new RegExp('\\b'+w.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\w*','i'),m=(w.sent||'').match(re);
+  return m?{text:E(w.sent.replace(re,'________'))+`<div class="mu">Hint: ${E(w.mean)}</div>`,x:m[0]}:{text:`________ <div class="mu">Meaning: ${E(w.mean)}</div>`,x:w.word}}
+ if(q.t==='sent')return{text:`Make a sentence using: <b>${W}</b>`};
+ return{text:`${E(SC[q.s])} Use the word <b>${W}</b> naturally.`}}
+async function aiAns(retry){if(aiBusy)return;const v=st.vt,q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i],w=gw(q.id),el=$('#aians'),ans=retry?v.pend:(el?el.value.trim():'');if(!ans)return;
+ v.pend=ans;aiErr=false;let r,note;
+ if(q.t==='spell'||q.t==='blank'){const x=bld(q,w).x,ok=nm(ans)===nm(x)||nm(ans)===nm(w.word);r=ok?'c':'w';note=ok?'Well done!':(q.t==='spell'?'Correct spelling: ':'Correct answer: ')+x}
+ else{aiBusy=true;save();render();try{const o=await judge(q.t,w,ans,SC[q.s]);r={correct:'c',partial:'p',wrong:'w'}[String(o.r).toLowerCase()]||'w';note=String(o.note||'')}catch(e){aiBusy=false;aiMsg=aiWhy(e);aiErr=e.message==='nokey'?'nokey':'fail';render();return}aiBusy=false}
+ const e={id:w.id,t:q.t,r,note,ans,sp:q.t==='spell'&&r==='w'};if(e.sp)st.sm[w.id]=1;
+ (q2?v.log2:v.log).push(e);v.fb=e;v.pend='';save();render()}
+function finMain(v){v.ph='res';v.log.forEach(e=>{if(e.r==='w'||e.sp)st.wh[e.id]=(st.wh[e.id]||0)+1});if(isSun()){const d=st.days[today()]=st.days[today()]||{};d.wd=true}}
+function nextQ(){const v=st.vt;v.fb=null;if(v.ph==='q2'){v.i2++;if(v.i2>=v.q2.length){v.ph='fin';v.log2.forEach(e=>{if(e.t==='spell'&&e.r==='c')delete st.sm[e.id]})}}else{v.i++;if(v.i>=v.q.length)finMain(v)}save();render()}
+function cats(v){const by={},S=[],N=[],K=[];v.log.forEach(e=>by[e.id]=e);Object.values(by).forEach(e=>{const w=gw(e.id);if(!w)return;const f=e.r==='w'||e.sp;if(e.r==='c'&&!e.sp)S.push(w);else if(f&&(st.wh[e.id]||0)>=2)K.push(w);else N.push(w)});return{S,N,K}}
+function aiBegin(){const ws=wkWords(today());if(!ws.length||!aiGet().key)return render();st.sm=st.sm||{};st.wh=st.wh||{};st.vt={wk:mon(today()),ph:'q',q:mkQ(ws,0),i:0,log:[],q2:[],i2:0,log2:[],fb:null,pend:'',rev:[]};save();render()}
+function startRe(){const v=st.vt,c=cats(v),ws=[...c.N,...c.K];v.rev=ws.map(w=>w.id);v.q2=mkQ(ws,1);v.i2=0;v.log2=[];v.ph='q2';v.fb=null;save();render()}
+function aiSaveF(){const k=$('#aik'),m=$('#aim');if(k&&k.value.trim()){aiSet({key:k.value.trim().replace(/^[\"']+|[\"']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())aiSet({model:m.value.trim().replace(/^models\//,'')})}
+async function aiAct(a){const v=st.vt;
+ if(a==='keyeye'){const i=$('#aik'),b=document.querySelector('[data-a=keyeye]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
+ if(a==='aisave'){aiSaveF();toast('✅ API settings saved');render();return}
+ if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
+ if(a==='aistart'){view='ai';animNext=true;render();return}
+ if(a==='aigoset'){view='set';animNext=true;render();return}
+ if(a==='aibegin')return aiBegin();
+ if(a==='aians')return aiAns(false);
+ if(a==='airetry')return aiAns(true);
+ if(a==='ainext')return nextQ();
+ if(a==='airev'){v.ph='rev';save();render();return}
+ if(a==='aiq2')return startRe();
+ if(a==='aiquit'){view='today';animNext=true;render();return}
+ if(a==='aireset'&&confirm('Start the test again from the beginning?')){st.vt=null;save();render()}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='aians'){e.preventDefault();aiAct('aians')}});
+const chipsOf=(ws,c)=>ws.length?`<div class="chips">${ws.map(w=>`<span style="--c:${c}">${E(w.word)}</span>`).join('')}</div>`:'<div class="mu">None 🎉</div>';
+function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
+ if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
+  return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
+ return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><button class="sec" data-a="gow">Add words</button></div>`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div>`:`<div class="card"><h2 style="margin-top:0">✨ Add a new word</h2><input type="text" id="nw" placeholder="Word" autocapitalize="off"><input type="text" id="nm" placeholder="Meaning"><input type="text" id="ns" placeholder="Example sentence"><button data-a="addw">Add word</button></div>`}
+function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
+ return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`}
+function aiHome(){const c=aiGet(),n=wkWords(today()).length;
+ return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!c.key?`<div class="warn">⚠️ Add your Gemini API key in Settings → AI Vocabulary.</div><button data-a="aigoset">Open Settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
+function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
+ let h=`<h1>${q2?'Weak Word Retest':'Sunday AI Vocabulary Test'}</h1><div class="card hero w"><div class="mu">Progress</div><div class="big2">Question ${i+1} / ${L.length}</div><div class="bar" style="margin-top:10px"><i style="width:${i/L.length*100}%"></i></div></div><div class="stats"><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div><div><b>${lg.filter(e=>e.sp).length}</b>Spelling mistakes</div></div><div class="card"><div class="mu">${TN[q.t]}</div><div class="aq">${b.text}</div>`;
+ if(f)h+=`<div class="fb ${f.r}">${{c:'✅ Correct',p:'🟡 Partly correct',w:'❌ Wrong'}[f.r]}<div style="font-weight:500;margin-top:4px">${E(f.note)}</div></div><button data-a="ainext">${i+1>=L.length?'Finish':'Next →'}</button>`;
+ else{h+=`<input type="text" id="aians" placeholder="Your answer" autocomplete="off" autocapitalize="off" spellcheck="false" value="${E(v.pend||'')}" ${aiBusy?'disabled':''}>`;
+  if(aiErr)h+=`<div class="warn">${aiErr==='nokey'?'⚠️ Add your Gemini API key in Settings → AI Vocabulary.':'❌ AI connection failed. Check your API key and internet connection.'}${aiErr==='fail'?'<div class="mu" style="margin-top:4px;font-weight:500">'+E(aiMsg)+'</div>':''}</div><button data-a="airetry">Try Again</button>`+(aiErr==='nokey'?'<button class="sec" data-a="aigoset">Open Settings</button>':'');
+  else h+=`<button data-a="aians" ${aiBusy?'disabled':''}>${aiBusy?'Checking…':'Submit answer'}</button>`}
+ return h+`</div><button class="sec" data-a="aiquit">Save and exit</button>`}
+function vRes(v){const c=cats(v),n=k=>v.log.filter(e=>e.r===k).length,T=v.log.length,sc=Math.round((n('c')+n('p')/2)/T*100),sp=v.log.filter(e=>e.sp),bad=c.N.length+c.K.length;
+ return `<h1>Test Result</h1><div class="card hero w"><div class="mu">🎯 Score</div><div class="big2">${sc}%</div></div><div class="stats"><div><b>${T}</b>Total</div><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div></div>
+ <h2>🟢 Strong words</h2>${chipsOf(c.S,'#34d399')}<h2>🟡 Needs practice</h2>${chipsOf(c.N,'#fbbf24')}<h2>🔴 Weak words</h2>${chipsOf(c.K,'#fb7185')}<h2>✍️ Spelling mistakes</h2>${sp.length?sp.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join(''):'<div class="mu">None 🎉</div>'}`+
+ (bad?`<button data-a="airev" style="margin-top:16px">🔄 Weak Word Revision</button>`:`<div class="card" style="margin-top:16px">🎉 No weak words. Great week!</div>`)+`<button class="sec" data-a="aiquit">Back to Today</button>`}
+function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
+ return `<h1>Weak Word Revision</h1><div class="mu">Read each word. Then say or write one new sentence with it.</div>`+ws.map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean)}</div><div class="mu">Spelling: <b>${E(w.word)}</b></div><div class="mu">Example: ${E(w.sent||'-')}</div><input type="text" placeholder="✍️ Now use it in your own sentence"></div>`).join('')+`<button data-a="aiq2">Start Weak Word Retest</button>`}
+function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
+ return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
+function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
 function editor(s){
  const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
- const L={wo:['Workout','10 min workout'],wd:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
+ const L={wo:['Workout','10 min workout'],wd:sun?['AI Vocabulary Test','AI Vocabulary Test']:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
   fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
  let h=`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
-  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
+  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
  if(showP)h+=privRow(s);
  return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
 
@@ -292,9 +390,9 @@ function checkNotify(){
  st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
 function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
- let h=`<h1>Winter Arc Tracker</h1><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
+ let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=playerCard(s,sk)+motiv(s,sk)+bookCard()+mission(s)+editor(s)+focusCard();
+ h+=playerCard(s,sk)+motiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
  return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
@@ -370,12 +468,12 @@ function vSyl(){
 function vWords(){
  if(test)return vTest();
  const t=today(),n=st.words.filter(w=>w.date===t).length,by={},mis=st.words.filter(w=>w.mistake).length;
- let h=`<h1>Words</h1><div class="card hero w"><div class="mu">Words today</div><div class="big2">${n}<span style="font-size:20px;opacity:.8">/10</span></div><div class="pips">${Array.from({length:10},(_,i)=>`<i class="${i<n?'on':''}" style="--k:${i}"></i>`).join('')}</div></div>`+
- `<div class="stats"><div><b>${st.words.length}</b>Total words</div><div><b>${mis}</b>Mistake list</div></div>`+
- `<div class="card"><h2 style="margin-top:0">✨ Add a new word</h2><input type="text" id="nw" placeholder="Word" autocapitalize="off"><input type="text" id="ns" placeholder="One sentence using the word"><button data-a="addw">Add word</button></div><button class="sec" data-a="tst">🧪 Start Sunday test (last 7 days)</button>`;
+ let h=`<h1>Words</h1><div class="card hero w"><div class="mu">Today's Words</div><div class="big2">${n}<span style="font-size:20px;opacity:.8">/10</span></div><div class="pips">${Array.from({length:10},(_,i)=>`<i class="${i<n?'on':''}" style="--k:${i}"></i>`).join('')}</div></div>`+
+ `<div class="stats"><div><b>${wkWords(today()).length}/${wkTarget(today())}</b>Weekly words</div><div><b>${mis}</b>Mistake list</div></div>`+
+ `${addBox()}`;
  if(!st.words.length)h+=`<div class="empty">📝<br>No words yet.<br><span class="mu">Add your first word above.</span></div>`;
  st.words.forEach(w=>(by[w.date]=by[w.date]||[]).push(w));
- Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div class="mu">${E(w.sent)}</div><label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Mistake list</label></div>`).join('')});
+ Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean||'')}</div><div class="mu">${E(w.sent)}</div><label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Mistake list</label></div>`).join('')});
  return h}
 function vTest(){
  const q=test.q;
@@ -388,11 +486,11 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- document.documentElement.dataset.theme=st.theme||'dark';const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats}[view]();
+ document.documentElement.dataset.theme=st.theme||'dark';const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI}[view]();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
- const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}checkAch()}
+ const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'){const x=$('#aians');if(x)x.focus()}checkAch()}
 
 /* ===== EVENTS ===== */
 document.addEventListener('click',e=>{
@@ -402,9 +500,11 @@ document.addEventListener('click',e=>{
  else if(a==='cm'){calM=v;calSel=null;animNext=true}
  else if(a==='cd')calSel=b.dataset.d;
  else if(a==='addw'){
-  const w=$('#nw').value.trim(),s=$('#ns').value.trim();
-  if(!w||!s)return alert('Add both the word and a sentence.');
-  st.words.push({id:Date.now()+Math.random().toString(36).slice(2,6),date:today(),word:w,sent:s,mistake:false});save()}
+  if(isSun())return alert('Sunday is test day. No new words.');
+  const w=$('#nw').value.trim(),m=$('#nm').value.trim(),s=$('#ns').value.trim();
+  if(!w||!m)return alert('Add the word and its meaning.');
+  if(st.words.filter(x=>x.date===today()).length>=10)return alert('You already added 10 words today. Great job!');
+  st.words.push({id:Date.now()+Math.random().toString(36).slice(2,6),date:today(),word:w,mean:m,sent:s,mistake:false});save()}
  else if(a==='tst'){
   const pool=st.words.filter(w=>w.date>=add(today(),-6));
   if(!pool.length)return alert('No words from the last 7 days.');
@@ -417,6 +517,7 @@ document.addEventListener('click',e=>{
  else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
  else if(a==='ftx'){st.ft=null;save()}
  else if(a==='gr'){grN=+v;animNext=true}
+ else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
  else if(a==='snd'){st.mute=v==='0';save()}
  else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true;animNext=true}
