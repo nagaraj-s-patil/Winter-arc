@@ -154,6 +154,10 @@ html[data-theme=cyber] .hero{background:linear-gradient(135deg,#00382b,#2a0a3d);
 .say{width:110px;height:110px;min-height:0;border-radius:50%;font-size:46px;margin:6px auto;display:block;padding:0;animation:sayp 2s infinite}
 @keyframes sayp{50%{box-shadow:0 0 0 16px rgba(124,58,237,0)}}
 .sperr{color:#fda4af;font-weight:600;margin-top:6px;font-size:14px}
+.mot{border:1px solid rgba(34,211,238,.35)!important;background:linear-gradient(135deg,rgba(34,211,238,.12),rgba(236,72,153,.1))!important}
+.mq{font-size:17px;line-height:1.5;font-weight:600;margin:8px 0 10px}.mq.dim{opacity:.5}
+a.lnk{display:block;text-align:center;margin-top:10px;color:var(--ac);font-weight:700;text-decoration:none}
+.rpd{margin-top:10px;font-size:17px;line-height:1.6}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -268,12 +272,13 @@ const isSun=s=>dow(s||today())===0,mon=s=>add(s,isSun(s)?-6:-(dow(s)-1)),gw=id=>
 const wkWords=s=>{const m=mon(s),e=add(m,5);return st.words.filter(w=>w.date>=m&&w.date<=e)};
 const wkTarget=s=>{const m=mon(s);let n=0;for(let i=0;i<6;i++){const d=add(m,i);if(d>=S0&&d<=E0)n++}return n*10};
 const nm=x=>String(x).trim().toLowerCase().replace(/[.!?,]+$/,''),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
-async function gem(p,retry=1,picked=false){const c=aiGet();if(!c.key)throw new Error('nokey');
+async function gem(p,retry=1,picked=false,feat='other'){const c=aiGet();if(!c.key)throw new Error('nokey');
  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model||'gemini-flash-latest')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':c.key},body:JSON.stringify({contents:[{parts:[{text:p}]}],generationConfig:{responseMimeType:'application/json'}})});
- if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gem(p,retry,true)}}
- if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gem(p,retry-1,picked)}
+ if(r.status===429){const j=await (r.clone?r.clone():r).json().catch(()=>({}));useAdd(feat,0,(j.error&&j.error.message)||'429 Too many requests')}
+ if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gem(p,retry,true,feat)}}
+ if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gem(p,retry-1,picked,feat)}
  if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(r.status+'|'+((j.error&&j.error.message)||r.statusText||''))}
- const j=await r.json(),cd=j.candidates&&j.candidates[0],t=cd&&cd.content&&cd.content.parts?cd.content.parts.map(x=>x.text||'').join(''):'';
+ const j=await r.json();useAdd(feat,j.usageMetadata&&j.usageMetadata.totalTokenCount);const cd=j.candidates&&j.candidates[0],t=cd&&cd.content&&cd.content.parts?cd.content.parts.map(x=>x.text||'').join(''):'';
  if(!t)throw new Error('0|Empty reply'+(cd&&cd.finishReason?' ('+cd.finishReason+')':''));
  return JSON.parse(t.replace(/```json|```/g,'').trim())}
 async function pickModel(){const c=aiGet(),r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':c.key}});if(!r.ok)return null;
@@ -289,7 +294,7 @@ function aiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('
  if(c==='429')return 'Too many requests or free quota used. Wait 1 minute.';
  return 'Error '+c+(d?': '+d:'')}
 function judge(t,w,ans,sc){const P={mean:`Word: "${w.word}". Correct meaning: "${w.mean||'standard meaning'}". Learner's answer: "${ans}". Does the learner's answer show the right meaning?`,sent:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Learner's sentence: "${ans}". Check: word used correctly, sentence makes sense, grammar reasonably correct.`,work:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Situation: ${sc}. Learner's reply: "${ans}". Check: word used naturally and correctly here, reply makes sense, grammar reasonably correct.`}[t];
- return gem('You are a kind English teacher for a beginner learner. '+P+' Reply ONLY JSON: {"r":"correct" or "partial" or "wrong","note":"max 20 words, simple English, give the fix if not fully correct"}')}
+ return gem('You are a kind English teacher for a beginner learner. '+P+' Reply ONLY JSON: {"r":"correct" or "partial" or "wrong","note":"max 20 words, simple English, give the fix if not fully correct"}',1,false,'ai-test')}
 function mkQ(ws,off){const TY=Object.keys(TN);return shuf(ws).map((w,i)=>{let t=(st.sm&&st.sm[w.id])?'spell':TY[(i+off)%5];if(t==='blank'&&!w.sent)t='sent';return{id:w.id,t,s:Math.floor(Math.random()*SC.length)}})}
 function bld(q,w){const W=E(w.word);
  if(q.t==='mean')return{text:`What does <b>${W}</b> mean?`};
@@ -309,11 +314,21 @@ function nextQ(){const v=st.vt;v.fb=null;if(v.ph==='q2'){v.i2++;if(v.i2>=v.q2.le
 function cats(v){const by={},S=[],N=[],K=[];v.log.forEach(e=>by[e.id]=e);Object.values(by).forEach(e=>{const w=gw(e.id);if(!w)return;const f=e.r==='w'||e.sp;if(e.r==='c'&&!e.sp)S.push(w);else if(f&&(st.wh[e.id]||0)>=2)K.push(w);else N.push(w)});return{S,N,K}}
 function aiBegin(){const ws=wkWords(today());if(!ws.length||!aiGet().key)return render();st.sm=st.sm||{};st.wh=st.wh||{};st.vt={wk:mon(today()),ph:'q',q:mkQ(ws,0),i:0,log:[],q2:[],i2:0,log2:[],fb:null,pend:'',rev:[]};save();render()}
 function startRe(){const v=st.vt,c=cats(v),ws=[...c.N,...c.K];v.rev=ws.map(w=>w.id);v.q2=mkQ(ws,1);v.i2=0;v.log2=[];v.ph='q2';v.fb=null;save();render()}
+/* ===== API USAGE ===== */
+const ptDay=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'});
+function useAdd(feat,tok,err){const c=aiGet(),u=c.use||{days:{},total:{n:0,tok:0}},d=ptDay(),r=u.days[d]=u.days[d]||{n:0,tok:0,by:{},f429:0};
+ if(err){r.f429++;u.e429={t:Date.now(),msg:String(err).slice(0,220)}}else{r.n++;r.tok+=tok||0;r.by[feat]=(r.by[feat]||0)+1;u.total.n++;u.total.tok+=tok||0;u.last={t:Date.now(),model:c.model,feat}}
+ const ks=Object.keys(u.days).sort();while(ks.length>14)delete u.days[ks.shift()];aiSet({use:u});const el=document.getElementById('rpdn');if(el)el.innerHTML=rpdHtml()}
+const rpdHtml=()=>{const c=aiGet(),u=c.use||{days:{}},n=(u.days[ptDay()]||{n:0}).n,L=+c.limit||0;
+ return L?`<div class="rpd">Requests Today: <b>${n} / ${L}</b></div><div class="rpd">Remaining: <b>${Math.max(0,L-n)}</b></div>`:`<div class="rpd">Requests Today: <b>${n}</b></div><div class="rpd">Remaining: <span class="mu">enter your RPD limit above</span></div>`};
+function usePanel(){const c=aiGet();
+ return `<div class="card"><h2 style="margin-top:0">📊 API Usage</h2><div class="mu">Google Gemini RPD Limit</div><div style="display:flex;gap:8px"><input type="number" id="ailim" inputmode="numeric" min="0" placeholder="20" value="${+c.limit||''}"><button data-a="ailimsave" style="width:96px;margin:5px 0">Save</button></div><div id="rpdn">${rpdHtml()}</div></div>`}
 function aiSaveF(){const k=$('#aik'),m=$('#aim');if(k&&k.value.trim()){aiSet({key:k.value.trim().replace(/^[\"']+|[\"']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())aiSet({model:m.value.trim().replace(/^models\//,'')})}
 async function aiAct(a){const v=st.vt;
+ if(a==='ailimsave'){const n=Math.round(+($('#ailim').value||0));aiSet({limit:n>0?n:0});toast('✅ Limit saved');render();return}
  if(a==='keyeye'){const i=$('#aik'),b=document.querySelector('[data-a=keyeye]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
  if(a==='aisave'){aiSaveF();toast('✅ API settings saved');render();return}
- if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
+ if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}',1,false,'connection');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
  if(a==='aistart'){view='ai';animNext=true;render();return}
  if(a==='aigoset'){view='set';animNext=true;render();return}
  if(a==='aibegin')return aiBegin();
@@ -332,7 +347,7 @@ function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><div class="two"><button class="sec" data-a="gow">Add words</button><button class="sec" data-a="spstart">🔊 Spelling</button></div></div>`}
 function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
 function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
- return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`}
+ return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
  return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!c.key?`<div class="warn">⚠️ Add your Gemini API key in Settings → AI Vocabulary.</div><button data-a="aigoset">Open Settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
 function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
@@ -363,7 +378,7 @@ function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
 async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
  if(!aiGet().key){toast('Add your Gemini API key in Settings to get meaning and example');return}
  fillBusy=true;render();
- try{const o=await gem('You help an English learner in India (beginner level). For each word below give a very simple meaning (max 10 words) and one short simple example sentence (max 12 words) that uses the exact word. Words: '+JSON.stringify(ws.map(w=>w.word))+'. Reply ONLY a JSON array like [{"word":"...","mean":"...","sent":"..."}]');
+ try{const o=await gem('You help an English learner in India (beginner level). For each word below give a very simple meaning (max 10 words) and one short simple example sentence (max 12 words) that uses the exact word. Words: '+JSON.stringify(ws.map(w=>w.word))+'. Reply ONLY a JSON array like [{"word":"...","mean":"...","sent":"..."}]',1,false,'words');
   const arr=Array.isArray(o)?o:(o.words||[]);let n=0;
   arr.forEach(x=>{const w=ws.find(y=>y.word.toLowerCase()===String(x.word||'').trim().toLowerCase());if(w&&x.mean){w.mean=String(x.mean);w.sent=String(x.sent||'');n++}});
   save();toast('✨ AI wrote meaning and example for '+n+' word'+(n===1?'':'s'))
@@ -397,6 +412,24 @@ function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothin
  if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
  else h+=`<input type="text" id="spans" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
  return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
+/* ===== AI COACH MOTIVATION ===== */
+let motBusy=false,motErr='',motT=null;
+const motSig=s=>s+'|'+cnt(s)+'|'+(new Date().getHours()<12?'m':new Date().getHours()<18?'a':'e');
+function motPrompt(s){const N={wo:'Workout',wd:'Words',sp:'Speaking',fr:'Frappe coding',rd:'Reading'},h=new Date().getHours(),sk=streaks(),g=gstats(),t=(st.days[s]&&st.days[s].t)||{},
+ dn=Math.round((pd(s)-pd(S0))/864e5)+1,
+ day=(d,now)=>{const a=T.filter(k=>isDone(d,k)).map(k=>N[k]),m=T.filter(k=>!isDone(d,k)).map(k=>N[k]);return cnt(d)+'/'+T.length+(a.length?' done: '+a.join(', '):' nothing done')+(m.length?(now?'; not done yet: ':'; missed: ')+m.join(', '):'')},
+ past=[];for(let i=1;i<=7;i++){const d=add(s,-i);if(d<S0)break;past.push(pd(d).toLocaleDateString('en-IN',{weekday:'short'})+' '+d.slice(5)+': '+day(d))}
+ return 'You are a strict but caring personal coach for a learner in a 92-day challenge (Oct 1 to Dec 31). Use ONLY the data below. Write 2 or 3 short sentences in very simple English. Mention one real fact from the data (a streak, a missed task, a good day). Be honest, no fake praise. End with one clear next action for right now. Max 45 words. No hashtags.\nDATA:\nChallenge day '+dn+' of 92. Local time '+h+':00.\nStreak '+sk.cur+' days (best '+sk.best+'). Level '+(g.lv||1)+'.\nToday: '+day(s,true)+'. Frappe minutes today '+(t.fr||0)+'. Words added today '+st.words.filter(w=>w.date===s).length+'/10.\nLast days:\n'+(past.join('\n')||'No past days yet (this is the first day).')+'\nOpen spelling mistakes: '+Object.keys(st.sm||{}).length+'.\nReply ONLY JSON {"msg":"..."}'}
+function aiMotiv(s,sk){const m=st.mot;let b;
+ if(!aiGet().key)b='<div class="mu" style="margin:6px 0">Add your Gemini API key in Settings to get your daily AI coach message.</div><button class="sec" data-a="aigoset">Open Settings</button>';
+ else{b=(m&&m.msg?'<div class="mq'+(motBusy?' dim':'')+'">'+E(m.msg)+'</div>':motBusy?'<div class="mq dim">Your coach is reading your last days…</div>':'')+(motErr&&!motBusy?'<div class="mu" style="margin:6px 0">❌ '+E(motErr)+'</div>':'')+'<button class="sec" data-a="motgo" '+(motBusy?'disabled':'')+'>'+(motBusy?'✨ Thinking…':'🔄 New message')+'</button>';
+  if(s===today()&&!motBusy&&!motErr&&(!m||m.sig!==motSig(s))){clearTimeout(motT);motT=setTimeout(()=>motGo(false),1500)}}
+ return '<div class="card mot" id="motc" style="animation:none"><div class="mu">💬 AI Coach</div>'+b+'</div>'}
+const refreshMot=()=>{const e=$('#motc');if(e&&view==='today')e.outerHTML=aiMotiv(today(),streaks())};
+async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr='';const s=today();motBusy=true;refreshMot();
+ try{const o=await gem(motPrompt(s),1,false,'coach'),msg=String(o.msg||'').trim();if(!msg)throw new Error('0|Empty reply');st.mot={d:s,sig:motSig(s),msg,at:Date.now()};save()}
+ catch(e){motErr=aiWhy(e)}
+ motBusy=false;refreshMot()}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
 function editor(s){
  const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
@@ -441,7 +474,7 @@ function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=playerCard(s,sk)+motiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
+ h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
  return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
@@ -562,6 +595,7 @@ document.addEventListener('click',e=>{
  else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
  else if(a==='ftx'){st.ft=null;save()}
  else if(a==='gr'){grN=+v;animNext=true}
+ else if(a==='motgo'){motGo(true);return}
  else if(a==='say'){sayWord(v);return}
  else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
