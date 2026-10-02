@@ -1,13 +1,51 @@
-# Winter Arc: push setup (5 steps)
+# Winter Arc Tracker
 
-1. Upload everything in this folder to your GitHub repo root (keep the `.github` and `scripts` folders). Turn on GitHub Pages.
-2. Open your site on your phone. Android: Chrome menu > Install app. iPhone (iOS 16.4+): Share > Add to Home Screen, then open from the icon.
-3. In the app: Today > Settings > Turn ON reminders > Allow. Tap **Copy device code**.
-4. GitHub repo > Settings > Secrets and variables > Actions > New secret. Create 3 secrets:
-   - `PUSH_SUBSCRIPTION` = the device code you copied (for 2 devices use a list: `[{...},{...}]`)
-   - `VAPID_PUBLIC` and `VAPID_PRIVATE` = from KEEP-PRIVATE-vapid-keys.txt
-5. Actions tab > Winter Arc push > Run workflow. You should get a notification in a minute.
+A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libraries, no server. Works on phone and desktop. Data stays in your browser.
 
-Schedule: every 2 hours, 6:30 AM to 10:30 PM IST (edit `cron` in `.github/workflows/push.yml`).
-Limits: GitHub can delay a scheduled run by 5-30 min, and pauses schedules after 60 days without repo activity.
-Your old data is stored in your old browser/file. On the new website use Export backup (old) > Import backup (new).
+## Files
+| File | What it is |
+|---|---|
+| `winter-arc-tracker.html` | The whole app. Open it in a browser or host it anywhere. |
+| `winter-arc-push/index.html` | Same app, ready for GitHub Pages (with `sw.js`, `manifest.json`, icons so it can be installed on a phone). |
+| `winter-arc-push/.github`, `scripts/` | Optional push-reminder sender. The reminder screen was removed from the app, so these are not needed. |
+
+## Daily tasks (5)
+💪 Workout · 🔤 Words (Sunday: AI test) · 🎤 Speaking · 💻 Frappe coding · 📖 Reading.
+- Workout, Speaking, Frappe: type minutes. Reading: type pages.
+- Wed and Sun are workout rest days. A "minimum day" counts when you are weak or sick.
+- All 5 done = confetti + chime. A day is green (5/5), yellow (3-4) or red (0-2).
+
+## Screens
+- **Today**: day X of 92, level / XP / streak flame, daily score, **AI Coach**, vocabulary card, book card, today's 5 missions, 25/50/90-min focus timer, backup buttons. The ⚙️ button opens Settings.
+- **Calendar**: coloured month grid. Tap a day to edit it.
+- **Weekly**: workouts, Frappe, speaking, reading days, auto totals (Frappe hours, pages, words), score, copyable Sunday report. Short weeks use their real day count (week 1 = 3 workouts).
+- **Rules**: your 12 rules and daily timetable.
+- **Syllabus**: 26 topics (Oct / Nov / Dec) with a progress ring.
+- **Words**: add words, spelling check, word list.
+- **Stats**: 90-day timeline, 7/30-day graph, 11 badges, theme selector (Dark / Cyber / Minimal), sound on/off.
+- **Private row**: tap the page title 3 times to show or hide it.
+
+## Vocabulary
+- **Mon-Sat**: add up to 10 words a day. Type only the word (or many with commas). **AI writes the meaning and example.** Weekly target is 60 (30 in week 1).
+- **Spelling check**: the app says the word, you type it. Mistakes are marked on the word card (red line) and removed when you spell it right. Keyboard suggestions are switched off.
+- **Sunday (no new words)**: AI Vocabulary Test with 5 question types (Meaning, Spelling by voice, Fill in the blank, Sentence, Workplace) → Result → Weak Word Revision → Retest → Final Result. Progress is saved after every answer.
+
+## AI (Google Gemini)
+- Open Settings (⚙️), paste your Gemini API key, tap **Save**, then **Test API Connection**. Default model: `gemini-flash-latest` (the app finds a working model by itself if Google renames it).
+- AI is used for: word meanings, checking meaning / sentence / workplace answers, and the **AI Coach** message.
+- **AI Coach** (Today): reads your last 7 days, today's tasks, streak, Frappe minutes and words, then writes a short honest message. It refreshes about 1.5 seconds after you tick a task, and when the time of day changes. **🔄 New message** forces a new one. Without a key it shows nothing but a link to Settings. It never shows a made-up local message.
+- **API Usage** (Settings): type your Gemini RPD limit from Google AI Studio and tap Save. The app shows `Requests Today: 1 / 20` and `Remaining: 19` and updates after every request. It counts only requests made by this app in this browser.
+- The AI gets only a short text summary of your progress. It never gets your API key in the summary.
+
+## Data and security
+- Main data: `localStorage` key `winterArc.v1`. **Export backup** saves it as a file, **Import backup** restores it.
+- API key and model: separate key `winterArc.ai.v1`. It is **not** in the backup file.
+- The key is stored in plain text in this browser. Anyone who can open your browser data can read it. **Do not use a personal key on a public website such as GitHub Pages.** Use a restricted or throwaway key.
+- Each website address has its own storage. If you move the file to GitHub Pages, export first, then import there.
+
+## Known limits
+- Dates are fixed to 1 Oct to 31 Dec 2026, using your device clock.
+- Free Gemini quota is limited. If you see "Too many requests", wait a minute.
+- Voice needs a browser that can speak (Chrome works). Phone keyboard suggestions can only be requested off; turn them off in the keyboard settings if they still show.
+- AI meanings can be wrong. Read new word cards.
+- No reminder notifications. Use your phone alarm.
