@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0f1115"><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -158,6 +158,14 @@ html[data-theme=cyber] .hero{background:linear-gradient(135deg,#00382b,#2a0a3d);
 .mq{font-size:17px;line-height:1.5;font-weight:600;margin:8px 0 10px}.mq.dim{opacity:.5}
 a.lnk{display:block;text-align:center;margin-top:10px;color:var(--ac);font-weight:700;text-decoration:none}
 .rpd{margin-top:10px;font-size:17px;line-height:1.6}
+button.tp{background:var(--card);border:1px solid var(--bd);box-shadow:none;text-align:left;display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:66px;border-left:5px solid var(--c,#22d3ee);border-radius:18px;margin:12px 0 0;font-weight:600}
+.tp .ti{font-size:26px}.tp .tm2{flex:1;min-width:0;line-height:1.3}.tp .tm2 b{display:block;font-size:16.5px}.tp .pc2{font-weight:800;color:var(--c)}.tp .chev{transition:transform .2s;color:var(--mu)}.tp.open .chev{transform:rotate(180deg)}
+.tp.done{background:color-mix(in srgb,#34d399 16%,#131530);border-color:rgba(52,211,153,.5)}
+.sub{padding:2px 0 6px 10px;border-left:2px dashed var(--bd);margin-left:16px}.sub .row{min-height:56px;font-size:15.5px;margin:7px 0}
+.nx{border:1px solid rgba(251,191,36,.45)!important;background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(244,114,182,.1))!important}
+.srow{padding:6px 12px}.stl{background:none;border:0;box-shadow:none;flex:1;min-width:0;text-align:left;display:flex;align-items:center;gap:8px;margin:0;padding:0;min-height:48px;font-weight:500;color:var(--tx);font-size:15.5px}
+.stl b{display:block;font-weight:600}.stl .cnt{margin-left:auto;font-weight:700;color:var(--c);font-size:14px}.stl .chev{transition:transform .2s;color:var(--mu)}.srow.open .chev{transform:rotate(180deg)}
+.its{margin:0 0 6px 14px;padding-left:8px;border-left:2px dashed var(--bd)}.its .row{min-height:46px;font-size:14.5px;margin:6px 0;background:var(--card2)}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -195,7 +203,7 @@ const dow=s=>pd(s).getDay();
 const isRest=s=>dow(s)===0||dow(s)===3;                 // Sun + Wed
 const wlab=w=>pd(w).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const WEEKS=[];for(let w='2026-10-04';w<='2026-12-27';w=add(w,7))WEEKS.push(w); // Sundays (must come after helpers)
-let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null,setOpen=false;
+let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null;
 
 /* ===== DAY LOGIC ===== */
 const hm=m=>{m=Math.round(m);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m'};
@@ -322,10 +330,10 @@ function useAdd(feat,tok,err){const c=aiGet(),u=c.use||{days:{},total:{n:0,tok:0
 const rpdHtml=()=>{const c=aiGet(),u=c.use||{days:{}},n=(u.days[ptDay()]||{n:0}).n,L=+c.limit||0;
  return L?`<div class="rpd">Requests Today: <b>${n} / ${L}</b></div><div class="rpd">Remaining: <b>${Math.max(0,L-n)}</b></div>`:`<div class="rpd">Requests Today: <b>${n}</b></div><div class="rpd">Remaining: <span class="mu">enter your RPD limit above</span></div>`};
 function usePanel(){const c=aiGet();
- return `<div class="card"><h2 style="margin-top:0">📊 API Usage</h2><div class="mu">Google Gemini RPD Limit</div><div style="display:flex;gap:8px"><input type="number" id="ailim" inputmode="numeric" min="0" placeholder="20" value="${+c.limit||''}"><button data-a="ailimsave" style="width:96px;margin:5px 0">Save</button></div><div id="rpdn">${rpdHtml()}</div></div>`}
+ return `<div class="card"><h2 style="margin-top:0">📊 API Usage</h2><div class="mu">Daily RPD Limit</div><input type="number" id="ailim" inputmode="numeric" min="0" placeholder="20" value="${+c.limit||''}"><div class="mu" style="margin-top:6px">Requests used today (copy from AI Studio, optional)</div><input type="number" id="aiused" inputmode="numeric" min="0" placeholder="11"><button data-a="ailimsave">Save</button><div id="rpdn">${rpdHtml()}</div></div>`}
 function aiSaveF(){const k=$('#aik'),m=$('#aim');if(k&&k.value.trim()){aiSet({key:k.value.trim().replace(/^[\"']+|[\"']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())aiSet({model:m.value.trim().replace(/^models\//,'')})}
 async function aiAct(a){const v=st.vt;
- if(a==='ailimsave'){const n=Math.round(+($('#ailim').value||0));aiSet({limit:n>0?n:0});toast('✅ Limit saved');render();return}
+ if(a==='ailimsave'){const n=Math.round(+($('#ailim').value||0));aiSet({limit:n>0?n:0});const uv=$('#aiused').value.trim();if(uv!==''){const c=aiGet(),u=c.use||{days:{},total:{n:0,tok:0}},r=u.days[ptDay()]=u.days[ptDay()]||{n:0,tok:0,by:{},f429:0};r.n=Math.max(0,Math.round(+uv)||0);aiSet({use:u})}toast('✅ Saved');render();return}
  if(a==='keyeye'){const i=$('#aik'),b=document.querySelector('[data-a=keyeye]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
  if(a==='aisave'){aiSaveF();toast('✅ API settings saved');render();return}
  if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}',1,false,'connection');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
@@ -443,39 +451,30 @@ function editor(s){
 
 /* ===== TODAY ===== */
 function notifySetup(){
- const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
- const msg=!sup?'Not supported here. iPhone: Share → Add to Home Screen, then open from the icon.':pm==='denied'?'Blocked. Allow notifications for this site in your browser settings.':!on?'Turn ON to get a reminder every 2 hours (6 AM to 11 PM).':n.sub?'✅ Phone push ready. Copy the device code and save it in GitHub (see README).':'Reminders work while this app is open. For closed-app push, open it from your https website.';
- return `<div class="card"><h2 style="margin-top:0">🔔 Notifications</h2><div class="mu">${msg}</div>
- <button class="${on?'dng':'pri'}" data-a="notif">${on?'Turn OFF reminders':'Turn ON reminders'}</button>
- ${on?`<div class="two"><button class="sec" data-a="tnot">Send test</button>${n.sub?'<button class="sec" data-a="csub">Copy device code</button>':'<span></span>'}</div>`:''}
- ${on&&n.next?`<div class="mu" style="margin-top:8px">Next in-app reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>`}
-const VAPID='BCRAi9qZMGFQU0moiQTCXgtxdNuXX3C9MZF0wbU5aYP2luosQLnD-b00rRDuxzBUjaSLDZyTjHsQT1l9uaVAkO8';
-const u8=b=>{const r=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(r),c=>c.charCodeAt(0))};
-async function showN(t,b){const o={body:b,icon:'icon-192.png',badge:'icon-192.png',tag:'winter-arc'};
- const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)return r.showNotification(t,o);new Notification(t,o)}
-async function pushOn(){
- try{
-  if(!('Notification' in window))return alert('Notifications are not supported here. iPhone: Share → Add to Home Screen first.');
-  const p=await Notification.requestPermission();if(p!=='granted')return alert('Notifications are blocked. Allow them in site settings.');
-  let sub=null;const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
-  if(reg&&'PushManager' in window){await navigator.serviceWorker.ready;
-   sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)}))}
-  st.notify={enabled:true,next:Date.now()+72e5,sub:sub?sub.toJSON():null};save();render()
- }catch(e){alert('Could not turn on: '+e.message)}}
-async function pushOff(){
- try{const r=await navigator.serviceWorker.getRegistration(),s=r&&await r.pushManager.getSubscription();if(s)await s.unsubscribe()}catch(e){}
- st.notify={enabled:false,next:0,sub:null};save();render()}
+ const n=st.notify||{enabled:false,next:0};
+ return `<div class="card"><h2 style="margin-top:0">🔔 2-Hour Notifications</h2>
+ <div class="mu">Get a reminder every 2 hours while this tracker is open.</div>
+ <button class="${n.enabled?'dng':'pri'}" data-a="notif">${n.enabled?'Turn OFF reminders':'Turn ON 2-hour reminders'}</button>
+ ${n.enabled&&n.next?`<div class="mu" style="margin-top:8px">Next reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}
+ </div>`;
+}
 function checkNotify(){
- if(!st.notify||!st.notify.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
- if(Date.now()<Number(st.notify.next||0))return;
- const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
- st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
+ if(!st.notify?.enabled)return;
+ if(!('Notification' in window))return;
+ if(Date.now()>=Number(st.notify.next||0)){
+  if(Notification.permission==='granted'){
+   new Notification('Winter Arc Reminder',{body:'2 hours are up. Check your Winter Arc tasks and keep going.'});
+  }
+  st.notify.next=Date.now()+2*60*60*1000; save();
+  if(view==='today')render();
+ }
+}
 function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
  h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
- return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
+ return h+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button>`}
 
 /* ===== CALENDAR ===== */
 function vCal(){
@@ -538,7 +537,95 @@ function vRules(){
 
 /* ===== SYLLABUS ===== */
 const MC={Oct:'oct',Nov:'nov',Dec:'dec'},MF={Oct:'October',Nov:'November',Dec:'December'};
-function vSyl(){
+/* ===== FRAPPE ROADMAP ===== */
+const FR=[
+['🧱','Web, Git and terminal basics','Oct',['~Python basics and OOP|variables, functions, classes, objects','~Files, JSON and errors|read and write files, try/except','JavaScript essentials|functions, objects, async/await, DOM','HTML and CSS basics|forms, layout, a simple page','~SQL basics|SELECT, JOIN, GROUP BY, indexes','Git and GitHub|commit, branch, pull request','Terminal and Linux basics|cd, ls, nano, permissions, ssh']],
+['⚙️','Install and bench','Oct',['Choose your setup|WSL2 or Ubuntu, Docker, or Frappe Cloud for practice','Install bench|Python, Node, MariaDB, Redis, then bench','Create a bench|bench init with the version-16 branch','Create a site|bench new-site, hosts entry, open in browser','Get and install apps|bench get-app, install-app erpnext','Developer mode and VS Code|set developer_mode, open the app folder','Daily bench commands|start, migrate, clear-cache, console, backup']],
+['🧭','How Frappe works','Oct',['Framework, ERPNext, app, site|what each one is and how they connect','App folder structure|hooks.py, modules.txt, patches.txt, module folders','Metadata idea|one DocType gives table, form, list and API','Request flow|nginx, gunicorn, Frappe, MariaDB, Redis','Workers and scheduler|background jobs and timed tasks','Create your first app|bench new-app and install it on your site']],
+['🧩','DocTypes','Nov',['Create a DocType|module, fields, save, see the form','Field types|Data, Link, Select, Date, Currency, Table','Naming rules|autoname, naming series, field name','Child tables|table fields, parent and child rows','Single, Tree and Submittable|settings pages, hierarchies, docstatus','Field logic|depends_on, mandatory_depends_on, read_only','Customize Form and Custom Fields|change ERPNext safely, no core edits','List and form settings|title field, search fields, list columns']],
+['🔐','Roles and permissions','Nov',['Roles and users|create users, give roles','DocType permissions|read, write, create, submit, cancel','Permission levels|hide fields from some roles','User permissions|restrict records by value, such as Company','Sharing and owner rules|if_owner, share one document','Test as another user|log in as a test user and check access']],
+['🐍','Server scripts (Python)','Nov',['Controller class|the .py file of a DocType','Document events|validate, before_save, on_update, on_submit','Create and read documents|get_doc, new_doc, insert, save','frappe.db|get_value, get_all, set_value, exists','Query Builder|frappe.qb and safe SQL, no string joins','Messages and errors|frappe.throw, msgprint, validation patterns','Utils|getdate, nowdate, flt, cint, add_days']],
+['🖱️','Client scripts (JS)','Nov',['Form events|frappe.ui.form.on, refresh, onload, validate','The frm object|set_value, set_df_property, toggle_display','Filters|set_query for Link fields','Custom buttons|add_custom_button and groups','Dialogs and prompts|frappe.ui.Dialog, frappe.prompt, confirm','Call the server|frappe.call and frappe.db.get_value','Child table events|row add, field change inside a table','List view scripts|listview_settings and indicators']],
+['📊','Reports and print','Nov',['Report Builder|no-code reports from any DocType','Query Report|a SQL report with filters','Script Report|Python and JS report with columns and filters','Charts and number cards|dashboard charts, KPI cards','Workspace and dashboard|build a home page for a module','Print Formats|Jinja print format, letterhead','Email templates|reuse text in emails and notifications']],
+['🔄','Workflows and automation','Nov',['Workflow|states, transitions, allowed roles','Assignment Rule and ToDo|auto-assign work to people','Notifications|email or system alert on events','Auto Repeat|repeat documents on a schedule','Background jobs|frappe.enqueue for slow work','Webhooks|send data to another system']],
+['🪝','Hooks and app config','Dec',['doc_events|run code when any DocType changes','scheduler_events|daily, hourly and cron jobs','Fixtures|export custom fields and settings with your app','Include JS and CSS|app_include_js, doctype_js','Override and extend|override_whitelisted_methods, extend_doctype_class','Permission hooks|has_permission, permission_query_conditions','Install hooks and patches|after_install, patches.txt migrations']],
+['🧪','Jinja and web pages','Dec',['Jinja basics|variables, loops, filters, if','Jinja in print formats|frappe.get_doc, formatting values','Web Form|let users submit data from the website','Portal pages|www folder, context, templates','Web Page and routes|simple website pages']],
+['🌐','REST API and integrations','Dec',['Whitelisted methods|@frappe.whitelist and /api/method','REST resource API|/api/resource GET, POST, PUT, DELETE','API key and secret|token authentication','Test with Postman|call your own site','Call other APIs|requests library and error handling','Data Import and Export|bulk upload from CSV','OAuth overview|login with other services']],
+['🏪','ERPNext basics','Dec',['Selling flow|Lead, Opportunity, Quotation, Sales Order','Delivery and invoice|Delivery Note, Sales Invoice, Payment Entry','Customer, Item, Price List|master data and taxes','Stock and accounts overview|just the basics','Customize ERPNext properly|own app, no core edits','Sales reports|the reports sales teams use']],
+['🛠️','Testing, debug and deploy','Dec',['bench console and execute|try code on a live site','Logs and Error Log|find and read errors','Unit tests|FrappeTestCase, bench run-tests','Performance basics|indexes, caching, avoid query loops','Backup, restore, update|bench backup, restore, update','Production and Frappe Cloud|nginx, supervisor, or hosted']],
+['🚀','Projects and jobs','Dec',['Library Management tutorial|official Frappe tutorial','Project 2: Sales Lead Tracker|DocTypes, scripts, report, workflow, print','Project 3: custom app on GitHub|clean code and a README','Resume and LinkedIn|add Frappe skills and projects','Interview practice|DocTypes, hooks, permissions, API questions','Apply to 10 jobs|send 10 applications']],
+['🐍','Python deep dive','Oct',['Setup and first program|python, pip, venv, run a script','Variables and data types|numbers, strings, booleans, None','Operators|math, compare, logic, membership','Strings|slicing, methods, formatting','Conditions|if, elif, else, match','Loops|for, while, range','Lists and tuples|ordered collections','Dictionaries and sets|key-value and unique items','Functions|def, return, arguments, scope','Built-in functions|len, sorted, map, any, all','Modules and packages|import, your own modules','File handling|text files, csv, paths','JSON and data formats|json, csv, API data','Errors and exceptions|try, except, raise','OOP: classes and objects|class, init, self, properties','OOP: inheritance and more|super, polymorphism, abc','Special methods and decorators|dunder methods, decorators','Iterators and generators|iter, next, yield','Useful standard modules|datetime, collections, re, os','Packages and APIs|pip, requests, environment variables','Testing and debugging|tracebacks, pdb, unittest, pytest','Practice projects|apply everything'],-2],
+['🗄️','SQL deep dive','Oct',['Database basics|tables, rows, keys','SELECT basics|read data','Filtering with WHERE|conditions','Sorting and limiting|ORDER BY, LIMIT','SQL functions|string, number, date, CASE','Aggregation|COUNT, SUM, AVG, GROUP BY','Changing data|INSERT, UPDATE, DELETE','Creating tables|CREATE, constraints, ALTER','JOINs|combine tables','Subqueries and CTEs|queries inside queries','Window functions|ranking, running totals','Design and normalization|good table design','Indexes and speed|why queries are slow','SQL from Python|connect and query','SQL practice|apply everything'],-1]];
+let syTab='job',syOpen={},fsOpen={},syInit=false;
+const MCOL={Oct:'#22d3ee',Nov:'#a78bfa',Dec:'#f472b6'};
+const FI=[
+['variables and data types;if / else and loops;functions and arguments;lists, dicts, sets;string methods and f-strings;classes and objects;init, self and methods;inheritance and super','open, read, write files;the with statement;json load and dump;try / except / finally;raise your own errors;pathlib basics','let, const, arrow functions;arrays: map, filter, forEach;objects and destructuring;callbacks and promises;async / await and fetch;DOM select and events','tags, forms, inputs;div, span, semantic tags;CSS selectors and box model;flexbox layout;build one simple page','SELECT and WHERE;ORDER BY and LIMIT;INSERT, UPDATE, DELETE;JOIN (inner, left);GROUP BY and COUNT;what an index is','git init, add, commit;branches and merge;push and pull;pull request flow;write a .gitignore;fix a merge conflict','cd, ls, pwd, mkdir;cp, mv, rm carefully;nano or vim basics;file permissions chmod;apt install and services;ssh into a server'],
+['what WSL2 or Ubuntu means;the Docker option;the Frappe Cloud trial option;pick one and write it down','update system packages;Python and pip;Node and yarn;MariaDB setup;Redis;install bench with pip','bench init command;the version-16 branch;folders: apps, sites, env;start the bench once','bench new-site;set the admin password;add the site to hosts;bench use site;login at localhost:8000','bench get-app;bench install-app;install ERPNext;list apps on a site','set developer_mode in site config;open the folder in VS Code;Python extension;debug with print and logs','bench start;bench migrate;bench clear-cache;bench build;bench console;bench backup'],
+['Frappe Framework is the base;ERPNext is an app on top;a bench holds many apps;a site is one database','hooks.py purpose;modules.txt;patches.txt;module folder with doctype folders;public and www folders','DocType JSON describes everything;one DocType gives form and list;every DocType gets a REST API;read one DocType JSON file','browser to nginx;gunicorn runs Frappe;MariaDB stores data;Redis for cache and queue;draw the flow on paper','background worker queues;short, default, long queues;scheduler runs timed jobs;check Scheduled Job Log','bench new-app;app name and module;install-app on your site;see it in the Apps list;push it to a GitHub repo'],
+['open the DocType list;click New;add 3 fields;set the module and save;open the form','Data, Text, Int, Float;Select with options;Link to another DocType;Date and Datetime;Currency;Table (child)','autoname options;naming series pattern;field:fieldname naming;prompt naming;set the title field','make a child DocType;add a Table field in the parent;add rows in the form;read rows in code','Single DocType for settings;Tree DocType (parent field);Submittable and docstatus 0, 1, 2;submit and cancel flow','depends_on expression;mandatory_depends_on;read_only_depends_on;hidden and read only;default values','the Customize Form screen;add a Custom Field to an ERPNext DocType;what a Property Setter is;why you never edit core','in list view option;title field;search fields;sort order;quick entry'],
+['create a user;assign roles;System Manager vs normal user;role profile','the permission matrix;read, write, create;submit, cancel, amend;delete and export','perm level 0, 1, 2;set the perm level on a field;grant a role per level','add a User Permission;restrict by Company;apply to all DocTypes toggle;test the result','the if_owner option;the Share button;read vs write share;when to use each','create a test user;log in as that user;check list and form access;fix a missing permission'],
+['open the .py file;class extends Document;add a method;call it with frappe.get_doc','validate vs before_save;on_update;before_submit and on_submit;on_cancel;order of events','frappe.get_doc;frappe.new_doc;doc.insert();doc.save();frappe.delete_doc','db.get_value;db.get_all and get_list;db.set_value;db.exists;db.count','frappe.qb.from_;select and where;joins;why to avoid string SQL;parameterized db.sql','frappe.throw;frappe.msgprint;ValidationError;frappe.log_error','getdate and nowdate;add_days and date_diff;flt and cint;fmt_money'],
+['frappe.ui.form.on;the refresh event;onload;validate and before_save;field change event','frm.set_value;frm.doc fields;set_df_property;toggle_display;refresh_field','frm.set_query;filter by another field;query for a child table field','add_custom_button;button groups;show only when saved;style the button','frappe.ui.Dialog fields;frappe.prompt;frappe.confirm;read values and submit','frappe.call with a method;pass args and handle the callback;frappe.db.get_value on client;show a freeze message','form_render and add rows;field change inside a child table;frappe.model.set_value;totals from rows','frappe.listview_settings;add_fields;get_indicator colors;onload button'],
+['create a report from a DocType;pick columns;filters and group by;save and share','write the SQL;filters with %(name)s;column format strings;add a chart','execute(filters) function;get_columns;get_data;JS filters file;return a chart','Dashboard Chart (count, sum);Number Card;add to a Workspace;refresh settings','create a Workspace;add shortcuts;add a chart and cards;set roles','Print Format Builder;custom HTML with Jinja;letterhead;check the PDF','Email Template DocType;Jinja in a template;use it in the Email dialog;use it in a Notification'],
+['states and doc status;transitions and actions;allowed roles;the workflow state field','set up an Assignment Rule;round robin vs load balancing;the ToDo list;test it','Notification DocType;event types;condition expression;email and system alerts','create an Auto Repeat;frequency;start and end date;check the generated documents','frappe.enqueue;queue and timeout;check the RQ job;when to use it','Webhook DocType;trigger event;request body with Jinja;test with webhook.site'],
+['doc_events in hooks.py;method path string;a before_save example;the wildcard *','daily and hourly events;cron expression;write the job function;test the job in bench console','fixtures in hooks.py;filters for Custom Field;bench export-fixtures;commit to git','app_include_js;doctype_js for one form;page_js;build assets','override_whitelisted_methods;override_doctype_class;extend_doctype_class;when hooks are better','the has_permission hook;permission_query_conditions;test with another role','after_install;patches.txt entry;write a patch;bench migrate runs patches'],
+['double braces output;if and for blocks;filters;comments','doc.field access;loop over doc.items;format_currency and format_date;page breaks','create a Web Form;pick fields;login required;thank you page','the www folder;html and py files;get_context;route from the file name','the Web Page DocType;route;rich content;Website Settings'],
+['@frappe.whitelist;call /api/method/path;allow_guest warning;return JSON','GET a list;GET one document;POST to create;PUT to update;DELETE','generate keys on the User;Authorization token header;rotate keys;keep the secret safe','make a request;set headers;read the response;save a collection','requests.get and post;timeout and errors;parse JSON;keep API keys in settings','download the template;fill the CSV;run Data Import;fix errors','what OAuth is;Social Login Key;OAuth Client;when you need it'],
+['Lead;Opportunity;Quotation;Sales Order;who does what','Delivery Note;Sales Invoice;Payment Entry;links between documents','create a Customer;create an Item;Price List;Tax templates','Warehouse;stock ledger idea;chart of accounts overview;GL entry in one line','use a custom app for changes;Custom Field with fixtures;hooks over core edits;upgrade safety','Sales Analytics;Sales Register;pipeline report;build one custom report'],
+['bench console;test a frappe.get_doc call;bench execute method;frappe.db.rollback','the Error Log DocType;the logs folder;read a traceback;frappe.log_error','FrappeTestCase class;write one test;bench run-tests;test records','add a db index;avoid queries in loops;frappe.cache;slow query log','bench backup;bench restore;bench update;check the version before updating','bench setup production;nginx and supervisor idea;SSL with certbot;Frappe Cloud steps'],
+['create the app;Article and Member DocTypes;Membership and Loan;scripts and portal','list requirements;DocTypes: Lead and Follow-up;server validation;client buttons;report and print;workflow','new app on GitHub;clean folder structure;README with screenshots;deploy notes','list your Frappe skills;describe 3 projects;add the GitHub link;ask for feedback','DocType types;hooks list;permissions flow;REST API;explain a project aloud','make a job list;tailor your resume;send applications;track replies'],
+['install Python and check the version;run a script in terminal and VS Code;print and input;comments and docstrings;virtual environments (venv);install packages with pip','int, float, complex;str, bool, NoneType;type() and isinstance();type conversion;variable naming rules;dynamic typing and id()','arithmetic operators;comparison operators;logical and, or, not;assignment and augmented assignment;membership: in, not in;identity: is, is not;operator precedence','indexing and slicing;upper, lower, strip, split, join;find, replace, startswith, endswith;f-strings and format();escape sequences and raw strings;strings are immutable;multiline strings','if / elif / else;nested conditions;ternary expression;truthy and falsy values;match statement','for loop and range();while loop;break, continue, pass;for-else;nested loops;enumerate and zip','list indexing and slicing;append, insert, remove, pop;sort and sorted;list comprehension;tuples and unpacking;copy vs deepcopy;nested lists','create, read, update a dict;get, items, keys, values;dict comprehension;nested dicts;set operations: union, intersection;frozenset;count things with a dict','def and return;positional and keyword arguments;default values;*args and **kwargs;scope: local, global, nonlocal;docstrings and type hints;recursion;lambda functions','len, abs, round, divmod;min, max, sum;sorted with key;map and filter;any and all;reversed','import and from import;own module in a file;the __name__ == "__main__" check;packages and __init__.py;random, math, datetime tour;requirements.txt','open modes: r, w, a;the with statement;read, readline, readlines;csv reader and writer;pathlib and os.path;binary files basics','json.load and json.dump;json.loads and json.dumps;nested JSON;pretty printing;read an API response','try / except / else / finally;catch specific errors;raise and custom exceptions;common errors: TypeError, KeyError, ValueError;assert;logging basics','define a class;init and self;instance vs class attributes;methods;__str__ and __repr__;@property getters and setters','single inheritance and super();method overriding;multiple inheritance and MRO;polymorphism;encapsulation: _ and __;abstract classes (abc);composition vs inheritance','@classmethod and @staticmethod;dunder methods: __len__, __eq__, __add__;write a decorator;functools.wraps;context managers: __enter__, __exit__','iterable vs iterator;__iter__ and __next__;generator functions with yield;generator expressions;itertools basics','datetime and timedelta;collections: Counter, defaultdict, deque;regular expressions (re) basics;random and secrets;os and sys','requests: GET and POST;status codes and headers;parse JSON responses;environment variables;pip freeze;read a library doc page','read a traceback;print and logging debugging;pdb basics;assert statements;unittest or pytest basics;write one test','CLI to-do app;file organizer script;number guessing game;contact book with JSON;Project 1: lead tracker CLI;push a project to GitHub'],
+['what a database and RDBMS are;tables, rows, columns;primary key;foreign key;data types;install MariaDB or MySQL','SELECT columns;SELECT *;aliases with AS;DISTINCT;LIMIT and OFFSET;comments in SQL','comparison operators;AND, OR, NOT;IN and BETWEEN;LIKE and wildcards;IS NULL and IS NOT NULL;operator order','ORDER BY asc and desc;sort by many columns;LIMIT top N;pagination idea','string: CONCAT, UPPER, SUBSTRING;number: ROUND, ABS, CEIL;date: NOW, DATE_ADD, DATEDIFF;CASE WHEN;COALESCE and IFNULL;CAST','COUNT, SUM, AVG, MIN, MAX;GROUP BY;HAVING vs WHERE;COUNT(DISTINCT);group by many columns','INSERT one and many rows;UPDATE with WHERE;DELETE with WHERE;TRUNCATE vs DELETE;test with SELECT first;transactions: COMMIT, ROLLBACK','CREATE TABLE;NOT NULL, UNIQUE, DEFAULT;PRIMARY KEY and AUTO_INCREMENT;FOREIGN KEY;ALTER TABLE;DROP TABLE carefully','INNER JOIN;LEFT JOIN;RIGHT JOIN;FULL JOIN idea;self join;join three tables;find rows with no match','subquery in WHERE;subquery in FROM;EXISTS and NOT EXISTS;correlated subquery;WITH (CTE);UNION and UNION ALL','OVER and PARTITION BY;ROW_NUMBER;RANK and DENSE_RANK;running SUM;LAG and LEAD','one-to-many;many-to-many with a link table;1NF, 2NF, 3NF;ER diagram basics;naming rules','what an index is;create an index;EXPLAIN a query;when indexes hurt;avoid SELECT *;composite index idea','connect with a library;run SELECT and fetch rows;parameterized queries, no string joins;insert from Python;close connections;SQLite with sqlite3','solve 20 SELECT problems;solve 10 JOIN problems;solve 10 GROUP BY problems;design a Lead Tracker schema;write queries for it']];
+function frSet(a,k,on){st.fs=st.fs||{};st.fi=st.fi||{};const sub=a==='fi'?k.replace(/_\d+$/,''):k,p=sub.slice(1).split('_'),n=FI[+p[0]][+p[1]].split(';').length,ids=[...Array(n).keys()].map(x=>sub+'_'+x);
+ ids.forEach(x=>{if(st.fi[x]===undefined)st.fi[x]=!!st.fs[sub]});
+ if(a==='fi')st.fi[k]=on;else ids.forEach(x=>st.fi[x]=on);
+ st.fs[sub]=ids.every(x=>st.fi[x])}
+const frAll=()=>{const F=st.fs||{},I=st.fi||{};return FR.map((t,i)=>{let nt=0,nd=0;const subs=[];t[3].forEach((x,j)=>{if(x[0]==='~')return;const p=x.split('|'),id='f'+i+'_'+j,its=FI[i][j].split(';').map((y,k)=>{const q=id+'_'+k;return{id:q,t:y,d:I[q]!==undefined?!!I[q]:!!F[id]}}),c=its.filter(z=>z.d).length;nt+=its.length;nd+=c;subs.push({id,t:p[0],h:p[1],its,c,d:c===its.length})});return{i,o:t[4]!==undefined?t[4]:i,ic:t[0],n:t[1],m:t[2],subs,nt,nd,d:subs.filter(s=>s.d).length}}).sort((a,b)=>a.o-b.o)};
+function vFrappe(){const A=frAll(),T2=A.reduce((a,t)=>a+t.nt,0),D2=A.reduce((a,t)=>a+t.nd,0),SB=A.reduce((a,t)=>a+t.subs.length,0),SD=A.reduce((a,t)=>a+t.d,0),pc=Math.round(D2/T2*100),tc=A.filter(t=>t.d===t.subs.length).length,
+ day=Math.max(1,Math.min(92,Math.round((pd(clamp(today()))-pd(S0))/864e5)+1)),ex=Math.round(day/92*100),nxt=A.find(t=>t.d<t.subs.length),ns=nxt&&nxt.subs.find(s=>!s.d),ni=ns&&ns.its.find(z=>!z.d);
+ if(!syInit){syInit=true;if(nxt){syOpen[nxt.i]=true;fsOpen[ns.id]=true}}
+ let h=`<div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe roadmap</div><div class="big2">${D2}/${T2}</div><div class="mu">study points done · ${SD}/${SB} subtopics · ${tc}/${A.length} topics</div></div></div>`+
+ `<div class="mu" style="margin:6px 2px">Pace: ${ex}% expected by today · you are at ${pc}% · ${pc>=ex?'✅ on track':'⚠️ catch up'}</div><div class="chips">${['Oct','Nov','Dec'].map(m=>{const ts=A.filter(t=>t.m===m);return `<span style="--c:${MCOL[m]}">${m} ${ts.reduce((a,t)=>a+t.nd,0)}/${ts.reduce((a,t)=>a+t.nt,0)}</span>`}).join('')}</div>`+
+ (ni?`<div class="card nx"><div class="mu">▶ Study this next</div><div style="font-size:18px;font-weight:700;margin:4px 0">${E(ni.t)}</div><div class="mu">in ${E(ns.t)} · ${E(nxt.n)}</div><button data-a="synext" data-v="${nxt.i}|${ns.id}">Open it</button></div>`:`<div class="card nx">🎉 Roadmap complete. Now build and apply!</div>`);
+ A.forEach(t=>{const n=t.subs.length,p=Math.round(t.nd/t.nt*100),dn2=t.d===n,c='t-'+MC[t.m];
+  h+=`<button class="tp ${c} ${syOpen[t.i]?'open':''} ${dn2?'done':''}" data-a="syo" data-v="${t.i}"><span class="ti">${dn2?'✅':t.ic}</span><span class="tm2"><b>${E(t.n)}</b><span class="mu">${t.d}/${n} subtopics · suggested ${t.m}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+  if(syOpen[t.i])h+=`<div class="sub">`+t.subs.map(s=>`<div class="row srow ${c} ${fsOpen[s.id]?'open':''}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="fso" data-v="${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.h)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">▾</span></button></div>`+(fsOpen[s.id]?`<div class="its">`+s.its.map(z=>`<label class="row ${c}"><input type="checkbox" data-a="fi" data-k="${z.id}" ${z.d?'checked':''}><span>${E(z.t)}</span></label>`).join('')+`</div>`:'')).join('')+`</div>`});
+ return h+`<div class="card" style="margin-top:18px"><b>📚 Where to study</b><div class="mu" style="margin-top:4px">Frappe is not a first step into programming, so finish Python and SQL first. Use Frappe version 16.</div><a class="lnk" href="https://docs.frappe.io/framework" target="_blank" rel="noopener">Frappe Framework docs ↗</a><a class="lnk" href="https://school.frappe.io" target="_blank" rel="noopener">Frappe School (free courses) ↗</a></div>`}
+/* ===== JOB PLAN (14 weeks) ===== */
+const JP=[
+['Setup and warm-up','A working Python, Git and terminal setup on your own computer.','Follow your timetable: 70 minutes a day. Write your own one-page cheat sheet for terminal and Git commands.','Create a GitHub repo and push your first Python script.','0.6;0.5;15.0'],
+['Python core','Write small Python programs without looking at your notes.','Test-out rule: for each subtopic do 3 small exercises from memory. Pass = tick it and move on. Fail = study only that point, then retry.','Solve 15 beginner problems (strings, lists, dicts, functions) and push them to GitHub.','15.1-9'],
+['Python files, errors and OOP','Build programs with classes that save data to files.','Learn classes by building one thing: a Lead class with add, list and save to JSON. Read every error message slowly.','A class-based program that saves leads to a JSON file.','15.10-16'],
+['SQL and Project 1','Write SQL from memory and use it from Python.','Use your SQL books for syntax. Practise on a real leads table, not by reading. Connect Project 1 to SQLite.','Project 1: Python CLI Lead Tracker with SQLite, on GitHub with a README.','16.0-10;15.21'],
+['SQL finish, JavaScript and web basics','Finish SQL. Know enough JavaScript for Frappe client scripts.','Learn only the JavaScript Frappe needs: functions, objects, arrays, async. Keep HTML and CSS light: one page is enough.','One HTML page with a JS button that calls a public API and shows the data.','16.12-14;0.2;0.3;15.18;15.19'],
+['Install Frappe and understand it','Frappe and ERPNext running on your machine, and you can explain what each part is.','Install from the official docs, step by step. If you are stuck for more than 45 minutes, use Frappe Cloud or Docker and move on.','Bench running with a site and ERPNext installed. Take a screenshot.','1.0-6;2.0-2'],
+['How Frappe works and first DocTypes','Understand the request flow and create your first DocTypes.','Read one DocType JSON file line by line. Build first, then read the docs for each field you used.','Your first app with two DocTypes (Lead and Follow-up) linked by a child table.','2.3-5;3.0-4'],
+['DocTypes, permissions and Python basics','Finish DocTypes, control access, and write server-side validation.','Break things on purpose: remove a permission and see what changes. Always test as a second user.','A validation in Python (follow-up date cannot be in the past), tested with 2 roles.','3.5-7;4.0-3;5.0-2'],
+['Server and client scripts','Make forms smart with Python and JavaScript.','Write every script yourself. Read one standard ERPNext script for ideas.','A custom button on Lead that creates a Follow-up, and a filter on a Link field.','5.3-6;6.0-3'],
+['Client finish, reports and workflows','Reports, print formats and workflows for your app.','Copy the idea, not the code: look at one standard ERPNext report and workflow, then build your own.','A Script Report, a Print Format and a Workflow (Open, Contacted, Won, Lost) in your app.','6.4-6;7.0-2;7.5;8.0-2'],
+['Hooks and APIs','Run code automatically and expose your own API.','Test every function in bench console before putting it in hooks.py. Test the API in Postman.','A doc_event that sets a field, a daily scheduled job, and one whitelisted API tested in Postman.','9.0-4;11.0-3'],
+['Integrations, ERPNext and testing','Know ERPNext selling flow, call other APIs and write tests.','Run one full flow end to end: Lead, Quotation, Sales Order in ERPNext. Then connect it to your app.','Your app works with ERPNext data, and has 3 passing tests.','11.4;11.5;12.0;12.1;12.2;12.4;13.0;13.1;13.2;13.4'],
+['Portfolio project and deploy','One finished project that a recruiter can open and understand.','Make it look finished: clean names, README with screenshots, a 2 minute demo video. This is what recruiters see.','Project 2 (Sales Lead Tracker) on GitHub with README, screenshots and demo. Resume and LinkedIn updated.','14.1;14.2;13.5;14.3'],
+['Interviews and applications','Explain your skills clearly and apply every day.','Practise aloud in simple English: DocTypes, hooks, permissions, REST API and your project. Apply every day.','Send 10 applications and do 3 mock interviews.','14.4;14.5']];
+let jOpen={},jInit=false;
+const jpSubs=s=>s.split(';').flatMap(tk=>{const p=tk.split('.'),r=p[1].split('-'),lo=+r[0],hi=r[1]!==undefined?+r[1]:lo;return Array.from({length:hi-lo+1},(_,k)=>'f'+p[0]+'_'+(lo+k))});
+function jpWeeks(){const a=[S0];let m=S0;while(dow(m)!==1)m=add(m,1);for(;m<=E0;m=add(m,7))a.push(m);return a.slice(0,JP.length).map((x,i,r)=>({a:x,b:i<r.length-1?add(r[i+1],-1):E0}))}
+function vJob(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({ti:t.i,tn:t.n},s)}));
+ const W=jpWeeks(),td=clamp(today()),cur=Math.max(0,W.findIndex(w=>td>=w.a&&td<=w.b)),J=st.jd||{},fmt=d=>pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
+ ids=JP.map(w=>jpSubs(w[4]).filter(x=>M[x])),used=new Set(ids.flat()),pts=a=>a.reduce((n,x)=>n+M[x].its.length,0),dn=a=>a.reduce((n,x)=>n+M[x].c,0),
+ pc=Math.round(dn([...used])/pts([...used])*100),cps=JP.filter((_,i)=>J['w'+i]).length,bonus=Object.keys(M).filter(x=>!used.has(x)).length;
+ if(!jInit){jInit=true;jOpen[cur]=true}
+ let h=`<div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe developer job plan</div><div class="big2">Week ${cur+1}/${JP.length}</div><div class="mu">${cps}/${JP.length} checkpoints done</div></div></div>`+
+ `<div class="chips">${[[0,5,'Foundations','#22d3ee'],[5,10,'Frappe core','#a78bfa'],[10,14,'Build and apply','#f472b6']].map(p=>{const x=ids.slice(p[0],p[1]).flat();return `<span style="--c:${p[3]}">${p[2]} ${Math.round(dn(x)/pts(x)*100)}%</span>`}).join('')}</div>`+
+ `<div class="card nx"><b>⏱ Reality check</b><div class="mu" style="margin-top:4px">Your timetable gives about 8.5 hours of coding a week, about 110 hours in total. This plan fits only because it skips bonus topics. If you fall behind, cut Python and SQL revision first. Never cut Weeks 6 to 13.</div><div class="mu" style="margin-top:6px">📨 Send your first 3 applications from ${fmt(W[11].a)} if you are on track. Apply to 10 or more from ${fmt(W[12].a)}.</div></div>`;
+ JP.forEach((w,i)=>{const a=ids[i],p=Math.round(dn(a)/pts(a)*100),ok=p===100&&J['w'+i],c='t-'+(i<5?'oct':i<10?'nov':'dec');
+  h+=`<button class="tp ${c} ${jOpen[i]?'open':''} ${ok?'done':''}" data-a="jw" data-v="${i}"><span class="ti">${ok?'✅':i===cur?'📍':'🗓'}</span><span class="tm2"><b>Week ${i+1}: ${E(w[0])}</b><span class="mu">${fmt(W[i].a)} to ${fmt(W[i].b)}${i===cur?' · THIS WEEK':''}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+  if(jOpen[i])h+=`<div class="sub"><div class="card" style="margin:8px 0"><div class="mu">🎯 Goal</div><div>${E(w[1])}</div><div class="mu" style="margin-top:8px">🛠 How to study</div><div>${E(w[2])}</div></div>`+
+   a.map(x=>{const s=M[x];return `<div class="row srow ${c}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="jgo" data-v="${s.ti}|${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">›</span></button></div>`}).join('')+
+   `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
+ return h+`<div class="card" style="margin-top:18px"><b>⭐ Bonus: ${bonus} subtopics are not in the plan</b><div class="mu" style="margin-top:4px">Window functions, iterators, Jinja and web pages, Webhooks, OAuth, performance and more. Study them after you start applying. Find them in All topics.</div></div>`}
+function vSyl(){const T=[['job','🎯 Job plan'],['fr','All topics'],['plan','Monthly plan']];return '<h1>Syllabus</h1><div class="tabs">'+T.map(x=>'<button class="'+(syTab===x[0]?'on':'')+'" data-a="sytab" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+(syTab==='job'?vJob():syTab==='fr'?vFrappe():vPlan().replace('<h1>Syllabus</h1>',''))}
+function vPlan(){
  const ks=Object.keys(SY),tot=ks.reduce((a,m)=>a+SY[m].length,0),dn=ks.reduce((a,m)=>a+SY[m].filter((_,i)=>st.syl[m+i]).length,0),pc=Math.round(dn/tot*100);
  let h=`<h1>Syllabus</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Your learning path</div><div class="big2">${dn}/${tot}</div><div class="mu">topics completed</div></div></div>`;
  ks.forEach(mo=>{const it=SY[mo],c=MC[mo],d=it.filter((_,i)=>st.syl[mo+i]).length,p=Math.round(d/it.length*100);
@@ -595,6 +682,12 @@ document.addEventListener('click',e=>{
  else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
  else if(a==='ftx'){st.ft=null;save()}
  else if(a==='gr'){grN=+v;animNext=true}
+ else if(a==='jw'){jOpen[v]=!jOpen[v]}
+ else if(a==='jgo'){const q=v.split('|');syTab='fr';syOpen[q[0]]=true;fsOpen[q[1]]=true;animNext=true}
+ else if(a==='sytab'){syTab=v;animNext=true}
+ else if(a==='syo'){syOpen[v]=!syOpen[v]}
+ else if(a==='synext'){const q=v.split('|');syOpen[q[0]]=true;fsOpen[q[1]]=true}
+ else if(a==='fso'){fsOpen[v]=!fsOpen[v]}
  else if(a==='motgo'){motGo(true);return}
  else if(a==='say'){sayWord(v);return}
  else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a);return}
@@ -604,9 +697,16 @@ document.addEventListener('click',e=>{
  else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true;animNext=true}
  else if(a==='bkdone'){bks();if(!confirm('Mark this book as completed?'))return;st.bi++;save()}
  else if(a==='bkadd'){const t=prompt('Book title?');if(!t||!t.trim())return;bks().push(t.trim());save()}
- else if(a==='notif'){(st.notify&&st.notify.enabled?pushOff():pushOn());return}
- else if(a==='tnot'){showN('Winter Arc test','Notifications work ✅');return}
- else if(a==='csub'){const t=JSON.stringify(st.notify.sub);(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('Copied')):Promise.reject()).catch(()=>prompt('Copy this code:',t));return}
+ else if(a==='notif'){
+ if(!st.notify)st.notify={enabled:false,next:0};
+ if(st.notify.enabled){st.notify.enabled=false;st.notify.next=0;save();render();return}
+ if(!('Notification' in window))return alert('Browser notifications are not supported here.');
+ Notification.requestPermission().then(p=>{
+  if(p!=='granted')return alert('Please allow notifications in your browser.');
+  st.notify={enabled:true,next:Date.now()+2*60*60*1000};save();render();
+ });
+ return;
+ }
  else if(a==='copy'){const t=report(wkSel),done=()=>alert('Copied');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(done).catch(()=>{
    const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()});return}
@@ -624,6 +724,8 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  else if(a==='tk')day()[t.dataset.k]=t.checked;
  else if(a==='min')day().min=t.checked;
  else if(a==='np')day().np=t.checked;
+ else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
+ else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
  else if(a==='ms')st.words.find(w=>w.id===t.dataset.id).mistake=t.checked;
  if(a==='tk'&&t.checked){ac();popD=t.dataset.d;popK=t.dataset.k;if(cnt(t.dataset.d)===T.length)setTimeout(burst,250)}
@@ -656,8 +758,6 @@ $('#file').addEventListener('change',e=>{                   // import backup
  r.readAsText(f);e.target.value=''});
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='today')render()}); // new day rollover
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-document.addEventListener('toggle',e=>{if(e.target.id==='set')setOpen=e.target.open},true);
 
 render();
 </script></body></html>
