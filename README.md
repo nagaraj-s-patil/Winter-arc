@@ -28,6 +28,8 @@ A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libr
 - **🐞 Error log**: write the error, its cause and your fix.
 - **🎤 Interview practice**: 87 questions for every topic. Write your answer, the AI scores it 0-10, shows what was good, what to fix and a model answer. A score of 7 or more marks it ready.
 - **📖 How to study well**: the 7 study rules, one tap away.
+- **🃏 Mistake cards** (top of the Syllabus): a wrong quiz answer, an interview answer scored below 7, or an Error log entry with a cause or fix becomes a flashcard automatically. Tap Show answer, then Got it or Again. Cards return after 1, 3 and 7 days; three good answers finish a card. A good interview answer later closes its card. Deleting an error removes its card.
+- **🛠 Proof of work** (Today screen, below the tasks): write one line a day about what you built or fixed, with an optional GitHub link. It saves as you type, shows your streak and last 7 days, and **Copy last 7 days** gives text for your resume or LinkedIn. Only http / https links become clickable.
 - These features use the API (Explain, Quiz, Interview). If you buy a higher plan, raise the number in Settings > API Usage.
 - **Words**: add words, spelling check, word list.
 - **Stats**: 90-day timeline, 7/30-day graph, 11 badges, theme selector (Dark / Cyber / Minimal), sound on/off.
