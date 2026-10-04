@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1115"><title>Winter Arc Tracker</title>
+<style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
+html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
+body{margin:auto;background:transparent;color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 104px;max-width:560px;overflow-x:hidden}
+h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:6px 0 14px;background:linear-gradient(90deg,#fff,#a5f3fc 60%,#f9a8d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+h2{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7dd3fc;margin:22px 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin:12px 0}
+.card .row{background:var(--card2)}
+.mu{color:var(--mu);font-size:13.5px}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--g1);border:0;border-radius:14px;min-height:50px;padding:0 16px;font-weight:700;color:#fff;width:100%;margin:6px 0;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.3);transition:transform .08s,filter .15s}
+button:active{transform:scale(.97);filter:brightness(.9)}
+button.sec{background:var(--card2);border:1px solid var(--bd);box-shadow:none}
+button.dng{background:transparent;border:1px solid rgba(251,113,133,.5);color:#fda4af;box-shadow:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two button{margin:0}
+input[type=text],input[type=number],select{width:100%;min-height:50px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:0 14px;margin:5px 0;outline:0;transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=number]:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(34,211,238,.25)}
+select option{background:#14162e}
+input[type=number]{-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.row{--c:#34d399;display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 14px;margin:9px 0;background:var(--card);border:1px solid var(--bd);border-radius:18px;font-size:16.5px;font-weight:500;transition:background .2s,border-color .2s}
+.row[class*=" t-"]{border-left:5px solid var(--c)}
+.t-wo{--c:#fb923c}.t-wd{--c:#a78bfa}.t-sp{--c:#f472b6}.t-fr{--c:#22d3ee}.t-rd{--c:#fbbf24}.t-min{--c:#94a3b8}
+.row:has(input[type=checkbox]:checked){background:color-mix(in srgb,var(--c) 20%,#131530);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
+.row:has(input[type=checkbox]:checked)>span{color:#fff}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;width:30px;height:30px;border-radius:50%;border:2.5px solid var(--c,#34d399);background:transparent;display:grid;place-content:center;flex:none;cursor:pointer;margin:0;transition:background .15s}
+input[type=checkbox]::after{content:"";width:12px;height:7px;border:solid #0a0b1a;border-width:0 0 3.5px 3.5px;transform:rotate(-45deg) scale(0);margin-top:-2px;transition:transform .12s}
+input[type=checkbox]:checked{background:var(--c,#34d399)}
+input[type=checkbox]:checked::after{transform:rotate(-45deg) scale(1)}
+input[type=checkbox]:disabled{opacity:.6;cursor:default}
+.row input.tm{width:84px;min-height:44px;margin:0 0 0 auto;padding:0 8px;text-align:center;flex:none;background:rgba(0,0,0,.25)}
+.row button.plus{width:46px;min-height:46px;margin:0 0 0 auto;padding:0;font-size:26px;border-radius:50%;flex:none}
+.bar{height:10px;background:var(--gy);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#2563eb,#7c3aed 55%,#db2777);border:0;box-shadow:0 12px 34px rgba(124,58,237,.35)}
+.hero::after{content:"❄";position:absolute;right:14px;top:2px;font-size:92px;opacity:.16}
+.hero .mu{color:rgba(255,255,255,.85)}.hero .bar{background:rgba(255,255,255,.28)}.hero .bar i{background:#fff}
+.big{font-size:40px;font-weight:800;background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .big{font-size:46px;line-height:1.1;margin:2px 0 12px;background:none;-webkit-text-fill-color:#fff}
+.warn{background:rgba(251,113,133,.14);border:1px solid rgba(251,113,133,.5);color:#fecdd3;border-radius:16px;padding:12px 14px;margin:12px 0;font-weight:600}
+.warn.ok{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.5);color:#a7f3d0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.stats>div{--c:#fb923c;min-width:0;background:var(--card);border:1px solid var(--bd);border-top:3px solid var(--c);border-radius:18px;padding:12px;text-align:center;font-size:13px;color:var(--mu)}
+.stats>div:nth-child(2){--c:#22d3ee}.stats>div:nth-child(3){--c:#f472b6}.stats>div:nth-child(4){--c:#fbbf24}
+.stats b{font-size:30px;display:block;color:var(--c)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chips span{padding:7px 12px;border-radius:999px;font-size:14px;font-weight:600;color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{background:var(--card2);border:1px solid var(--bd);margin:0;box-shadow:none}.tabs .on{background:var(--g1);border-color:transparent}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.grid i{text-align:center;color:var(--mu);font-style:normal;font-size:13px;font-weight:700}
+.grid button{min-height:44px;padding:0;margin:0;border-radius:12px;font-weight:700;font-size:15px;box-shadow:none}
+.cg{background:var(--card2)!important;border:1px solid var(--bd);color:var(--mu)}.cg:disabled{opacity:.4}
+.cgr{background:linear-gradient(135deg,#10b981,#34d399)!important;color:#04261a}.cy{background:linear-gradient(135deg,#f59e0b,#fbbf24)!important;color:#2a1a00}.cr{background:linear-gradient(135deg,#f43f5e,#fb7185)!important;color:#fff}
+.td{box-shadow:0 0 0 2px var(--ac)}.sel{outline:3px solid #fff;outline-offset:1px}
+summary{list-style:none;cursor:pointer;background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;font-weight:700;margin:14px 0 4px}
+summary::-webkit-details-marker{display:none}details[open]>summary{border-color:var(--ac)}
+nav{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;display:flex;background:rgba(14,15,34,.9);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--bd);border-radius:22px 22px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;border-radius:0;margin:0;min-height:64px;font-size:11px;font-weight:700;color:var(--mu);padding:6px 0 0;position:relative;box-shadow:none}
+nav .ic{display:block;font-size:21px;line-height:1.25}
+nav .on{color:#fff}nav .on .ic{filter:drop-shadow(0 0 8px #22d3ee)}nav .on::before{content:"";position:absolute;top:0;left:26%;right:26%;height:3px;border-radius:0 0 4px 4px;background:var(--g1)}
+
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-100%);animation:sheen 5s ease-in-out infinite;pointer-events:none}
+.hero::after{animation:spin 40s linear infinite}
+.rg{display:flex;align-items:center;gap:10px;margin:24px 0 8px}.rg i{font-style:normal;font-size:20px}.rg h2{margin:0;color:var(--c)}
+.rule{--c:#fb923c;display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--c);border-radius:18px;padding:14px;margin:9px 0}
+.rule .num{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;color:#0a0b1a;background:var(--c)}
+.rule p{margin:0;font-size:15.5px;line-height:1.45;color:#dfe3ff}.rule p b{color:#fff;display:block;font-size:16.5px;margin-bottom:2px}
+.tl{position:relative;margin:6px 0 0 6px;padding-left:26px}
+.tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:3px;border-radius:3px;background:linear-gradient(#fb923c,#a78bfa,#f472b6,#22d3ee,#fbbf24,#818cf8)}
+.tli{--c:#94a3b8;position:relative;display:flex;align-items:center;gap:12px;min-height:50px;margin:8px 0;padding:8px 14px;background:var(--card);border:1px solid var(--bd);border-radius:14px}
+.tli::before{content:"";position:absolute;left:-26px;top:50%;width:15px;height:15px;margin-top:-7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px #0a0b1a,0 0 12px var(--c)}
+.tli b{min-width:70px;color:var(--c);font-variant-numeric:tabular-nums}
+.enter>*{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+.enter .bar i{transform-origin:left;animation:grow 1s .2s cubic-bezier(.2,.8,.2,1) both}
+.row.pop{animation:pop .4s ease}.row.pop input[type=checkbox]{animation:tick .45s ease}
+nav .on .ic{animation:bounce .45s ease}
+.cf{position:fixed;top:-14px;width:9px;height:14px;border-radius:2px;z-index:99;pointer-events:none;animation:fall 1.9s ease-in forwards}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}}
+@keyframes pop{40%{transform:scale(1.035)}}
+@keyframes tick{0%{transform:scale(.5)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sheen{0%,55%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes bounce{40%{transform:translateY(-5px) scale(1.15)}}
+@keyframes fall{to{transform:translate(var(--x),105vh) rotate(720deg)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+.hero.s{background:linear-gradient(135deg,#0891b2,#7c3aed 70%)}.hero.w{background:linear-gradient(135deg,#7c3aed,#db2777)}
+.hr{display:flex;align-items:center;gap:18px}
+.big2{font-size:36px;font-weight:800;line-height:1.1}
+.rw{position:relative;width:96px;height:96px;flex:none}
+.ring{--p:0;position:absolute;inset:0;border-radius:50%;background:conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.25) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 9px));mask:radial-gradient(farthest-side,transparent calc(100% - 10px),#000 calc(100% - 9px))}
+.rt{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px}
+.mh{--c:#22d3ee;display:flex;justify-content:space-between;align-items:center;margin:26px 0 8px}
+.mh b{font-size:19px;color:var(--c)}.mh .pc{font-weight:800;font-size:20px;color:var(--c)}
+.t-oct{--c:#22d3ee}.t-nov{--c:#a78bfa}.t-dec{--c:#f472b6}
+.bar.mb{margin-bottom:6px}.bar.mb i{background:var(--c)}
+.pips{display:flex;gap:6px;margin-top:12px}.pips i{flex:1;height:12px;border-radius:6px;background:rgba(255,255,255,.22)}.pips i.on{background:#fff}
+.wcard{--c:#a78bfa;border-left:5px solid var(--c)}
+.wcard>b{font-size:21px;color:#c4b5fd;display:block;margin-bottom:2px}
+.mk{--c:#fb7185;display:flex;gap:10px;align-items:center;min-height:44px;margin-top:6px;font-size:14px;color:var(--mu)}
+.mk:has(input:checked){color:#fda4af}
+.empty{text-align:center;padding:30px 0;font-size:38px;line-height:1.5}.empty .mu{font-size:14px}
+.enter .ring{animation:fill 1.2s .15s cubic-bezier(.2,.8,.2,1) both}
+.enter .pips i.on{animation:pipin .45s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(var(--k)*60ms + .25s)}
+@keyframes fill{from{--p:0}}
+@keyframes pipin{from{transform:scale(0);opacity:0}}
+
+.pl{display:flex;align-items:center;gap:12px}
+.fl{text-align:center;flex:none;width:68px}.fl span{display:inline-block;filter:drop-shadow(0 0 12px #fb923c);animation:flick 1.1s ease-in-out infinite alternate;transform-origin:50% 90%}.fl.z span{filter:grayscale(1);opacity:.45;animation:none}
+.fl b{display:block;font-size:26px;line-height:1}.fl small{font-size:11px;color:var(--mu)}
+.pm{flex:1;min-width:0}.pl .big2{font-size:25px}.bar.xp i{background:linear-gradient(90deg,#fbbf24,#fb923c)}
+.pl .ring{background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--gy) 0)}.rw.sm{width:78px;height:78px}.rw.sm .rt{font-size:17px}.rt small{display:block;font-size:11px;font-weight:600;opacity:.75}
+.mo{display:flex;gap:12px;align-items:center;font-weight:600;background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(244,114,182,.12));border-color:rgba(251,191,36,.35)}.mo>span{font-size:28px}
+.two3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.two3 button{margin:0}
+.ftc{font-size:54px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;margin:6px 0}#ftb{transition:width 1s linear}
+.hm{display:grid;grid-template-columns:repeat(31,1fr);gap:3px}.sq{aspect-ratio:1;border-radius:3px;min-width:0}
+.enter .sq{animation:pipin .4s both;animation-delay:calc(var(--k)*10ms)}
+.gr{display:flex;align-items:flex-end;gap:4px;height:120px;margin-top:6px}.gr i{flex:1;border-radius:6px 6px 2px 2px;min-width:0}.gr i.x{opacity:.35}
+.enter .gr i{transform-origin:bottom;animation:growY .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--k)*25ms)}
+.bd{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bg{text-align:center;padding:14px 6px;border-radius:18px;background:var(--card);border:1px solid var(--bd);filter:grayscale(1);opacity:.5}
+.bg span{font-size:30px;display:block}.bg b{display:block;font-size:13px;margin-top:4px}.bg small{color:var(--mu);font-size:11px}
+.bg.on{filter:none;opacity:1;border-color:#fbbf24;box-shadow:0 0 18px rgba(251,191,36,.25)}
+.enter .bg{animation:rise .5s both;animation-delay:calc(var(--k)*50ms)}
+nav button{font-size:10px}nav .ic{font-size:20px}
+@keyframes flick{from{transform:scale(.94) rotate(-3deg)}to{transform:scale(1.08) rotate(3deg)}}
+@keyframes growY{from{transform:scaleY(0)}}
+html[data-theme=minimal]{--bg:#f4f6fb;--card:#fff;--card2:#eef1f7;--bd:#dde2ee;--tx:#14172a;--mu:#6b7390;--ac:#4f46e5;--g1:linear-gradient(135deg,#4f46e5,#6366f1);--gy:#e3e7f1;color-scheme:light;background:#f4f6fb}
+html[data-theme=minimal] h1{background:none;-webkit-text-fill-color:var(--tx)}html[data-theme=minimal] h2{color:#6366f1}
+html[data-theme=minimal] input[type=text],html[data-theme=minimal] input[type=number],html[data-theme=minimal] select,html[data-theme=minimal] .row input.tm{background:#fff}
+html[data-theme=minimal] nav{background:rgba(255,255,255,.92)}html[data-theme=minimal] summary{background:#fff}
+html[data-theme=minimal] .row:has(input[type=checkbox]:checked){background:color-mix(in srgb,var(--c) 14%,#fff)}
+html[data-theme=minimal] .row:has(input[type=checkbox]:checked)>span,html[data-theme=minimal] .rule p,html[data-theme=minimal] .rule p b{color:var(--tx)}
+html[data-theme=minimal] .warn{color:#9f1239}html[data-theme=minimal] .warn.ok{color:#065f46}html[data-theme=minimal] .wcard>b{color:#6d28d9}
+html[data-theme=minimal] .tli::before{box-shadow:0 0 0 4px #f4f6fb}html[data-theme=minimal] .mo{color:var(--tx)}
+html[data-theme=cyber]{--bg:#05060a;--card:rgba(8,14,18,.88);--card2:rgba(0,255,170,.07);--bd:rgba(0,255,170,.3);--tx:#d7fff1;--mu:#6fb8a0;--ac:#00ffaa;--g1:linear-gradient(135deg,#00ffaa,#00b3ff 60%,#ff2bd6);--gy:rgba(0,255,170,.15);background:radial-gradient(500px 340px at 90% -60px,rgba(255,43,214,.3),transparent 70%),radial-gradient(500px 340px at 0 0,rgba(0,255,170,.22),transparent 70%),#05060a}
+html[data-theme=cyber] body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+html[data-theme=cyber] :is(.card,.row,.rule,.tli,button,input,select,summary,.stats>div,.warn,.bg){border-radius:6px}
+html[data-theme=cyber] button:not(.sec):not(.dng){color:#02130d}
+html[data-theme=cyber] h1{background:linear-gradient(90deg,#00ffaa,#00b3ff,#ff2bd6);-webkit-background-clip:text;background-clip:text}
+html[data-theme=cyber] h2{color:#00ffaa}
+html[data-theme=cyber] .hero{background:linear-gradient(135deg,#00382b,#2a0a3d);border:1px solid #00ffaa;box-shadow:0 0 26px rgba(0,255,170,.3)}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:120;max-width:92vw;padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#ec4899);color:#fff;font-weight:700;box-shadow:0 10px 30px rgba(236,72,153,.45);animation:drop .5s cubic-bezier(.2,1.4,.4,1) both,out .4s 2.8s both;pointer-events:none}
+@keyframes drop{from{transform:translate(-50%,-90px);opacity:0}}
+@keyframes out{to{opacity:0;transform:translate(-50%,-30px)}}
+.hd{display:flex;align-items:center;justify-content:space-between}
+.gear{width:44px;min-height:44px;border-radius:50%;padding:0;margin:0;font-size:20px;background:var(--card2);border:1px solid var(--bd);box-shadow:none;flex:none}
+.aq{font-size:19px;font-weight:600;line-height:1.5;margin:6px 0 12px}
+.fb{border-radius:16px;padding:14px;margin:12px 0;font-weight:700}
+.fb.c{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}.fb.p{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.5)}.fb.w{background:rgba(251,113,133,.15);border:1px solid rgba(251,113,133,.5)}
+.say{width:110px;height:110px;min-height:0;border-radius:50%;font-size:46px;margin:6px auto;display:block;padding:0;animation:sayp 2s infinite}
+@keyframes sayp{50%{box-shadow:0 0 0 16px rgba(124,58,237,0)}}
+.sperr{color:#fda4af;font-weight:600;margin-top:6px;font-size:14px}
+.mot{border:1px solid rgba(34,211,238,.35)!important;background:linear-gradient(135deg,rgba(34,211,238,.12),rgba(236,72,153,.1))!important}
+.mq{font-size:17px;line-height:1.5;font-weight:600;margin:8px 0 10px}.mq.dim{opacity:.5}
+a.lnk{display:block;text-align:center;margin-top:10px;color:var(--ac);font-weight:700;text-decoration:none}
+.rpd{margin-top:10px;font-size:17px;line-height:1.6}
+button.tp{background:var(--card);border:1px solid var(--bd);box-shadow:none;text-align:left;display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:66px;border-left:5px solid var(--c,#22d3ee);border-radius:18px;margin:12px 0 0;font-weight:600}
+.tp .ti{font-size:26px}.tp .tm2{flex:1;min-width:0;line-height:1.3}.tp .tm2 b{display:block;font-size:16.5px}.tp .pc2{font-weight:800;color:var(--c)}.tp .chev{transition:transform .2s;color:var(--mu)}.tp.open .chev{transform:rotate(180deg)}
+.tp.done{background:color-mix(in srgb,#34d399 16%,#131530);border-color:rgba(52,211,153,.5)}
+.sub{padding:2px 0 6px 10px;border-left:2px dashed var(--bd);margin-left:16px}.sub .row{min-height:56px;font-size:15.5px;margin:7px 0}
+
+.srow{padding:6px 12px}.stl{background:none;border:0;box-shadow:none;flex:1;min-width:0;text-align:left;display:flex;align-items:center;gap:8px;margin:0;padding:0;min-height:48px;font-weight:500;color:var(--tx);font-size:15.5px}
+.stl b{display:block;font-weight:600}.stl .cnt{margin-left:auto;font-weight:700;color:var(--c);font-size:14px}.stl .chev{transition:transform .2s;color:var(--mu)}.srow.open .chev{transform:rotate(180deg)}
+.its{margin:0 0 6px 14px;padding-left:8px;border-left:2px dashed var(--bd)}.its .row{min-height:46px;font-size:14.5px;margin:6px 0;background:var(--card2)}
+.t-syl{--c:var(--ac)}
+.nx{border:1px solid var(--bd)!important;border-left:5px solid var(--ac)!important;background:var(--card)!important}
+.card.hr:not(.hero) .ring{background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--gy) 0)}
+textarea{width:100%;min-height:80px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:10px 12px;font:inherit;color:inherit;margin:5px 0;outline:0;resize:vertical}textarea:focus{border-color:var(--ac)}
+.two3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.two3 button{margin:0}.cfb.on{outline:2px solid var(--ac)}
+button.qo{text-align:left;margin:6px 0}button.qo.ok{border-color:#34d399;background:rgba(52,211,153,.2)}button.qo.bad{border-color:#fb7185;background:rgba(251,113,133,.2)}
+button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;flex:none}
+.tools{margin:0 0 10px 14px;padding:8px 0 4px 8px;border-left:2px dashed var(--bd)}
+.how summary{cursor:pointer;font-weight:700;list-style:none;margin:0;padding:0;background:none;border:0}
+.lnk2{color:var(--ac);font-weight:600}
+</style></head><body>
+<div id="app"></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<nav>
+<button data-a="nav" data-v="today"><span class="ic">✅</span>Today</button><button data-a="nav" data-v="cal"><span class="ic">🗓</span>Calendar</button>
+<button data-a="nav" data-v="week"><span class="ic">📊</span>Weekly</button><button data-a="nav" data-v="rules"><span class="ic">📌</span>Rules</button><button data-a="nav" data-v="syl"><span class="ic">📚</span>Syllabus</button>
+<button data-a="nav" data-v="words"><span class="ic">🔤</span>Words</button><button data-a="nav" data-v="stats"><span class="ic">🏆</span>Stats</button>
+</nav>
+<script>
+/* ===== CONFIG ===== */
+const S0='2026-10-01',E0='2026-12-31',KEY='winterArc.v1';
+const T=['wo','wd','sp','fr','rd'];               // 5 daily tasks
+const MN={10:'Oct',11:'Nov',12:'Dec'};
+const SY={
+ Oct:['Python basics','Python OOP','Files / JSON / errors','JavaScript revision','HTML / CSS','SQL (SELECT / JOIN / GROUP BY)','Git and GitHub','Install bench + first DocType','Project 1: Python CLI Lead Tracker'],
+ Nov:['DocTypes','Permissions','Client scripts','Server scripts','Reports','Print formats','Workflows','Library Management tutorial','Project 2: Sales Lead Tracker app'],
+ Dec:['Hooks','Whitelisted APIs','Jinja','REST API','ERPNext basics','Project 3: Custom app + README','Resume + LinkedIn','Apply to 10 jobs']};
+
+/* ===== STORAGE ===== */
+const blank=()=>({days:{},weeks:{},words:[],syl:{}});
+let st=blank();
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.days)st=Object.assign(blank(),s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){alert('Could not save. Browser storage is blocked or full.')}}
+
+/* ===== HELPERS ===== */
+const $=q=>document.querySelector(q);
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pd=s=>{const[y,m,d]=s.split('-');return new Date(+y,m-1,+d)};
+const fd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function add(s,n){const d=pd(s);d.setDate(d.getDate()+n);return fd(d)}
+const today=()=>fd(new Date());
+const inPlan=s=>s>=S0&&s<=E0;
+const clamp=s=>s<S0?S0:s>E0?E0:s;
+const dow=s=>pd(s).getDay();
+const isRest=s=>dow(s)===0||dow(s)===3;                 // Sun + Wed
+const wlab=w=>pd(w).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const WEEKS=[];for(let w='2026-10-04';w<='2026-12-27';w=add(w,7))WEEKS.push(w); // Sundays (must come after helpers)
+let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null;
+
+/* ===== DAY LOGIC ===== */
+const hm=m=>{m=Math.round(m);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m'};
+const tmt=s=>hm(['wo','sp','fr'].reduce((a,k)=>a+(+(st.days[s]&&st.days[s].t&&st.days[s].t[k])||0),0));
+const isDone=(s,k)=>k==='wo'&&isRest(s)?true:!!(st.days[s]&&st.days[s][k]);  // rest day = workout done
+const cnt=s=>T.filter(k=>isDone(s,k)).length;
+const ok=s=>!!((st.days[s]&&st.days[s].min)||cnt(s)>=3);    // "not missed": minimum toggle OR 3+ tasks
+function col(s){if(s>today())return'cg';const c=cnt(s);return c===T.length?'cgr':(c>=3||(st.days[s]&&st.days[s].min))?'cy':'cr'}
+function streaks(){                                         // current + best streak
+ const t=clamp(today()),r=today();let run=0,best=0;
+ for(let s=S0;s<=t&&s<=r;s=add(s,1)){if(ok(s)){run++;best=Math.max(best,run)}else if(s<r)run=0}
+ return{cur:run,best}}
+function book(s){return s<='2026-10-30'?'Book 1: The Power of Your Subconscious Mind':s<='2026-11-25'?'Book 2: The Alchemist':s<='2026-12-28'?'Book 3: Rich Dad Poor Dad':'Buffer: review and catch up'}
+
+/* ===== BOOKS / PRIVATE / CONTROLS ===== */
+const bks=()=>{if(!st.books)st.books=['The Power of Your Subconscious Mind','The Alchemist','Rich Dad Poor Dad'];if(typeof st.bi!=='number')st.bi=0;return st.books};
+function bookCard(){const b=bks(),i=st.bi,dn=i>=b.length;
+ return `<div class="card">📖 ${dn?'All '+b.length+' books completed 🎉':'Book '+(i+1)+' of '+b.length+': '+E(b[i])}<div class="mu" style="margin:4px 0">Completed: ${Math.min(i,b.length)}/${b.length}</div>${dn?'':'<button class="sec" data-a="bkdone">Book completed ✓ (go to next)</button>'}<button class="sec" data-a="bkadd">+ Add a book</button></div>`}
+function pst(){const r=today();let run=0,best=0;for(let s=S0;s<=r;s=add(s,1)){if(st.days[s]&&st.days[s].np){run++;best=Math.max(best,run)}else if(s<r)run=0}return{cur:run,best}}
+function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
+function ctl(k,s,rest){const d=st.days[s]||{};
+ if(k==='wd')return isSun(s)?'<button class="plus" data-a="aistart">▶</button>':'<button class="plus" data-a="gow">+</button>';
+ if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}">`;
+ if(rest)return '';
+ return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}">`}
+
+const IC={wo:'💪',wd:'🔤',sp:'🎤',fr:'💻',rd:'📖'};
+function burst(){chime();for(let i=0;i<30;i++){const e=document.createElement('i');e.className='cf';e.style.cssText='left:'+(5+Math.random()*90)+'vw;background:hsl('+Math.floor(Math.random()*360)+',90%,60%);animation-delay:'+(Math.random()*.3)+'s;--x:'+Math.round((Math.random()-.5)*180)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}}
+/* ===== GAME LAYER ===== */
+const TIT=['Rookie','Starter','Grinder','Focused','Disciplined','Warrior','Elite','Master','Legend'];
+let AC,grN=7;
+const ac=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume&&AC.resume()}catch(e){}return AC};
+function chime(){if(st.mute)return;const c=ac();if(!c)return;[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*.14;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.45)})}
+function gstats(){const r=today();let xp=0,tasks=0,perfect=0;
+ for(let s=S0;s<=r&&s<=E0;s=add(s,1)){if(!st.days[s])continue;const c=cnt(s);tasks+=c;xp+=c*20;if(c===T.length){perfect++;xp+=30}}
+ const lv=Math.floor(Math.sqrt(xp/60))+1,lo=60*(lv-1)*(lv-1),hi=60*lv*lv;
+ return{xp,tasks,perfect,lv,hi,pct:(xp-lo)/(hi-lo)*100,title:TIT[Math.min(lv-1,8)]}}
+function playerCard(s,sk){const g=gstats(),c=cnt(s),pc=Math.round(c/T.length*100);
+ return `<div class="card pl"><div class="fl ${sk.cur?'':'z'}"><span style="font-size:${38+Math.min(sk.cur,20)}px">🔥</span><b>${sk.cur}</b><small>day streak</small></div><div class="pm"><div class="mu">Level ${g.lv} · ${g.title}</div><div class="big2">${g.xp} XP</div><div class="bar xp"><i style="width:${g.pct}%"></i></div><div class="mu">${Math.round(g.hi-g.xp)} XP to Level ${g.lv+1}</div></div><div class="rw sm"><div class="ring" style="--p:${pc}"></div><div class="rt"><div>${c*2}/10<small>${pc}%</small></div></div></div></div>`}
+const MQ=[['Day not started. Do the smallest task first.','The hardest part is opening the app. You did it.','Start with the workout. Momentum follows.'],['Good start. Do one more task right now.','You moved. Keep the chain going.','Small wins add up. Pick the next mission.'],['Almost there. Finish the last missions.','You are close. Do not stop at 3.','Strong day. Two more and it is perfect.'],['Perfect day. You earned your rest.','5 of 5. This is who you are now.','Locked in. Repeat tomorrow.']];
+function motiv(s,sk){const c=cnt(s),b=c===T.length?3:c>=3?2:c>0?1:0,d=Math.round((pd(s)-pd(S0))/864e5);
+ return `<div class="card mo"><span>💡</span><div>${MQ[b][((d%3)+3)%3]}${sk.cur>=7?`<div class="mu">🔥 ${sk.cur}-day streak. Protect it.</div>`:''}</div></div>`}
+const mission=s=>`<div class="mh t-oct"><div><b>🎯 Today's Mission</b><br><span class="mu">Complete these ${T.length} missions</span></div><div class="pc">${cnt(s)}/${T.length}</div></div>`;
+const fmt=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
+function focusCard(){const f=st.ft;
+ return `<div class="card"><h2 style="margin-top:0">⏱ Focus timer</h2>`+(f?`<div class="ftc" id="ftc">${fmt(f.end-Date.now())}</div><div class="bar"><i id="ftb" style="width:${Math.min(100,(1-(f.end-Date.now())/(f.m*6e4))*100)}%"></i></div><button class="dng" style="margin-top:12px" data-a="ftx">Stop timer</button>`:`<div class="mu" style="margin-bottom:10px">Finished sessions are added to your Frappe minutes.</div><div class="two3"><button class="sec" data-a="fts" data-v="25">25 min</button><button class="sec" data-a="fts" data-v="50">50 min</button><button class="sec" data-a="fts" data-v="90">90 min</button></div>`)+`</div>`}
+function ftTick(){const f=st.ft;if(!f)return;const left=f.end-Date.now();
+ if(left<=0){const k=today(),d=st.days[k]=st.days[k]||{};d.t=d.t||{};d.t.fr=(d.t.fr||0)+f.m;st.ft=null;save();burst();navigator.vibrate&&navigator.vibrate([200,100,200]);render();return}
+ const c=$('#ftc');if(c)c.textContent=fmt(left);const b=$('#ftb');if(b)b.style.width=Math.min(100,(1-left/(f.m*6e4))*100)+'%'}
+setInterval(ftTick,1000);
+function achList(){const g=gstats(),sk=streaks();return [['🚀','First Step',g.tasks,1],['🔥','3-Day Streak',sk.best,3],['⚡','7-Day Streak',sk.best,7],['💎','14-Day Streak',sk.best,14],['👑','30 Days',sk.best,30],['✅','100 Tasks',g.tasks,100],['🌟','Perfect Day',g.perfect,1],['🏆','10 Perfect Days',g.perfect,10],['🔤','50 Words',st.words.length,50],['📚','Book Done',st.bi||0,1],['🎖','Level 5',g.lv,5]]}
+function toast(m){const e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3300)}
+function checkAch(){const u=achList().filter(b=>b[2]>=b[3]).map(b=>b[1]);
+ if(!st.ach){st.ach=u;save();return}
+ const nw=u.filter(x=>!st.ach.includes(x));if(!nw.length)return;
+ st.ach=u;save();toast('🏅 Badge unlocked: '+nw.join(', '));chime()}
+function vStats(){
+ const g=gstats(),sk=streaks(),r=today(),n=r<S0?0:Math.min(92,Math.round((pd(clamp(r))-pd(S0))/864e5)+1),p=Math.round(n/92*100);let k=0;
+ let h=`<h1>Progress</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${p}"></div><div class="rt">${p}%</div></div><div><div class="mu">Winter Arc journey</div><div class="big2">Day ${n}/92</div><div class="mu">Level ${g.lv} · ${g.xp} XP · best streak ${sk.best}</div></div></div>`;
+ h+=`<h2>📈 90-day timeline</h2><div class="card">`+[['October',10,31],['November',11,30],['December',12,31]].map(([nm,m,dn])=>`<div class="mu" style="margin:6px 0 4px">${nm}</div><div class="hm">`+Array.from({length:dn},(_,i)=>{const s='2026-'+m+'-'+String(i+1).padStart(2,'0');return `<i class="sq ${s>r?'cg':col(s)} ${s===r?'td':''}" style="--k:${k++}"></i>`}).join('')+'</div>').join('')+`<div class="mu" style="margin-top:10px">Green = all 5 · Yellow = 3-4 · Red = missed</div></div>`;
+ const days=Array.from({length:grN},(_,i)=>add(r,i-grN+1)),vals=days.map(s=>st.days[s]?cnt(s):0),av=Math.round(vals.reduce((a,b)=>a+b,0)/grN/T.length*100);
+ h+=`<h2>📊 Consistency</h2><div class="card"><div class="tabs"><button class="${grN===7?'on':''}" data-a="gr" data-v="7">7 days</button><button class="${grN===30?'on':''}" data-a="gr" data-v="30">30 days</button></div><div class="gr">`+vals.map((c,i)=>`<i class="${days[i]>r||days[i]<S0?'x':''}" style="--k:${i};height:${Math.max(c/T.length*100,4)}%;background:${c===T.length?'#34d399':c>=3?'#fbbf24':c>0?'#fb923c':'rgba(255,255,255,.14)'}"></i>`).join('')+`</div><div class="mu" style="margin-top:8px">Average daily score: <b>${av}%</b></div></div>`;
+ const B=achList();
+ h+=`<h2>🏅 Achievements · ${B.filter(b=>b[2]>=b[3]).length}/${B.length}</h2><div class="bd">`+B.map(([e,t,v,gl],i)=>`<div class="bg ${v>=gl?'on':''}" style="--k:${i}"><span>${e}</span><b>${t}</b><small>${v>=gl?'Unlocked':Math.min(v,gl)+'/'+gl}</small></div>`).join('')+'</div>';
+ const th=st.theme||'dark';
+ return h+`<h2>🎨 Theme</h2><div class="tabs">`+[['dark','🌙 Dark'],['cyber','⚡ Cyber'],['minimal','☀️ Minimal']].map(([k,l])=>`<button class="${th===k?'on':''}" data-a="th" data-v="${k}">${l}</button>`).join('')+'</div>'+`<h2>🔊 Sound</h2><div class="tabs"><button class="${st.mute?'':'on'}" data-a="snd" data-v="1">🔊 On</button><button class="${st.mute?'on':''}" data-a="snd" data-v="0">🔇 Off</button></div>`}
+/* ===== AI VOCABULARY (Gemini) ===== */
+const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
+const SC=['Your manager asks you to finish a task by Friday. Reply to your manager.','A customer calls and is angry about a late delivery. Reply to the customer.','You are on a sales call and the client asks about the price. Reply.','In a team meeting your lead asks for your update. Give your update.','Write one or two lines of an email to a client about a new meeting time.','A user asks for help with an IT ticket. Reply to the user.','A friend asks what you did yesterday. Answer in a daily conversation.'];
+let aiBusy=false,aiErr=false,aiMsg='',fillBusy=false;
+const aiGet=()=>{let o={key:'',model:'gemini-flash-latest',status:'none'};try{Object.assign(o,JSON.parse(localStorage.getItem(AIK)||'{}'))}catch(e){}if(o.model==='gemini-2.5-flash')o.model='gemini-flash-latest';return o};
+const aiSet=o=>{try{localStorage.setItem(AIK,JSON.stringify(Object.assign(aiGet(),o)))}catch(e){}};
+const isSun=s=>dow(s||today())===0,mon=s=>add(s,isSun(s)?-6:-(dow(s)-1)),gw=id=>st.words.find(w=>w.id===id);
+const wkWords=s=>{const m=mon(s),e=add(m,5);return st.words.filter(w=>w.date>=m&&w.date<=e)};
+const wkTarget=s=>{const m=mon(s);let n=0;for(let i=0;i<6;i++){const d=add(m,i);if(d>=S0&&d<=E0)n++}return n*10};
+const nm=x=>String(x).trim().toLowerCase().replace(/[.!?,]+$/,''),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+async function gem(p,retry=1,picked=false,feat='other'){const c=aiGet();if(!c.key)throw new Error('nokey');
+ const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model||'gemini-flash-latest')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':c.key},body:JSON.stringify({contents:[{parts:[{text:p}]}],generationConfig:{responseMimeType:'application/json'}})});
+ if(r.status===429){const j=await (r.clone?r.clone():r).json().catch(()=>({}));useAdd(feat,0,(j.error&&j.error.message)||'429 Too many requests')}
+ if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gem(p,retry,true,feat)}}
+ if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gem(p,retry-1,picked,feat)}
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(r.status+'|'+((j.error&&j.error.message)||r.statusText||''))}
+ const j=await r.json();useAdd(feat,j.usageMetadata&&j.usageMetadata.totalTokenCount);const cd=j.candidates&&j.candidates[0],t=cd&&cd.content&&cd.content.parts?cd.content.parts.map(x=>x.text||'').join(''):'';
+ if(!t)throw new Error('0|Empty reply'+(cd&&cd.finishReason?' ('+cd.finishReason+')':''));
+ return JSON.parse(t.replace(/```json|```/g,'').trim())}
+async function pickModel(){const c=aiGet(),r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':c.key}});if(!r.ok)return null;
+ const j=await r.json(),ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));
+ return ['gemini-3.5-flash','gemini-flash-latest','gemini-3.1-flash-lite','gemini-3-flash-preview','gemini-2.5-flash'].find(p=>ok.includes(p))||ok.find(n=>/flash/.test(n)&&!/image|tts|live|audio|embed|thinking/.test(n))||null}
+function aiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,90);
+ if(e&&e.message==='nokey')return 'No API key saved.';
+ if(e instanceof TypeError)return 'Cannot reach Google. Check internet, VPN or ad-blocker.';
+ if(e instanceof SyntaxError)return 'AI reply was not understood. Try again.';
+ if(c==='400')return /key/i.test(d)?'API key is not valid. Paste it again.':'Bad request: '+d;
+ if(c==='403')return 'Key not allowed (restricted, blocked, or API not enabled).';
+ if(c==='404')return 'No working Gemini model found for this key. Check the key in Google AI Studio.';
+ if(c==='429')return 'Too many requests or free quota used. Wait 1 minute.';
+ return 'Error '+c+(d?': '+d:'')}
+function judge(t,w,ans,sc){const P={mean:`Word: "${w.word}". Correct meaning: "${w.mean||'standard meaning'}". Learner's answer: "${ans}". Does the learner's answer show the right meaning?`,sent:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Learner's sentence: "${ans}". Check: word used correctly, sentence makes sense, grammar reasonably correct.`,work:`Word: "${w.word}" (meaning: ${w.mean||'standard meaning'}). Situation: ${sc}. Learner's reply: "${ans}". Check: word used naturally and correctly here, reply makes sense, grammar reasonably correct.`}[t];
+ return gem('You are a kind English teacher for a beginner learner. '+P+' Reply ONLY JSON: {"r":"correct" or "partial" or "wrong","note":"max 20 words, simple English, give the fix if not fully correct"}',1,false,'ai-test')}
+function mkQ(ws,off){const TY=Object.keys(TN);return shuf(ws).map((w,i)=>{let t=(st.sm&&st.sm[w.id])?'spell':TY[(i+off)%5];if(t==='blank'&&!w.sent)t='sent';return{id:w.id,t,s:Math.floor(Math.random()*SC.length)}})}
+function bld(q,w){const W=E(w.word);
+ if(q.t==='mean')return{text:`What does <b>${W}</b> mean?`};
+ if(q.t==='spell')return canSay?{text:`🔊 Listen and type the spelling.<div class="mu">${w.word.length} letters</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="w">🔊 Hear word</button><button class="sec" data-a="say" data-v="s">💬 In a sentence</button></div>`,x:w.word}:{text:`Spell the word that means: <b>${E(w.mean||'')}</b><div class="mu">${w.word.length} letters, starts with "${E(w.word[0])}"</div>`,x:w.word};
+ if(q.t==='blank'){const re=new RegExp('\\b'+w.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\w*','i'),m=(w.sent||'').match(re);
+  return m?{text:E(w.sent.replace(re,'________'))+`<div class="mu">Hint: ${E(w.mean)}</div>`,x:m[0]}:{text:`________ <div class="mu">Meaning: ${E(w.mean)}</div>`,x:w.word}}
+ if(q.t==='sent')return{text:`Make a sentence using: <b>${W}</b>`};
+ return{text:`${E(SC[q.s])} Use the word <b>${W}</b> naturally.`}}
+async function aiAns(retry){if(aiBusy)return;const v=st.vt,q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i],w=gw(q.id),el=$('#aians'),ans=retry?v.pend:(el?el.value.trim():'');if(!ans)return;
+ v.pend=ans;aiErr=false;let r,note;
+ if(q.t==='spell'||q.t==='blank'){const x=bld(q,w).x,ok=nm(ans)===nm(x)||nm(ans)===nm(w.word);r=ok?'c':'w';note=ok?'Well done!':(q.t==='spell'?'Correct spelling: ':'Correct answer: ')+x}
+ else{aiBusy=true;save();render();try{const o=await judge(q.t,w,ans,SC[q.s]);r={correct:'c',partial:'p',wrong:'w'}[String(o.r).toLowerCase()]||'w';note=String(o.note||'')}catch(e){aiBusy=false;aiMsg=aiWhy(e);aiErr=e.message==='nokey'?'nokey':'fail';render();return}aiBusy=false}
+ const e={id:w.id,t:q.t,r,note,ans,sp:q.t==='spell'&&r==='w'};if(e.sp)markSp(w,ans);else if(q.t==='spell'&&r==='c')clearSp(w);
+ (q2?v.log2:v.log).push(e);v.fb=e;v.pend='';save();render()}
+function finMain(v){v.ph='res';v.log.forEach(e=>{if(e.r==='w'||e.sp)st.wh[e.id]=(st.wh[e.id]||0)+1});if(isSun()){const d=st.days[today()]=st.days[today()]||{};d.wd=true}}
+function nextQ(){const v=st.vt;v.fb=null;if(v.ph==='q2'){v.i2++;if(v.i2>=v.q2.length){v.ph='fin';v.log2.forEach(e=>{if(e.t==='spell'&&e.r==='c')delete st.sm[e.id]})}}else{v.i++;if(v.i>=v.q.length)finMain(v)}save();render()}
+function cats(v){const by={},S=[],N=[],K=[];v.log.forEach(e=>by[e.id]=e);Object.values(by).forEach(e=>{const w=gw(e.id);if(!w)return;const f=e.r==='w'||e.sp;if(e.r==='c'&&!e.sp)S.push(w);else if(f&&(st.wh[e.id]||0)>=2)K.push(w);else N.push(w)});return{S,N,K}}
+function aiBegin(){const ws=wkWords(today());if(!ws.length||!aiGet().key)return render();st.sm=st.sm||{};st.wh=st.wh||{};st.vt={wk:mon(today()),ph:'q',q:mkQ(ws,0),i:0,log:[],q2:[],i2:0,log2:[],fb:null,pend:'',rev:[]};save();render()}
+function startRe(){const v=st.vt,c=cats(v),ws=[...c.N,...c.K];v.rev=ws.map(w=>w.id);v.q2=mkQ(ws,1);v.i2=0;v.log2=[];v.ph='q2';v.fb=null;save();render()}
+/* ===== API USAGE ===== */
+const ptDay=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'});
+function useAdd(feat,tok,err){const c=aiGet(),u=c.use||{days:{},total:{n:0,tok:0}},d=ptDay(),r=u.days[d]=u.days[d]||{n:0,tok:0,by:{},f429:0};
+ if(err){r.f429++;u.e429={t:Date.now(),msg:String(err).slice(0,220)}}else{r.n++;r.tok+=tok||0;r.by[feat]=(r.by[feat]||0)+1;u.total.n++;u.total.tok+=tok||0;u.last={t:Date.now(),model:c.model,feat}}
+ const ks=Object.keys(u.days).sort();while(ks.length>14)delete u.days[ks.shift()];aiSet({use:u});const el=document.getElementById('rpdn');if(el)el.innerHTML=rpdHtml()}
+const rpdHtml=()=>{const c=aiGet(),u=c.use||{days:{}},n=(u.days[ptDay()]||{n:0}).n,L=+c.limit||0;
+ return L?`<div class="rpd">Requests Today: <b>${n} / ${L}</b></div><div class="rpd">Remaining: <b>${Math.max(0,L-n)}</b></div>`:`<div class="rpd">Requests Today: <b>${n}</b></div><div class="rpd">Remaining: <span class="mu">enter your RPD limit above</span></div>`};
+function usePanel(){const c=aiGet();
+ return `<div class="card"><h2 style="margin-top:0">📊 API Usage</h2><div class="mu">Daily RPD Limit</div><input type="number" id="ailim" inputmode="numeric" min="0" placeholder="20" value="${+c.limit||''}"><div class="mu" style="margin-top:6px">Requests used today (copy from AI Studio, optional)</div><input type="number" id="aiused" inputmode="numeric" min="0" placeholder="11"><button data-a="ailimsave">Save</button><div id="rpdn">${rpdHtml()}</div></div>`}
+function aiSaveF(){const k=$('#aik'),m=$('#aim');if(k&&k.value.trim()){aiSet({key:k.value.trim().replace(/^[\"']+|[\"']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())aiSet({model:m.value.trim().replace(/^models\//,'')})}
+async function aiAct(a){const v=st.vt;
+ if(a==='ailimsave'){const n=Math.round(+($('#ailim').value||0));aiSet({limit:n>0?n:0});const uv=$('#aiused').value.trim();if(uv!==''){const c=aiGet(),u=c.use||{days:{},total:{n:0,tok:0}},r=u.days[ptDay()]=u.days[ptDay()]||{n:0,tok:0,by:{},f429:0};r.n=Math.max(0,Math.round(+uv)||0);aiSet({use:u})}toast('✅ Saved');render();return}
+ if(a==='keyeye'){const i=$('#aik'),b=document.querySelector('[data-a=keyeye]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
+ if(a==='aisave'){aiSaveF();toast('✅ API settings saved');render();return}
+ if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}',1,false,'connection');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
+ if(a==='aistart'){view='ai';animNext=true;render();return}
+ if(a==='aigoset'){view='set';animNext=true;render();return}
+ if(a==='aibegin')return aiBegin();
+ if(a==='aians')return aiAns(false);
+ if(a==='airetry')return aiAns(true);
+ if(a==='ainext')return nextQ();
+ if(a==='airev'){v.ph='rev';save();render();return}
+ if(a==='aiq2')return startRe();
+ if(a==='aiquit'){view='today';animNext=true;render();return}
+ if(a==='aireset'&&confirm('Start the test again from the beginning?')){st.vt=null;save();render()}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='aians'){e.preventDefault();aiAct('aians')}});
+const chipsOf=(ws,c)=>ws.length?`<div class="chips">${ws.map(w=>`<span style="--c:${c}">${E(w.word)}</span>`).join('')}</div>`:'<div class="mu">None 🎉</div>';
+function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
+ if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
+  return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
+ return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><div class="two"><button class="sec" data-a="gow">Add words</button><button class="sec" data-a="spstart">🔊 Spelling</button></div></div>`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
+function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
+ return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()}
+function aiHome(){const c=aiGet(),n=wkWords(today()).length;
+ return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!c.key?`<div class="warn">⚠️ Add your Gemini API key in Settings → AI Vocabulary.</div><button data-a="aigoset">Open Settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
+function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
+ let h=`<h1>${q2?'Weak Word Retest':'Sunday AI Vocabulary Test'}</h1><div class="card hero w"><div class="mu">Progress</div><div class="big2">Question ${i+1} / ${L.length}</div><div class="bar" style="margin-top:10px"><i style="width:${i/L.length*100}%"></i></div></div><div class="stats"><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div><div><b>${lg.filter(e=>e.sp).length}</b>Spelling mistakes</div></div><div class="card"><div class="mu">${TN[q.t]}</div><div class="aq">${b.text}</div>`;
+ if(f)h+=`<div class="fb ${f.r}">${{c:'✅ Correct',p:'🟡 Partly correct',w:'❌ Wrong'}[f.r]}<div style="font-weight:500;margin-top:4px">${E(f.note)}</div></div><button data-a="ainext">${i+1>=L.length?'Finish':'Next →'}</button>`;
+ else{h+=`<input type="text" id="aians" placeholder="Your answer" ${(q.t==='spell'||q.t==='blank')?NOSUG:'autocomplete="off" autocapitalize="off" spellcheck="false"'} value="${E(v.pend||'')}" ${aiBusy?'disabled':''}>`;
+  if(aiErr)h+=`<div class="warn">${aiErr==='nokey'?'⚠️ Add your Gemini API key in Settings → AI Vocabulary.':'❌ AI connection failed. Check your API key and internet connection.'}${aiErr==='fail'?'<div class="mu" style="margin-top:4px;font-weight:500">'+E(aiMsg)+'</div>':''}</div><button data-a="airetry">Try Again</button>`+(aiErr==='nokey'?'<button class="sec" data-a="aigoset">Open Settings</button>':'');
+  else h+=`<button data-a="aians" ${aiBusy?'disabled':''}>${aiBusy?'Checking…':'Submit answer'}</button>`}
+ return h+`</div><button class="sec" data-a="aiquit">Save and exit</button>`}
+function vRes(v){const c=cats(v),n=k=>v.log.filter(e=>e.r===k).length,T=v.log.length,sc=Math.round((n('c')+n('p')/2)/T*100),sp=v.log.filter(e=>e.sp),bad=c.N.length+c.K.length;
+ return `<h1>Test Result</h1><div class="card hero w"><div class="mu">🎯 Score</div><div class="big2">${sc}%</div></div><div class="stats"><div><b>${T}</b>Total</div><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div></div>
+ <h2>🟢 Strong words</h2>${chipsOf(c.S,'#34d399')}<h2>🟡 Needs practice</h2>${chipsOf(c.N,'#fbbf24')}<h2>🔴 Weak words</h2>${chipsOf(c.K,'#fb7185')}<h2>✍️ Spelling mistakes (marked)</h2>${sp.length?sp.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join(''):'<div class="mu">None 🎉</div>'}`+
+ (bad?`<button data-a="airev" style="margin-top:16px">🔄 Weak Word Revision</button>`:`<div class="card" style="margin-top:16px">🎉 No weak words. Great week!</div>`)+`<button class="sec" data-a="aiquit">Back to Today</button>`}
+function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
+ return `<h1>Weak Word Revision</h1><div class="mu">Read each word. Then say or write one new sentence with it.</div>`+ws.map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean)}</div><div class="mu">Spelling: <b>${E(w.word)}</b></div><div class="mu">Example: ${E(w.sent||'-')}</div><input type="text" placeholder="✍️ Now use it in your own sentence"></div>`).join('')+`<button data-a="aiq2">Start Weak Word Retest</button>`}
+function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
+ return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
+function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
+/* ===== SPELLING CHECK (listen and write) ===== */
+const NOSUG='autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" enterkeyhint="done" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"';
+const canSay='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';let lastSay='',sp=null;
+function say(t,rate){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.8;const v=speechSynthesis.getVoices().find(x=>/^en[-_](US|GB|IN)/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
+function sayWord(m){const w=curWord();if(!w)return;if(m==='s'&&w.sent)say(w.word+'. '+w.sent+'. '+w.word,.85);else say(w.word,m==='slow'?.5:.75)}
+function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
+function markSp(w,a){st.sm=st.sm||{};st.sm[w.id]=1;w.mistake=true;w.wrong=a}
+function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
+async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
+ if(!aiGet().key){toast('Add your Gemini API key in Settings to get meaning and example');return}
+ fillBusy=true;render();
+ try{const o=await gem('You help an English learner in India (beginner level). For each word below give a very simple meaning (max 10 words) and one short simple example sentence (max 12 words) that uses the exact word. Words: '+JSON.stringify(ws.map(w=>w.word))+'. Reply ONLY a JSON array like [{"word":"...","mean":"...","sent":"..."}]',1,false,'words');
+  const arr=Array.isArray(o)?o:(o.words||[]);let n=0;
+  arr.forEach(x=>{const w=ws.find(y=>y.word.toLowerCase()===String(x.word||'').trim().toLowerCase());if(w&&x.mean){w.mean=String(x.mean);w.sent=String(x.sent||'');n++}});
+  save();toast('✨ AI wrote meaning and example for '+n+' word'+(n===1?'':'s'))
+ }catch(e){toast('❌ AI failed: '+aiWhy(e))}
+ fillBusy=false;render()}
+async function addWords(){if(isSun())return alert('Sunday is test day. No new words.');
+ const el=$('#nw'),have=new Set(st.words.map(w=>w.word.toLowerCase())),seen=new Set(),
+  list=(el?el.value:'').split(/[,\n;]+/).map(x=>x.trim()).filter(x=>x&&!seen.has(x.toLowerCase())&&seen.add(x.toLowerCase())),
+  fresh=list.filter(x=>!have.has(x.toLowerCase())),left=10-st.words.filter(x=>x.date===today()).length;
+ if(!list.length)return alert('Write the word first.');
+ if(!fresh.length)return alert('You already have this word.');
+ if(left<=0)return alert('You already added 10 words today. Great job!');
+ const take=fresh.slice(0,left),ids=take.map(x=>{const id=Date.now()+Math.random().toString(36).slice(2,6);st.words.push({id,date:today(),word:x,mean:'',sent:'',mistake:false});return id});
+ save();if(fresh.length>take.length)toast('Only '+take.length+' added. Daily limit is 10.');
+ await fillAI(ids);if(!fillBusy)render()}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nw'){e.preventDefault();addWords()}});
+const pendingN=()=>st.words.filter(w=>!w.mean||!w.sent).length;
+function spStart(){const mk=st.sm||{},ws=wkWords(today());if(!ws.length)return alert('Add some words first.');
+ sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,20).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false};view='spell';animNext=true;render()}
+function spCheck(){const el=$('#spans'),a=el?el.value.trim():'';if(!a||!sp||sp.fb)return;const w=gw(sp.q[sp.i]),ok=nm(a)===nm(w.word);st.sm=st.sm||{};
+ if(ok){sp.ok++;clearSp(w)}else{sp.bad.push({id:w.id,ans:a});markSp(w,a)}sp.fb={ok,ans:a};save();render()}
+function spAct(a){if(a==='spstart')return spStart();if(a==='spchk')return spCheck();
+ if(a==='spnext'){sp.fb=null;sp.i++;if(sp.i>=sp.q.length)sp.done=true;return render()}
+ if(a==='spquit'){view='words';sp=null;animNext=true;return render()}
+ if(a==='spagain'){sp={q:shuf(sp.bad.map(e=>e.id)),i:0,ok:0,bad:[],fb:null,done:false};render()}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='spans'){e.preventDefault();spCheck()}});
+function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothing to practice yet.</div>';
+ if(sp.done){const n=sp.q.length;return `<h1>Spelling Result</h1><div class="card hero w"><div class="mu">Score</div><div class="big2">${sp.ok} / ${n}</div></div>`+(sp.bad.length?`<h2>✍️ Spelling mistakes (marked)</h2><div class="mu">Saved as spelling mistakes on your Words page.</div>`+sp.bad.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join('')+`<button data-a="spagain">🔁 Practice mistakes again</button>`:'<div class="card">🎉 All spelled correctly!</div>')+`<button class="sec" data-a="spstart">New round</button><button class="sec" data-a="spquit">Back to Words</button>`}
+ const w=gw(sp.q[sp.i]),f=sp.fb;
+ let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
+ if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
+ else h+=`<input type="text" id="spans" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
+ return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
+/* ===== AI COACH MOTIVATION ===== */
+let motBusy=false,motErr='',motT=null;
+const motSig=s=>s+'|'+cnt(s)+'|'+(new Date().getHours()<12?'m':new Date().getHours()<18?'a':'e');
+function motPrompt(s){const N={wo:'Workout',wd:'Words',sp:'Speaking',fr:'Frappe coding',rd:'Reading'},h=new Date().getHours(),sk=streaks(),g=gstats(),t=(st.days[s]&&st.days[s].t)||{},
+ dn=Math.round((pd(s)-pd(S0))/864e5)+1,
+ day=(d,now)=>{const a=T.filter(k=>isDone(d,k)).map(k=>N[k]),m=T.filter(k=>!isDone(d,k)).map(k=>N[k]);return cnt(d)+'/'+T.length+(a.length?' done: '+a.join(', '):' nothing done')+(m.length?(now?'; not done yet: ':'; missed: ')+m.join(', '):'')},
+ past=[];for(let i=1;i<=7;i++){const d=add(s,-i);if(d<S0)break;past.push(pd(d).toLocaleDateString('en-IN',{weekday:'short'})+' '+d.slice(5)+': '+day(d))}
+ return 'You are a strict but caring personal coach for a learner in a 92-day challenge (Oct 1 to Dec 31). Use ONLY the data below. Write 2 or 3 short sentences in very simple English. Mention one real fact from the data (a streak, a missed task, a good day). Be honest, no fake praise. End with one clear next action for right now. Max 45 words. No hashtags.\nDATA:\nChallenge day '+dn+' of 92. Local time '+h+':00.\nStreak '+sk.cur+' days (best '+sk.best+'). Level '+(g.lv||1)+'.\nToday: '+day(s,true)+'. Frappe minutes today '+(t.fr||0)+'. Words added today '+st.words.filter(w=>w.date===s).length+'/10.\nLast days:\n'+(past.join('\n')||'No past days yet (this is the first day).')+'\nOpen spelling mistakes: '+Object.keys(st.sm||{}).length+'.\nReply ONLY JSON {"msg":"..."}'}
+function aiMotiv(s,sk){const m=st.mot;let b;
+ if(!aiGet().key)b='<div class="mu" style="margin:6px 0">Add your Gemini API key in Settings to get your daily AI coach message.</div><button class="sec" data-a="aigoset">Open Settings</button>';
+ else{b=(m&&m.msg?'<div class="mq'+(motBusy?' dim':'')+'">'+E(m.msg)+'</div>':motBusy?'<div class="mq dim">Your coach is reading your last days…</div>':'')+(motErr&&!motBusy?'<div class="mu" style="margin:6px 0">❌ '+E(motErr)+'</div>':'')+'<button class="sec" data-a="motgo" '+(motBusy?'disabled':'')+'>'+(motBusy?'✨ Thinking…':'🔄 New message')+'</button>';
+  if(s===today()&&!motBusy&&!motErr&&(!m||m.sig!==motSig(s))){clearTimeout(motT);motT=setTimeout(()=>motGo(false),1500)}}
+ return '<div class="card mot" id="motc" style="animation:none"><div class="mu">💬 AI Coach</div>'+b+'</div>'}
+const refreshMot=()=>{const e=$('#motc');if(e&&view==='today')e.outerHTML=aiMotiv(today(),streaks())};
+async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr='';const s=today();motBusy=true;refreshMot();
+ try{const o=await gem(motPrompt(s),1,false,'coach'),msg=String(o.msg||'').trim();if(!msg)throw new Error('0|Empty reply');st.mot={d:s,sig:motSig(s),msg,at:Date.now()};save()}
+ catch(e){motErr=aiWhy(e)}
+ motBusy=false;refreshMot()}
+/* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
+function editor(s){
+ const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
+ const L={wo:['Workout','10 min workout'],wd:sun?['AI Vocabulary Test','AI Vocabulary Test']:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
+  fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
+ let h=`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
+ T.forEach(k=>{const rest=k==='wo'&&isRest(s);
+  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
+ if(showP)h+=privRow(s);
+ return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
+
+/* ===== TODAY ===== */
+function notifySetup(){
+ const n=st.notify||{enabled:false,next:0};
+ return `<div class="card"><h2 style="margin-top:0">🔔 2-Hour Notifications</h2>
+ <div class="mu">Get a reminder every 2 hours while this tracker is open.</div>
+ <button class="${n.enabled?'dng':'pri'}" data-a="notif">${n.enabled?'Turn OFF reminders':'Turn ON 2-hour reminders'}</button>
+ ${n.enabled&&n.next?`<div class="mu" style="margin-top:8px">Next reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}
+ </div>`;
+}
+function checkNotify(){
+ if(!st.notify?.enabled)return;
+ if(!('Notification' in window))return;
+ if(Date.now()>=Number(st.notify.next||0)){
+  if(Notification.permission==='granted'){
+   new Notification('Winter Arc Reminder',{body:'2 hours are up. Check your Winter Arc tasks and keep going.'});
+  }
+  st.notify.next=Date.now()+2*60*60*1000; save();
+  if(view==='today')render();
+ }
+}
+function vToday(){
+ const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
+ let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
+ if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
+ h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+focusCard();
+ return h+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button>`}
+
+/* ===== CALENDAR ===== */
+function vCal(){
+ let h='<h1>Calendar</h1><div class="tabs">'+Object.keys(MN).map(m=>`<button data-a="cm" data-v="${m}" class="${calM===m?'on':''}">${MN[m]}</button>`).join('')+'</div><div class="grid">';
+ 'MTWTFSS'.split('').forEach(x=>h+=`<i>${x}</i>`);
+ const off=(pd('2026-'+calM+'-01').getDay()+6)%7,dim=new Date(2026,+calM,0).getDate();
+ for(let i=0;i<off;i++)h+='<i></i>';
+ for(let d=1;d<=dim;d++){const s=`2026-${calM}-${String(d).padStart(2,'0')}`;
+  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}</button>`}
+ h+='</div><div class="mu" style="margin:10px 0">Green: all 5 · Yellow: 3-4 · Red: 0-2 · Grey: future</div>';
+ return h+(calSel?`<h2>${pd(calSel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</h2>`+editor(calSel):'')}
+
+/* ===== WEEKLY ===== */
+function wk(w){                                             // auto stats + score for a week ending Sunday w
+ const D=[];for(let i=-6;i<=0;i++){const s=add(w,i);if(inPlan(s))D.push(s)}
+ const n=D.length,wd=D.filter(s=>!isRest(s)),m=st.weeks[w]||{},max=w==='2026-10-04'?30:60,
+ c=k=>D.filter(s=>isDone(s,k)).length,wo=wd.filter(s=>isDone(s,'wo')).length,pgA=D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].pg)||0),0),wn=st.words.filter(w=>D.includes(w.date)).length,tm=k=>D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].t&&st.days[s].t[k])||0),0),fh=Math.round((tm('fr')/60||+m.fh||0)*10)/10,sc=+m.sc||0,
+ P={fr:Math.min(fh/(8.5*n/7),1)*30,wo:wo/wd.length*20,sp:c('sp')/n*15,sc:Math.min(sc/max,1)*15,rd:c('rd')/n*10,co:D.filter(s=>ok(s)).length/n*10}; // 8.5h = 6x70min + 90min
+ return{wo,wt:wd.length,n,fr:c('fr'),sp:c('sp'),rd:c('rd'),max,fh,sc,pg:pgA||+m.pg||0,wn,tmx:{wo:tm('wo'),wd:tm('wd'),sp:tm('sp'),fr:tm('fr'),rd:tm('rd')},m,P,score:Math.round(Object.values(P).reduce((a,b)=>a+b,0)),missed:D.filter(s=>s<today()&&!ok(s)).length}}
+function wkOut0(w){
+ const c=wk(w),p=WEEKS[WEEKS.indexOf(w)-1],started=add(w,-6)<=today();
+ let h=`<div class="stats"><div><b>${c.wo}/${c.wt}</b>Workouts</div><div><b>${c.fr}/${c.n}</b>Frappe days</div><div><b>${c.sp}/${c.n}</b>Speaking days</div><div><b>${c.rd}/${c.n}</b>Reading days</div></div><div class="card"><b>Time this week (auto)</b><div class="chips"><span style="--c:#fb923c">💪 ${hm(c.tmx.wo)}</span><span style="--c:#a78bfa">🔤 ${c.wn} words</span><span style="--c:#f472b6">🎤 ${hm(c.tmx.sp)}</span><span style="--c:#22d3ee">💻 ${hm(c.tmx.fr)}</span><span style="--c:#fbbf24">📖 ${c.pg} pages</span></div></div>`+
+ `<div class="card">Score<div class="big">${c.score}/100</div><div class="mu">Frappe ${c.P.fr|0}/30, Workout ${c.P.wo|0}/20, Speaking ${c.P.sp|0}/15, Spelling ${c.P.sc|0}/15, Reading ${c.P.rd|0}/10, Consistency ${c.P.co|0}/10</div></div>`;
+ if(c.missed>=3)h+='<div class="warn">FAIL WEEK - repeat this week\'s Frappe topic</div>';
+ if(started&&c.score<70)h+='<div class="warn">Score below 70. Fix it next week.</div>';
+ if(started&&c.score<50&&p&&wk(p).score<50)h+='<div class="warn">CUT GOALS: below 50 two weeks in a row. Reduce the plan.</div>';
+ return h}
+function report(w){const c=wk(w);
+ return `Workouts ${c.wo}/${c.wt}, Frappe hours ${c.fh}, Pages read ${c.pg}, Speaking days ${c.sp}/${c.n}, Spelling test ${c.sc}/${c.max}, What I built ${c.m.built||'-'}, Biggest excuse ${c.m.excuse||'-'}.`}
+function vWeek(){
+ if(!wkSel)wkSel=WEEKS.filter(w=>add(w,-6)<=today()).pop()||WEEKS[0];
+ const m=st.weeks[wkSel]||{},max=wkSel==='2026-10-04'?30:60;
+ const f=(k,l,t)=>`<div class="mu" style="margin-top:8px">${l}</div><input type="${t}" ${t==='number'?'inputmode="decimal"':''} data-w="${k}" value="${E(m[k])}">`;
+ return `<h1>Weekly review</h1><select data-a="wsel">${WEEKS.map(w=>`<option value="${w}" ${w===wkSel?'selected':''}>Week ${WEEKS.indexOf(w)+1} · ending ${wlab(w)}</option>`).join('')}</select><div id="wko">${wkOut(wkSel)}</div>`+
+ f('sc',`Spelling test score (/${max})`,'number')+f('built','What I built','text')+f('excuse','Biggest excuse','text')+
+ `<button data-a="copy">📋 Copy Sunday report</button><div class="mu" style="text-align:center">Paste it to your coach every Sunday (Rule 10)</div>`}
+
+/* ===== RULES ===== */
+const RULES=[
+'Never miss twice in a row. One miss is an accident. Two is a habit.',
+'No double work next day. No catch-up burnout.',
+'Minimum day: 10 min workout, 5 words, 5 min speaking, 20 min coding, 5 pages. NEVER zero.',
+'Missed 2 days in a row: +30 min extra on Sunday and write the REAL reason.',
+'Missed 3+ days in a week = FAIL week. Repeat that week’s Frappe topic.',
+'Real sickness: rest and tell your coach. Not a fail.',
+'Weekly targets: Workouts 5/5, new words 60, speaking 7/7, Frappe 7 hours+, reading 50 pages, GitHub push at least once.',
+'Score: Frappe 30, Workout 20, Speaking 15, Spelling 15, Reading 10, Consistency 10.',
+'Below 70 = warning. Below 50 two weeks in a row = goals get cut.',
+'Every Sunday report: workouts /5, Frappe hours, pages read, speaking /7, spelling test, what I built, biggest excuse.',
+'Oct 1–4 is a short week: 3 workouts, 5 Frappe hours, spelling test /30.',
+'Use a dictionary for every new word. Wrong spelling-test words go to the Mistake List and return next week.'
+];
+const RG=[['🔥','Consistency rules',[0,1,2,3,4,5],'#fb923c'],['🎯','Targets and score',[6,7,8],'#22d3ee'],['🗓','Weekly routine',[9,10,11],'#a78bfa']];
+const TL=[['6:00','💪','Workout','#fb923c'],['6:30','🔤','Words','#a78bfa'],['6:40','🎤','Speaking','#f472b6'],['9:00–7:00','💼','Sales job','#94a3b8'],['7:30','🍽','Dinner','#94a3b8'],['8:00','💻','Frappe / coding','#22d3ee'],['9:10','📖','Reading','#fbbf24'],['9:30','📵','Phone away','#94a3b8'],['10:00','😴','Sleep','#818cf8']];
+const rl=x=>{const m=x.match(/^(.*?[.:])\s+(.*)$/);return m?'<b>'+E(m[1])+'</b>'+E(m[2]):E(x)};
+function vRules(){
+ return '<h1>Rules</h1><div class="card hero"><b style="font-size:22px;display:block">Rules beat motivation.</b><span class="mu">Follow these 12 rules and the 92 days take care of themselves.</span></div>'+
+ RG.map(([ic,t,ix,c])=>`<div class="rg" style="--c:${c}"><i>${ic}</i><h2>${t}</h2></div>`+ix.map(i=>`<div class="rule" style="--c:${c}"><span class="num">${i+1}</span><p>${rl(RULES[i])}</p></div>`).join('')).join('')+
+ `<div class="rg" style="--c:#f472b6"><i>⏰</i><h2>Daily timetable</h2></div><div class="tl">`+TL.map(([t,ic,n,c])=>`<div class="tli" style="--c:${c}"><b>${t}</b><span>${ic} ${n}</span></div>`).join('')+'</div>'}
+
+/* ===== SYLLABUS ===== */
+const MC={Oct:'oct',Nov:'nov',Dec:'dec'},MF={Oct:'October',Nov:'November',Dec:'December'};
+/* ===== FRAPPE ROADMAP ===== */
+const FR=[
+['🧱','Web, Git and terminal basics','Oct',['~Python basics and OOP|variables, functions, classes, objects','~Files, JSON and errors|read and write files, try/except','JavaScript essentials|functions, objects, async/await, DOM','HTML and CSS basics|forms, layout, a simple page','~SQL basics|SELECT, JOIN, GROUP BY, indexes','Git and GitHub|commit, branch, pull request','Terminal and Linux basics|cd, ls, nano, permissions, ssh']],
+['⚙️','Install and bench','Oct',['Choose your setup|WSL2 or Ubuntu, Docker, or Frappe Cloud for practice','Install bench|Python, Node, MariaDB, Redis, then bench','Create a bench|bench init with the version-16 branch','Create a site|bench new-site, hosts entry, open in browser','Get and install apps|bench get-app, install-app erpnext','Developer mode and VS Code|set developer_mode, open the app folder','Daily bench commands|start, migrate, clear-cache, console, backup']],
+['🧭','How Frappe works','Oct',['Framework, ERPNext, app, site|what each one is and how they connect','App folder structure|hooks.py, modules.txt, patches.txt, module folders','Metadata idea|one DocType gives table, form, list and API','Request flow|nginx, gunicorn, Frappe, MariaDB, Redis','Workers and scheduler|background jobs and timed tasks','Create your first app|bench new-app and install it on your site']],
+['🧩','DocTypes','Nov',['Create a DocType|module, fields, save, see the form','Field types|Data, Link, Select, Date, Currency, Table','Naming rules|autoname, naming series, field name','Child tables|table fields, parent and child rows','Single, Tree and Submittable|settings pages, hierarchies, docstatus','Field logic|depends_on, mandatory_depends_on, read_only','Customize Form and Custom Fields|change ERPNext safely, no core edits','List and form settings|title field, search fields, list columns']],
+['🔐','Roles and permissions','Nov',['Roles and users|create users, give roles','DocType permissions|read, write, create, submit, cancel','Permission levels|hide fields from some roles','User permissions|restrict records by value, such as Company','Sharing and owner rules|if_owner, share one document','Test as another user|log in as a test user and check access']],
+['🐍','Server scripts (Python)','Nov',['Controller class|the .py file of a DocType','Document events|validate, before_save, on_update, on_submit','Create and read documents|get_doc, new_doc, insert, save','frappe.db|get_value, get_all, set_value, exists','Query Builder|frappe.qb and safe SQL, no string joins','Messages and errors|frappe.throw, msgprint, validation patterns','Utils|getdate, nowdate, flt, cint, add_days']],
+['🖱️','Client scripts (JS)','Nov',['Form events|frappe.ui.form.on, refresh, onload, validate','The frm object|set_value, set_df_property, toggle_display','Filters|set_query for Link fields','Custom buttons|add_custom_button and groups','Dialogs and prompts|frappe.ui.Dialog, frappe.prompt, confirm','Call the server|frappe.call and frappe.db.get_value','Child table events|row add, field change inside a table','List view scripts|listview_settings and indicators']],
+['📊','Reports and print','Nov',['Report Builder|no-code reports from any DocType','Query Report|a SQL report with filters','Script Report|Python and JS report with columns and filters','Charts and number cards|dashboard charts, KPI cards','Workspace and dashboard|build a home page for a module','Print Formats|Jinja print format, letterhead','Email templates|reuse text in emails and notifications']],
+['🔄','Workflows and automation','Nov',['Workflow|states, transitions, allowed roles','Assignment Rule and ToDo|auto-assign work to people','Notifications|email or system alert on events','Auto Repeat|repeat documents on a schedule','Background jobs|frappe.enqueue for slow work','Webhooks|send data to another system']],
+['🪝','Hooks and app config','Dec',['doc_events|run code when any DocType changes','scheduler_events|daily, hourly and cron jobs','Fixtures|export custom fields and settings with your app','Include JS and CSS|app_include_js, doctype_js','Override and extend|override_whitelisted_methods, extend_doctype_class','Permission hooks|has_permission, permission_query_conditions','Install hooks and patches|after_install, patches.txt migrations']],
+['🧪','Jinja and web pages','Dec',['Jinja basics|variables, loops, filters, if','Jinja in print formats|frappe.get_doc, formatting values','Web Form|let users submit data from the website','Portal pages|www folder, context, templates','Web Page and routes|simple website pages']],
+['🌐','REST API and integrations','Dec',['Whitelisted methods|@frappe.whitelist and /api/method','REST resource API|/api/resource GET, POST, PUT, DELETE','API key and secret|token authentication','Test with Postman|call your own site','Call other APIs|requests library and error handling','Data Import and Export|bulk upload from CSV','OAuth overview|login with other services']],
+['🏪','ERPNext basics','Dec',['Selling flow|Lead, Opportunity, Quotation, Sales Order','Delivery and invoice|Delivery Note, Sales Invoice, Payment Entry','Customer, Item, Price List|master data and taxes','Stock and accounts overview|just the basics','Customize ERPNext properly|own app, no core edits','Sales reports|the reports sales teams use']],
+['🛠️','Testing, debug and deploy','Dec',['bench console and execute|try code on a live site','Logs and Error Log|find and read errors','Unit tests|FrappeTestCase, bench run-tests','Performance basics|indexes, caching, avoid query loops','Backup, restore, update|bench backup, restore, update','Production and Frappe Cloud|nginx, supervisor, or hosted']],
+['🚀','Projects and jobs','Dec',['Library Management tutorial|official Frappe tutorial','Project 2: Sales Lead Tracker|DocTypes, scripts, report, workflow, print','Project 3: custom app on GitHub|clean code and a README','Resume and LinkedIn|add Frappe skills and projects','Interview practice|DocTypes, hooks, permissions, API questions','Apply to 10 jobs|send 10 applications']],
+['🐍','Python deep dive','Oct',['Setup and first program|python, pip, venv, run a script','Variables and data types|numbers, strings, booleans, None','Operators|math, compare, logic, membership','Strings|slicing, methods, formatting','Conditions|if, elif, else, match','Loops|for, while, range','Lists and tuples|ordered collections','Dictionaries and sets|key-value and unique items','Functions|def, return, arguments, scope','Built-in functions|len, sorted, map, any, all','Modules and packages|import, your own modules','File handling|text files, csv, paths','JSON and data formats|json, csv, API data','Errors and exceptions|try, except, raise','OOP: classes and objects|class, init, self, properties','OOP: inheritance and more|super, polymorphism, abc','Special methods and decorators|dunder methods, decorators','Iterators and generators|iter, next, yield','Useful standard modules|datetime, collections, re, os','Packages and APIs|pip, requests, environment variables','Testing and debugging|tracebacks, pdb, unittest, pytest','Practice projects|apply everything'],-2],
+['🗄️','SQL deep dive','Oct',['Database basics|tables, rows, keys','SELECT basics|read data','Filtering with WHERE|conditions','Sorting and limiting|ORDER BY, LIMIT','SQL functions|string, number, date, CASE','Aggregation|COUNT, SUM, AVG, GROUP BY','Changing data|INSERT, UPDATE, DELETE','Creating tables|CREATE, constraints, ALTER','JOINs|combine tables','Subqueries and CTEs|queries inside queries','Window functions|ranking, running totals','Design and normalization|good table design','Indexes and speed|why queries are slow','SQL from Python|connect and query','SQL practice|apply everything'],-1]];
+let syTab='job',syOpen={},fsOpen={},syInit=false;
+const MCOL={Oct:'#22d3ee',Nov:'#a78bfa',Dec:'#f472b6'};
+const FI=[
+['variables and data types;if / else and loops;functions and arguments;lists, dicts, sets;string methods and f-strings;classes and objects;init, self and methods;inheritance and super','open, read, write files;the with statement;json load and dump;try / except / finally;raise your own errors;pathlib basics','let, const, arrow functions;arrays: map, filter, forEach;objects and destructuring;callbacks and promises;async / await and fetch;DOM select and events','tags, forms, inputs;div, span, semantic tags;CSS selectors and box model;flexbox layout;build one simple page','SELECT and WHERE;ORDER BY and LIMIT;INSERT, UPDATE, DELETE;JOIN (inner, left);GROUP BY and COUNT;what an index is','git init, add, commit;branches and merge;push and pull;pull request flow;write a .gitignore;fix a merge conflict','cd, ls, pwd, mkdir;cp, mv, rm carefully;nano or vim basics;file permissions chmod;apt install and services;ssh into a server'],
+['what WSL2 or Ubuntu means;the Docker option;the Frappe Cloud trial option;pick one and write it down','update system packages;Python and pip;Node and yarn;MariaDB setup;Redis;install bench with pip','bench init command;the version-16 branch;folders: apps, sites, env;start the bench once','bench new-site;set the admin password;add the site to hosts;bench use site;login at localhost:8000','bench get-app;bench install-app;install ERPNext;list apps on a site','set developer_mode in site config;open the folder in VS Code;Python extension;debug with print and logs','bench start;bench migrate;bench clear-cache;bench build;bench console;bench backup'],
+['Frappe Framework is the base;ERPNext is an app on top;a bench holds many apps;a site is one database','hooks.py purpose;modules.txt;patches.txt;module folder with doctype folders;public and www folders','DocType JSON describes everything;one DocType gives form and list;every DocType gets a REST API;read one DocType JSON file','browser to nginx;gunicorn runs Frappe;MariaDB stores data;Redis for cache and queue;draw the flow on paper','background worker queues;short, default, long queues;scheduler runs timed jobs;check Scheduled Job Log','bench new-app;app name and module;install-app on your site;see it in the Apps list;push it to a GitHub repo'],
+['open the DocType list;click New;add 3 fields;set the module and save;open the form','Data, Text, Int, Float;Select with options;Link to another DocType;Date and Datetime;Currency;Table (child)','autoname options;naming series pattern;field:fieldname naming;prompt naming;set the title field','make a child DocType;add a Table field in the parent;add rows in the form;read rows in code','Single DocType for settings;Tree DocType (parent field);Submittable and docstatus 0, 1, 2;submit and cancel flow','depends_on expression;mandatory_depends_on;read_only_depends_on;hidden and read only;default values','the Customize Form screen;add a Custom Field to an ERPNext DocType;what a Property Setter is;why you never edit core','in list view option;title field;search fields;sort order;quick entry'],
+['create a user;assign roles;System Manager vs normal user;role profile','the permission matrix;read, write, create;submit, cancel, amend;delete and export','perm level 0, 1, 2;set the perm level on a field;grant a role per level','add a User Permission;restrict by Company;apply to all DocTypes toggle;test the result','the if_owner option;the Share button;read vs write share;when to use each','create a test user;log in as that user;check list and form access;fix a missing permission'],
+['open the .py file;class extends Document;add a method;call it with frappe.get_doc','validate vs before_save;on_update;before_submit and on_submit;on_cancel;order of events','frappe.get_doc;frappe.new_doc;doc.insert();doc.save();frappe.delete_doc','db.get_value;db.get_all and get_list;db.set_value;db.exists;db.count','frappe.qb.from_;select and where;joins;why to avoid string SQL;parameterized db.sql','frappe.throw;frappe.msgprint;ValidationError;frappe.log_error','getdate and nowdate;add_days and date_diff;flt and cint;fmt_money'],
+['frappe.ui.form.on;the refresh event;onload;validate and before_save;field change event','frm.set_value;frm.doc fields;set_df_property;toggle_display;refresh_field','frm.set_query;filter by another field;query for a child table field','add_custom_button;button groups;show only when saved;style the button','frappe.ui.Dialog fields;frappe.prompt;frappe.confirm;read values and submit','frappe.call with a method;pass args and handle the callback;frappe.db.get_value on client;show a freeze message','form_render and add rows;field change inside a child table;frappe.model.set_value;totals from rows','frappe.listview_settings;add_fields;get_indicator colors;onload button'],
+['create a report from a DocType;pick columns;filters and group by;save and share','write the SQL;filters with %(name)s;column format strings;add a chart','execute(filters) function;get_columns;get_data;JS filters file;return a chart','Dashboard Chart (count, sum);Number Card;add to a Workspace;refresh settings','create a Workspace;add shortcuts;add a chart and cards;set roles','Print Format Builder;custom HTML with Jinja;letterhead;check the PDF','Email Template DocType;Jinja in a template;use it in the Email dialog;use it in a Notification'],
+['states and doc status;transitions and actions;allowed roles;the workflow state field','set up an Assignment Rule;round robin vs load balancing;the ToDo list;test it','Notification DocType;event types;condition expression;email and system alerts','create an Auto Repeat;frequency;start and end date;check the generated documents','frappe.enqueue;queue and timeout;check the RQ job;when to use it','Webhook DocType;trigger event;request body with Jinja;test with webhook.site'],
+['doc_events in hooks.py;method path string;a before_save example;the wildcard *','daily and hourly events;cron expression;write the job function;test the job in bench console','fixtures in hooks.py;filters for Custom Field;bench export-fixtures;commit to git','app_include_js;doctype_js for one form;page_js;build assets','override_whitelisted_methods;override_doctype_class;extend_doctype_class;when hooks are better','the has_permission hook;permission_query_conditions;test with another role','after_install;patches.txt entry;write a patch;bench migrate runs patches'],
+['double braces output;if and for blocks;filters;comments','doc.field access;loop over doc.items;format_currency and format_date;page breaks','create a Web Form;pick fields;login required;thank you page','the www folder;html and py files;get_context;route from the file name','the Web Page DocType;route;rich content;Website Settings'],
+['@frappe.whitelist;call /api/method/path;allow_guest warning;return JSON','GET a list;GET one document;POST to create;PUT to update;DELETE','generate keys on the User;Authorization token header;rotate keys;keep the secret safe','make a request;set headers;read the response;save a collection','requests.get and post;timeout and errors;parse JSON;keep API keys in settings','download the template;fill the CSV;run Data Import;fix errors','what OAuth is;Social Login Key;OAuth Client;when you need it'],
+['Lead;Opportunity;Quotation;Sales Order;who does what','Delivery Note;Sales Invoice;Payment Entry;links between documents','create a Customer;create an Item;Price List;Tax templates','Warehouse;stock ledger idea;chart of accounts overview;GL entry in one line','use a custom app for changes;Custom Field with fixtures;hooks over core edits;upgrade safety','Sales Analytics;Sales Register;pipeline report;build one custom report'],
+['bench console;test a frappe.get_doc call;bench execute method;frappe.db.rollback','the Error Log DocType;the logs folder;read a traceback;frappe.log_error','FrappeTestCase class;write one test;bench run-tests;test records','add a db index;avoid queries in loops;frappe.cache;slow query log','bench backup;bench restore;bench update;check the version before updating','bench setup production;nginx and supervisor idea;SSL with certbot;Frappe Cloud steps'],
+['create the app;Article and Member DocTypes;Membership and Loan;scripts and portal','list requirements;DocTypes: Lead and Follow-up;server validation;client buttons;report and print;workflow','new app on GitHub;clean folder structure;README with screenshots;deploy notes','list your Frappe skills;describe 3 projects;add the GitHub link;ask for feedback','DocType types;hooks list;permissions flow;REST API;explain a project aloud','make a job list;tailor your resume;send applications;track replies'],
+['install Python and check the version;run a script in terminal and VS Code;print and input;comments and docstrings;virtual environments (venv);install packages with pip','int, float, complex;str, bool, NoneType;type() and isinstance();type conversion;variable naming rules;dynamic typing and id()','arithmetic operators;comparison operators;logical and, or, not;assignment and augmented assignment;membership: in, not in;identity: is, is not;operator precedence','indexing and slicing;upper, lower, strip, split, join;find, replace, startswith, endswith;f-strings and format();escape sequences and raw strings;strings are immutable;multiline strings','if / elif / else;nested conditions;ternary expression;truthy and falsy values;match statement','for loop and range();while loop;break, continue, pass;for-else;nested loops;enumerate and zip','list indexing and slicing;append, insert, remove, pop;sort and sorted;list comprehension;tuples and unpacking;copy vs deepcopy;nested lists','create, read, update a dict;get, items, keys, values;dict comprehension;nested dicts;set operations: union, intersection;frozenset;count things with a dict','def and return;positional and keyword arguments;default values;*args and **kwargs;scope: local, global, nonlocal;docstrings and type hints;recursion;lambda functions','len, abs, round, divmod;min, max, sum;sorted with key;map and filter;any and all;reversed','import and from import;own module in a file;the __name__ == "__main__" check;packages and __init__.py;random, math, datetime tour;requirements.txt','open modes: r, w, a;the with statement;read, readline, readlines;csv reader and writer;pathlib and os.path;binary files basics','json.load and json.dump;json.loads and json.dumps;nested JSON;pretty printing;read an API response','try / except / else / finally;catch specific errors;raise and custom exceptions;common errors: TypeError, KeyError, ValueError;assert;logging basics','define a class;init and self;instance vs class attributes;methods;__str__ and __repr__;@property getters and setters','single inheritance and super();method overriding;multiple inheritance and MRO;polymorphism;encapsulation: _ and __;abstract classes (abc);composition vs inheritance','@classmethod and @staticmethod;dunder methods: __len__, __eq__, __add__;write a decorator;functools.wraps;context managers: __enter__, __exit__','iterable vs iterator;__iter__ and __next__;generator functions with yield;generator expressions;itertools basics','datetime and timedelta;collections: Counter, defaultdict, deque;regular expressions (re) basics;random and secrets;os and sys','requests: GET and POST;status codes and headers;parse JSON responses;environment variables;pip freeze;read a library doc page','read a traceback;print and logging debugging;pdb basics;assert statements;unittest or pytest basics;write one test','CLI to-do app;file organizer script;number guessing game;contact book with JSON;Project 1: lead tracker CLI;push a project to GitHub'],
+['what a database and RDBMS are;tables, rows, columns;primary key;foreign key;data types;install MariaDB or MySQL','SELECT columns;SELECT *;aliases with AS;DISTINCT;LIMIT and OFFSET;comments in SQL','comparison operators;AND, OR, NOT;IN and BETWEEN;LIKE and wildcards;IS NULL and IS NOT NULL;operator order','ORDER BY asc and desc;sort by many columns;LIMIT top N;pagination idea','string: CONCAT, UPPER, SUBSTRING;number: ROUND, ABS, CEIL;date: NOW, DATE_ADD, DATEDIFF;CASE WHEN;COALESCE and IFNULL;CAST','COUNT, SUM, AVG, MIN, MAX;GROUP BY;HAVING vs WHERE;COUNT(DISTINCT);group by many columns','INSERT one and many rows;UPDATE with WHERE;DELETE with WHERE;TRUNCATE vs DELETE;test with SELECT first;transactions: COMMIT, ROLLBACK','CREATE TABLE;NOT NULL, UNIQUE, DEFAULT;PRIMARY KEY and AUTO_INCREMENT;FOREIGN KEY;ALTER TABLE;DROP TABLE carefully','INNER JOIN;LEFT JOIN;RIGHT JOIN;FULL JOIN idea;self join;join three tables;find rows with no match','subquery in WHERE;subquery in FROM;EXISTS and NOT EXISTS;correlated subquery;WITH (CTE);UNION and UNION ALL','OVER and PARTITION BY;ROW_NUMBER;RANK and DENSE_RANK;running SUM;LAG and LEAD','one-to-many;many-to-many with a link table;1NF, 2NF, 3NF;ER diagram basics;naming rules','what an index is;create an index;EXPLAIN a query;when indexes hurt;avoid SELECT *;composite index idea','connect with a library;run SELECT and fetch rows;parameterized queries, no string joins;insert from Python;close connections;SQLite with sqlite3','solve 20 SELECT problems;solve 10 JOIN problems;solve 10 GROUP BY problems;design a Lead Tracker schema;write queries for it']];
+function frSet(a,k,on){st.fs=st.fs||{};st.fi=st.fi||{};const sub=a==='fi'?k.replace(/_\d+$/,''):k,p=sub.slice(1).split('_'),n=FI[+p[0]][+p[1]].split(';').length,ids=[...Array(n).keys()].map(x=>sub+'_'+x);
+ ids.forEach(x=>{if(st.fi[x]===undefined)st.fi[x]=!!st.fs[sub]});
+ if(a==='fi')st.fi[k]=on;else ids.forEach(x=>st.fi[x]=on);
+ st.fs[sub]=ids.every(x=>st.fi[x]);if(st.fs[sub])rvAdd(sub)}
+const frAll=()=>{const F=st.fs||{},I=st.fi||{};return FR.map((t,i)=>{let nt=0,nd=0;const subs=[];t[3].forEach((x,j)=>{if(x[0]==='~')return;const p=x.split('|'),id='f'+i+'_'+j,its=FI[i][j].split(';').map((y,k)=>{const q=id+'_'+k;return{id:q,t:y,d:I[q]!==undefined?!!I[q]:!!F[id]}}),c=its.filter(z=>z.d).length;nt+=its.length;nd+=c;subs.push({id,t:p[0],h:p[1],its,c,d:c===its.length})});return{i,o:t[4]!==undefined?t[4]:i,ic:t[0],n:t[1],m:t[2],subs,nt,nd,d:subs.filter(s=>s.d).length}}).sort((a,b)=>a.o-b.o)};
+function vFrappe(){const A=frAll(),T2=A.reduce((a,t)=>a+t.nt,0),D2=A.reduce((a,t)=>a+t.nd,0),SB=A.reduce((a,t)=>a+t.subs.length,0),SD=A.reduce((a,t)=>a+t.d,0),pc=Math.round(D2/T2*100),tc=A.filter(t=>t.d===t.subs.length).length,
+ day=Math.max(1,Math.min(92,Math.round((pd(clamp(today()))-pd(S0))/864e5)+1)),ex=Math.round(day/92*100),nxt=A.find(t=>t.d<t.subs.length),ns=nxt&&nxt.subs.find(s=>!s.d),ni=ns&&ns.its.find(z=>!z.d);
+ if(!syInit){syInit=true;if(nxt){syOpen[nxt.i]=true;fsOpen[ns.id]=true}}
+ let h=`<div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe roadmap</div><div class="big2">${D2}/${T2}</div><div class="mu">study points done · ${SD}/${SB} subtopics · ${tc}/${A.length} topics</div></div></div>`+
+ `<div class="mu" style="margin:6px 2px">Pace: ${ex}% expected by today · you are at ${pc}% · ${pc>=ex?'✅ on track':'⚠️ catch up'}</div><div class="chips">${['Oct','Nov','Dec'].map(m=>{const ts=A.filter(t=>t.m===m);return `<span style="--c:${MCOL[m]}">${m} ${ts.reduce((a,t)=>a+t.nd,0)}/${ts.reduce((a,t)=>a+t.nt,0)}</span>`}).join('')}</div>`+
+ (ni?`<div class="card nx"><div class="mu">▶ Study this next</div><div style="font-size:18px;font-weight:700;margin:4px 0">${E(ni.t)}</div><div class="mu">in ${E(ns.t)} · ${E(nxt.n)}</div><button data-a="synext" data-v="${nxt.i}|${ns.id}">Open it</button></div>`:`<div class="card nx">🎉 Roadmap complete. Now build and apply!</div>`);
+ A.forEach(t=>{const n=t.subs.length,p=Math.round(t.nd/t.nt*100),dn2=t.d===n,c='t-'+MC[t.m];
+  h+=`<button class="tp ${c} ${syOpen[t.i]?'open':''} ${dn2?'done':''}" data-a="syo" data-v="${t.i}"><span class="ti">${dn2?'✅':t.ic}</span><span class="tm2"><b>${E(t.n)}</b><span class="mu">${t.d}/${n} subtopics · suggested ${t.m}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+  if(syOpen[t.i])h+=`<div class="sub">`+t.subs.map(s=>`<div class="row srow ${c} ${fsOpen[s.id]?'open':''}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="fso" data-v="${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.h)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">▾</span></button></div>`+(fsOpen[s.id]?`<div class="its">`+s.its.map(z=>`<label class="row ${c}"><input type="checkbox" data-a="fi" data-k="${z.id}" ${z.d?'checked':''}><span>${E(z.t)}</span></label>`).join('')+`</div>`:'')).join('')+`</div>`});
+ return h+`<div class="card" style="margin-top:18px"><b>📚 Where to study</b><div class="mu" style="margin-top:4px">Frappe is not a first step into programming, so finish Python and SQL first. Use Frappe version 16.</div><a class="lnk" href="https://docs.frappe.io/framework" target="_blank" rel="noopener">Frappe Framework docs ↗</a><a class="lnk" href="https://school.frappe.io" target="_blank" rel="noopener">Frappe School (free courses) ↗</a></div>`}
+/* ===== JOB PLAN (14 weeks) ===== */
+const JP=[["Python start","Python is set up. Variables, operators, strings and conditions work from memory.","Test-out rule: for each subtopic do 3 small exercises from memory. Pass = tick it and move on. Fail = study only that point from your own notes, then retry.","Write and save 10 small programs (calculator, string tricks, number checks) in one folder.","15.0-4"],
+["Python core","Loops, lists, dicts and functions without looking at notes.","Same test-out rule. Spend your time on the points you fail, not on the ones you already know.","Solve 15 problems (loops, lists, dicts, functions) and save them in the folder.","15.5-9"],
+["Python files, errors and OOP","Build programs with classes that save data to files.","Learn classes by building one thing: a Lead class with add, list and save to JSON. Read every error message slowly.","A class-based program that saves leads to a JSON file.","15.10-16"],
+["SQL from basics to subqueries","Write SELECT, JOIN, GROUP BY and subqueries from memory.","Use your SQL books for syntax. Practise on a real leads table, not by reading.","Design a leads table and write 30 queries for it (select, filter, join, group).","16.0-10"],
+["SQL finish, Project 1, Git and terminal","Use SQL from Python, build Project 1, and learn the terminal and Git.","Build Project 1 first, then learn Git by pushing it. Make your own one-page cheat sheet of terminal and Git commands.","Project 1: Python CLI Lead Tracker with SQLite, on GitHub with a README.","16.12-14;15.18;15.19;15.21;0.6;0.5"],
+["Install Frappe and understand it","Frappe and ERPNext running on your machine, and you can explain what each part is.","Install from the official docs, step by step. If you are stuck for more than 45 minutes, use Frappe Cloud or Docker and move on.","Bench running with a site and ERPNext installed. Take a screenshot.","1.0-6;2.0-2"],
+["How Frappe works and first DocTypes","Understand the request flow and create your first DocTypes.","Read one DocType JSON file line by line. Build first, then read the docs for each field you used.","Your first app with two DocTypes (Lead and Follow-up) linked by a child table.","2.3-5;3.0-4"],
+["DocTypes, permissions and Python basics","Finish DocTypes, control access, and write server-side validation.","Break things on purpose: remove a permission and see what changes. Always test as a second user.","A validation in Python (follow-up date cannot be in the past), tested with 2 roles.","3.5-7;4.0-3;5.0-2"],
+["JavaScript, server and client scripts","Learn the JavaScript Frappe needs, and make forms smart with Python and JavaScript.","Learn only the JavaScript Frappe needs: functions, objects, arrays, async. Write every script yourself.","A custom button on Lead that creates a Follow-up, and a filter on a Link field.","0.2;5.3-6;6.0-3"],
+["Client finish, HTML, reports and workflows","Reports, print formats and workflows for your app. Enough HTML and CSS to style a print format.","Copy the idea, not the code: look at one standard ERPNext report and workflow, then build your own. Keep HTML and CSS light.","A Script Report, a Print Format and a Workflow (Open, Contacted, Won, Lost) in your app.","6.4-6;0.3;7.0-2;7.5;8.0-2"],
+["Hooks and APIs","Run code automatically and expose your own API.","Test every function in bench console before putting it in hooks.py. Test the API in Postman.","A doc_event that sets a field, a daily scheduled job, and one whitelisted API tested in Postman.","9.0-4;11.0-3"],
+["Integrations, ERPNext and testing","Know ERPNext selling flow, call other APIs and write tests.","Run one full flow end to end: Lead, Quotation, Sales Order in ERPNext. Then connect it to your app.","Your app works with ERPNext data, and has 3 passing tests.","11.4;11.5;12.0;12.1;12.2;12.4;13.0;13.1;13.2;13.4"],
+["Portfolio, interviews and applications","One finished project, a ready resume, and applications sent.","Dec 21 to 27: finish the project, README and demo, and update your resume and LinkedIn. Dec 28 to 31: practise aloud in simple English (DocTypes, hooks, permissions, REST API, your project) and apply every day.","Project 2 (Sales Lead Tracker) on GitHub with README and demo, resume updated, 10 applications sent, 3 mock interviews done.","14.1;14.2;13.5;14.3;14.4;14.5"]];
+let jOpen={},jInit=false;
+const jpSubs=s=>s.split(';').flatMap(tk=>{const p=tk.split('.'),r=p[1].split('-'),lo=+r[0],hi=r[1]!==undefined?+r[1]:lo;return Array.from({length:hi-lo+1},(_,k)=>'f'+p[0]+'_'+(lo+k))});
+function jpWeeks(){const a=[S0];let m=S0;while(dow(m)!==1)m=add(m,1);for(;m<=E0;m=add(m,7))a.push(m);return a.slice(0,JP.length).map((x,i,r)=>({a:x,b:i<r.length-1?add(r[i+1],-1):E0}))}
+function vJob(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({ti:t.i,tn:t.n},s)}));
+ const W=jpWeeks(),td=clamp(today()),cur=Math.max(0,W.findIndex(w=>td>=w.a&&td<=w.b)),J=st.jd||{},fmt=d=>pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
+ ids=JP.map(w=>jpSubs(w[4]).filter(x=>M[x])),used=new Set(ids.flat()),pts=a=>a.reduce((n,x)=>n+M[x].its.length,0),dn=a=>a.reduce((n,x)=>n+M[x].c,0),
+ pc=Math.round(dn([...used])/pts([...used])*100),cps=JP.filter((_,i)=>J['w'+i]).length,bonus=Object.keys(M).filter(x=>!used.has(x)).length;
+ if(!jInit){jInit=true;jOpen[cur]=true}
+ let h=`<div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe developer job plan</div><div class="big2">Week ${cur+1}/${JP.length}</div><div class="mu">${cps}/${JP.length} checkpoints done</div></div></div>`+
+ `<div class="chips">${[[0,5,'Foundations','#22d3ee'],[5,10,'Frappe core','#a78bfa'],[10,14,'Build and apply','#f472b6']].map(p=>{const x=ids.slice(p[0],p[1]).flat();return `<span style="--c:${p[3]}">${p[2]} ${Math.round(dn(x)/pts(x)*100)}%</span>`}).join('')}</div>`+
+ `<div class="card nx"><b>⏱ Reality check</b><div class="mu" style="margin-top:4px">Your timetable gives about 8.5 hours of coding a week, about 110 hours in total. This plan fits only because it skips bonus topics. If you fall behind, cut Python and SQL revision first. Never cut Weeks 6 to 13.</div><div class="mu" style="margin-top:6px">📨 Send your first 3 applications from ${fmt(W[11].a)} if you are on track. Apply to 10 or more from ${fmt(W[12].a)}.</div></div>`;
+ JP.forEach((w,i)=>{const a=ids[i],p=Math.round(dn(a)/pts(a)*100),ok=p===100&&J['w'+i],c='t-'+(i<5?'oct':i<10?'nov':'dec');
+  h+=`<button class="tp ${c} ${jOpen[i]?'open':''} ${ok?'done':''}" data-a="jw" data-v="${i}"><span class="ti">${ok?'✅':i===cur?'📍':'🗓'}</span><span class="tm2"><b>Week ${i+1}: ${E(w[0])}</b><span class="mu">${fmt(W[i].a)} to ${fmt(W[i].b)}${i===cur?' · THIS WEEK':''}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+  if(jOpen[i])h+=`<div class="sub"><div class="card" style="margin:8px 0"><div class="mu">🎯 Goal</div><div>${E(w[1])}</div><div class="mu" style="margin-top:8px">🛠 How to study</div><div>${E(w[2])}</div></div>`+
+   a.map(x=>{const s=M[x];return `<div class="row srow ${c}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="jgo" data-v="${s.ti}|${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">›</span></button></div>`}).join('')+
+   `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
+ return h+`<div class="card" style="margin-top:18px"><b>⭐ Bonus: ${bonus} subtopics are not in the plan</b><div class="mu" style="margin-top:4px">Window functions, iterators, Jinja and web pages, Webhooks, OAuth, performance and more. Study them after you start applying. Find them in All topics.</div></div>`}
+/* ===== PROOF OF WORK + MISTAKE CARDS ===== */
+let fcShow='';
+const FCI=[1,3,7];
+const pwUrl=l=>{l=String(l||'').trim();if(!l)return '';if(/^https?:\/\//i.test(l))return l;if(/^[a-z][a-z0-9+.-]*:/i.test(l))return '';return 'https://'+l};
+function pwStreak(){const P=st.pw||{},r=clamp(today());const has=x=>P[x]&&P[x].t&&P[x].t.trim();let d=has(r)?r:add(r,-1),n=0;while(d>=S0&&has(d)){n++;d=add(d,-1)}return n}
+function pwLine(s){const P=st.pw||{},n=pwStreak();let dots='';for(let i=6;i>=0;i--){const d=add(s,-i);if(d>=S0)dots+=P[d]&&P[d].t&&P[d].t.trim()?'✅':'⚪'}return '🔥 '+n+' day'+(n===1?'':'s')+' in a row · '+dots}
+function pwCard(s){const P=st.pw||{},c=P[s]||{},u=pwUrl(c.l);
+ const past=Object.keys(P).filter(d=>d<s&&P[d].t).sort().reverse().slice(0,4);
+ return `<div class="card"><b>🛠 Proof of work</b><div class="mu">What did you build or fix today? One line. It saves as you type.</div><input type="text" id="pwt" placeholder="Example: added a validation for the follow-up date" value="${E(c.t||'')}" autocomplete="off"><input type="text" id="pwl" placeholder="GitHub link (optional)" value="${E(c.l||'')}" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="mu" id="pwst">${c.t?'✓ Saved':''}${u?` · <a class="lnk2" href="${E(u)}" target="_blank" rel="noopener">open link ↗</a>`:''}</div><div class="mu" style="margin-top:6px" id="pwsk">${pwLine(s)}</div>`+
+ past.map(d=>{const q=P[d],uu=pwUrl(q.l);return `<div class="mu" style="margin-top:4px">${pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}: ${E(q.t)}${uu?` <a class="lnk2" href="${E(uu)}" target="_blank" rel="noopener">↗</a>`:''}</div>`}).join('')+`<button class="sec" data-a="pwc" style="margin-top:10px">📋 Copy last 7 days</button></div>`}
+document.addEventListener('input',e=>{const id=e.target.id;if(id!=='pwt'&&id!=='pwl')return;const k=clamp(today());st.pw=st.pw||{};const c=st.pw[k]=st.pw[k]||{};c[id==='pwt'?'t':'l']=e.target.value;
+ const ok2=!!(c.t&&c.t.trim());if(!c.t&&!c.l)delete st.pw[k];save();const s=$('#pwst');if(s)s.textContent=ok2?'✓ Saved':'Write the line above so today counts';const sk=$('#pwsk');if(sk)sk.textContent=pwLine(k)});
+function pwCopy(){const P=st.pw||{},k=clamp(today()),L=[];for(let i=6;i>=0;i--){const d=add(k,-i);if(d<S0)continue;const q=P[d];if(q&&q.t)L.push('- '+pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+': '+q.t+(pwUrl(q.l)?' ('+pwUrl(q.l)+')':''))}
+ const t='Proof of work, last 7 days:\n'+(L.join('\n')||'- nothing written yet');(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('✅ Copied')):Promise.reject()).catch(()=>prompt('Copy this text:',t))}
+function fcAdd(key,q,a,src){st.fc=st.fc||[];const c=st.fc.find(x=>x.key===key);
+ if(c){c.q=q;c.a=a;if(c.done){c.done=false;c.n=0;c.due=add(today(),FCI[0])}return}
+ st.fc.push({id:Date.now()+Math.random().toString(36).slice(2,5),key,q,a,src,n:0,due:add(today(),FCI[0]),done:false})}
+function fcDone(key){const c=(st.fc||[]).find(x=>x.key===key);if(c)c.done=true}
+function fcAns(id,ok){const c=(st.fc||[]).find(x=>x.id===id);if(!c)return;fcShow='';
+ if(ok){c.n++;if(c.n>=FCI.length)c.done=true;else c.due=add(today(),FCI[c.n])}else{c.n=0;c.done=false;c.due=add(today(),FCI[0])}save()}
+function fcBox(){const F=st.fc||[],t=today(),act=F.filter(c=>!c.done),due=act.filter(c=>c.due<=t);
+ if(!F.length)return '<div class="mu" style="margin:6px 2px">🃏 Mistake cards: mistakes from quizzes, interview practice and the Error log will appear here.</div>';
+ if(!due.length)return `<div class="mu" style="margin:6px 2px">🃏 Mistake cards: none due today ✅ (${act.length} waiting)</div>`;
+ const c=due[0];
+ return `<div class="card nx"><div class="mu">🃏 Mistake card · ${due.length} due · ${c.src==='quiz'?'from a quiz':c.src==='interview'?'from interview practice':'from your error log'}</div><div class="aq">${E(c.q)}</div>`+(fcShow===c.id?`<div class="fb c"><div style="font-weight:500">${E(c.a)}</div></div><div class="two"><button class="sec" data-a="fgn" data-v="${c.id}">😕 Again</button><button data-a="fgy" data-v="${c.id}">✅ Got it</button></div>`:`<button data-a="fsh" data-v="${c.id}">Show answer</button>`)+'</div>'}
+/* ===== LEARNING TOOLS (revise, notes, time, quiz, errors, interview) ===== */
+const IQ=[['What is the difference between git merge and git rebase?','How do you undo your last commit?','What does async / await do in JavaScript?','What is the difference between let and const?','How do you find which process uses a port in Linux?'],
+['What is a bench in Frappe?','How do you create a site and install an app on it?','What does bench migrate do?','What is the difference between bench start and a production setup?','How do you take and restore a backup?'],
+['What is the difference between Frappe, ERPNext and an app?','What happens when a browser opens a Frappe URL?','What do Redis and background workers do?','What files are inside a Frappe app?','Why is Frappe called metadata driven?'],
+['What is a DocType and what does it create?','What is the difference between a Single and a normal DocType?','How does a child table work?','What are naming series and autoname?','How do you add a field to an ERPNext DocType safely?'],
+['How do roles and permissions work in Frappe?','What is a permission level?','What is the difference between role permission and user permission?','How do you restrict a user to one Company?','What does if_owner mean?'],
+['Name five document events and when they run.','What is the difference between get_list and get_all?','How do you stop a save with an error?','What does frappe.db.get_value return?','How do you write a safe query with frappe.qb?'],
+['How do you add a custom button to a form?','How do you filter a Link field with set_query?','How do you call a server method from JavaScript?','How do you react to a change in a child table field?','What is the difference between refresh and onload?'],
+['What is the difference between a Query Report and a Script Report?','How do you add filters to a Script Report?','How do you create a print format with Jinja?','What is a Number Card?','How does a Workspace help users?'],
+['How does a Workflow control a document?','What is an Assignment Rule?','When would you use frappe.enqueue?','How do you send an email when a document is submitted?','What is a Webhook?'],
+['What is hooks.py used for?','How do you run code on save with doc_events?','How do you schedule a daily job?','What are fixtures and why use them?','How do you override a whitelisted method safely?'],
+['What is Jinja and where does Frappe use it?','How do you create a Web Form?','What is the www folder in an app?','How do you pass data to a portal page?','What is the difference between a Web Page and a Web Form?'],
+['How do you call the REST API to create a document?','How does API key and secret authentication work?','How do you expose your own function as an API?','What is the difference between /api/resource and /api/method?','How do you import data in bulk?'],
+['Explain the selling flow in ERPNext.','What is the difference between a Sales Order and a Sales Invoice?','How do you customise ERPNext without editing core code?','What is a Price List?','Which reports does a sales team use?'],
+['How do you debug an error in a Frappe app?','How do you write and run a unit test?','How do you find a slow query?','What steps do you follow to update a production site?','What is the difference between Frappe Cloud and self hosting?'],
+['Explain your best project in two minutes.','What problem did your app solve?','What was the hardest bug you fixed?','How would you improve your project?','Why do you want to be a Frappe developer?'],
+['What is the difference between a list and a tuple?','Explain a decorator with an example.','What is the difference between is and ==?','What are generators and why use them?','How does inheritance work in Python?','What is a context manager?'],
+['What is the difference between INNER JOIN and LEFT JOIN?','What is the difference between WHERE and HAVING?','What is an index and when can it hurt?','Explain primary key and foreign key.','What is a window function?','How do you avoid SQL injection?']];
+let qz=null,aiX='',aiXe='',iOpen={},iCur='',iBusy=false,iErr='';
+const RIV=[1,3,7,21];
+const subById=id=>{const q=id.slice(1).split('_').map(Number),t=FR[q[0]],p=t[3][q[1]].replace(/^~/,'').split('|');return{tn:t[1],t:p[0],h:p[1],its:FI[q[0]][q[1]].split(';'),ti:q[0]}};
+const ctxOf=id=>{const s=subById(id);return (s.ti>=1&&s.ti<=14?'Frappe Framework (version 16) and ERPNext':s.ti===15?'Python':s.ti===16?'SQL (MariaDB / MySQL)':'web development basics')+', topic "'+s.tn+'", subtopic "'+s.t+'" ('+s.h+'). Study points: '+s.its.join('; ')};
+function rvAdd(id){st.rv=st.rv||{};if(!st.rv[id])st.rv[id]={n:0,due:add(today(),RIV[0])}}
+function rvAns(id,ok){const r=(st.rv||{})[id];if(!r)return;if(ok){r.n++;if(r.n>=RIV.length){r.done=true;r.due='9999-12-31'}else r.due=add(today(),RIV[r.n])}else{r.n=0;r.done=false;r.due=add(today(),1);st.cf=st.cf||{};st.cf[id]=1}save()}
+function qzCard(){if(aiX==='quiz')return '<div class="card nx"><b>🧠 Making your quiz…</b><div class="mu">The AI is writing 5 questions.</div></div>';
+ if(!qz)return aiXe?'<div class="warn">❌ '+E(aiXe)+'</div>':'';
+ const s=subById(qz.sub);if(qz.i>=qz.qs.length)return `<div class="card nx"><b>🧠 Quiz result</b><div class="big2">${qz.ok}/${qz.qs.length}</div><div class="mu">${E(s.t)} · confidence set to ${qz.ok>=4?'💪':qz.ok>=3?'🙂':'😕 (added to Revise)'}</div><button data-a="qx">Close</button></div>`;
+ const q=qz.qs[qz.i],d=qz.sel!==null;
+ return `<div class="card nx"><div class="mu">🧠 Quiz · ${E(s.t)} · Question ${qz.i+1}/${qz.qs.length}</div><div class="aq">${E(q.q)}</div>`+q.o.map((o,k)=>`<button class="sec qo ${d?(k===q.a?'ok':k===qz.sel?'bad':''):''}" data-a="qa" data-v="${k}" ${d?'disabled':''}>${E(o)}</button>`).join('')+(d?`<div class="fb ${qz.sel===q.a?'c':'w'}">${qz.sel===q.a?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${E(q.e||'')}</div></div><button data-a="qn">${qz.i+1>=qz.qs.length?'Finish':'Next →'}</button>`:'')+`<button class="sec" data-a="qx">Stop quiz</button></div>`}
+function revCard(){const t=today(),due=Object.entries(st.rv||{}).filter(e=>!e[1].done&&e[1].due<=t);
+ if(!due.length)return '<div class="mu" style="margin:6px 2px">🔁 Revise: nothing due today ✅</div>';
+ return `<div class="card nx"><b>🔁 Revise today (${due.length})</b><div class="mu">Try to recall it without notes, then tap.</div>`+due.map(e=>{const s=subById(e[0]);return `<div class="row srow t-syl"><span style="flex:1"><b>${E(s.t)}</b><br><span class="mu">${E(s.tn)} · review ${e[1].n+1} of 4</span></span><button class="sec rb" data-a="rok" data-v="${e[0]}">✅</button><button class="sec rb" data-a="rno" data-v="${e[0]}">😕</button></div>`}).join('')+'</div>'}
+const HOW='<details class="card how"><summary>📖 How to study well</summary><div class="mu" style="margin-top:8px">1. Tick only when you can do it without notes.<br>2. Build first, read second: 40 of your 70 minutes typing code.<br>3. Revise when the Revise card asks (day 1, 3, 7, 21).<br>4. Write every error in the Error log.<br>5. Explain it aloud in 3 sentences.<br>6. Take the AI quiz after each subtopic.<br>7. Practise the interview questions aloud every week.</div></details>';
+function tools(id){const c=(st.cf||{})[id]||0,m=(st.tm||{})[id]||0,r=(st.rv||{})[id],ex=(st.exp||{})[id],h=(st.qh||{})[id]||[],last=h[h.length-1];
+ return `<div class="tools"><div class="mu">How sure are you?</div><div class="two3">${[['😕',1],['🙂',2],['💪',3]].map(p=>`<button class="sec cfb ${c===p[1]?'on':''}" data-a="cf" data-v="${id}|${p[1]}">${p[0]}</button>`).join('')}</div>`+
+ `<div class="mu" style="margin-top:8px">⏱ Time on this: <b>${hm(m)}</b></div><div class="two3">${[15,30,60].map(n=>`<button class="sec cfb" data-a="tm" data-v="${id}|${n}">+${n}m</button>`).join('')}</div>`+
+ (r?`<div class="mu" style="margin-top:8px">🔁 Next revision: ${r.done?'mastered 🏆':r.due}</div>`:'')+
+ `<div class="mu" style="margin-top:8px">📝 My notes (book, page, link)</div><textarea data-note="${id}" placeholder="Example: SQL book 1, page 42">${E((st.nt||{})[id]||'')}</textarea>`+
+ `<div class="two"><button class="sec" data-a="xpl" data-v="${id}" ${aiX?'disabled':''}>${aiX==='x'+id?'✨ Writing…':'✨ Explain simply'}</button><button class="sec" data-a="qz" data-v="${id}" ${aiX?'disabled':''}>🧠 AI quiz</button></div>`+
+ (last?`<div class="mu">Last quiz: ${last.s}/${last.n} on ${last.d}</div>`:'')+(ex?`<div class="card" style="margin:8px 0"><div class="mu">✨ Simple explanation</div><div style="white-space:pre-wrap">${E(ex)}</div></div>`:'')+'</div>'}
+async function xplain(id){if(aiX)return;aiX='x'+id;render();
+ try{const o=await gem('Explain this to a beginner in very simple English with one small example (max 120 words). Topic: '+ctxOf(id)+'. Reply ONLY JSON {"text":"..."}',1,false,'explain');st.exp=st.exp||{};st.exp[id]=String(o.text||'');save();aiXe=''}catch(e){aiXe=aiWhy(e)}aiX='';render()}
+async function startQuiz(id){if(aiX)return;aiX='quiz';aiXe='';qz=null;render();window.scrollTo({top:0,behavior:'smooth'});
+ try{const o=await gem('Make 5 multiple-choice questions to test a beginner on: '+ctxOf(id)+'. Each question has exactly 4 options and one correct option. Keep questions short and practical. Reply ONLY JSON {"qs":[{"q":"...","o":["...","...","...","..."],"a":0,"e":"short reason, max 20 words"}]} where a is the index (0 to 3) of the correct option.',1,false,'quiz');
+  const qs=(o.qs||[]).filter(q=>q&&q.q&&Array.isArray(q.o)&&q.o.length>=2&&Number.isInteger(q.a)&&q.a>=0&&q.a<q.o.length).slice(0,5);if(!qs.length)throw new Error('0|No questions');
+  qs.forEach(q=>{const c=q.o[q.a],o2=shuf(q.o);q.a=o2.indexOf(c);q.o=o2});qz={sub:id,qs,i:0,sel:null,ok:0}}catch(e){aiXe=aiWhy(e)}aiX='';render()}
+function errSec(){return '<h2>🐞 Error log</h2><div class="card"><input type="text" id="eerr" placeholder="Error message"><input type="text" id="ecau" placeholder="What caused it"><input type="text" id="efix" placeholder="How I fixed it"><button data-a="ea">Save error</button></div>'+(st.el||[]).slice(0,15).map(e=>`<div class="card"><b>${E(e.e)}</b><div class="mu">${E(e.d)} · Cause: ${E(e.c||'-')}</div><div>Fix: ${E(e.f||'-')}</div><button class="sec" data-a="ed" data-v="${e.id}">Delete</button></div>`).join('')}
+function iqPanel(key){const a=(st.iqa||{})[key];
+ return `<div class="its"><textarea id="iqans" placeholder="Answer in your own words, as in an interview">${E(a?a.ans||'':'')}</textarea><div class="two"><button data-a="ick" data-v="${key}" ${iBusy?'disabled':''}>${iBusy?'Checking…':'🤖 Check with AI'}</button><button class="sec" data-a="ir" data-v="${key}">✅ Ready / not</button></div>`+(iErr?`<div class="warn">${E(iErr)}</div>`:'')+(a&&a.score!==undefined?`<div class="fb ${a.score>=7?'c':a.score>=4?'p':'w'}">Score ${a.score}/10<div style="font-weight:500;margin-top:4px">👍 ${E(a.good||'')}<br>🔧 ${E(a.fix||'')}</div></div><div class="card"><div class="mu">Model answer</div>${E(a.model||'')}</div>`:'')+'</div>'}
+function iqSec(){const I=st.iq||{};let tot=0,rd=0;IQ.forEach((a,t)=>a.forEach((q,k)=>{tot++;if(I[t+'_'+k]==='r')rd++}));
+ let h=`<h2>🎤 Interview practice · ${rd}/${tot} ready</h2>`;
+ IQ.forEach((a,t)=>{const n=a.filter((_,k)=>I[t+'_'+k]==='r').length;
+  h+=`<button class="tp t-syl ${iOpen[t]?'open':''}" data-a="io" data-v="${t}"><span class="tm2"><b>${E(FR[t][1])}</b><span class="mu">${n}/${a.length} ready</span></span><span class="chev">▾</span></button>`;
+  if(iOpen[t])h+='<div class="sub">'+a.map((q,k)=>{const key=t+'_'+k,s=I[key];return `<div class="row srow t-syl ${iCur===key?'open':''}"><button class="stl" data-a="ia" data-v="${key}"><span><b>${E(q)}</b></span><span class="cnt">${s==='r'?'✅':s==='p'?'🔁':'⚪'}</span></button></div>`+(iCur===key?iqPanel(key):'')}).join('')+'</div>'});
+ return h}
+async function iqCheck(key){const el=$('#iqans'),ans=el?el.value.trim():'';if(!ans||iBusy)return;const p=key.split('_').map(Number),q=IQ[p[0]][p[1]];
+ st.iqa=st.iqa||{};st.iqa[key]=Object.assign(st.iqa[key]||{},{ans});iBusy=true;iErr='';render();
+ try{const o=await gem('You are a friendly interviewer for a junior '+(p[0]>=1&&p[0]<=14?'Frappe / ERPNext':'software')+' developer job. Question: "'+q+'". Learner answer: "'+ans+'". Rate the answer from 0 to 10. Reply ONLY JSON {"score":number,"good":"one short sentence","fix":"one short sentence","model":"a short model answer in simple English, max 60 words"}',1,false,'interview');
+  const sc=Math.max(0,Math.min(10,Math.round(+o.score)||0));st.iqa[key]={ans,score:sc,good:String(o.good||''),fix:String(o.fix||''),model:String(o.model||'')};st.iq=st.iq||{};st.iq[key]=sc>=7?'r':'p';if(sc<7)fcAdd('i:'+key,q,(String(o.model||'')+(o.fix?' Fix: '+o.fix:'')).trim(),'interview');else fcDone('i:'+key);save()}catch(e){iErr=aiWhy(e)}iBusy=false;render()}
+document.addEventListener('input',e=>{const id=e.target.dataset&&e.target.dataset.note;if(id===undefined)return;st.nt=st.nt||{};if(e.target.value.trim())st.nt[id]=e.target.value;else delete st.nt[id];save()});
+function vSyl(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({ti:t.i,tn:t.n},s)}));
+ const W=jpWeeks(),td=clamp(today()),cur=Math.max(0,W.findIndex(w=>td>=w.a&&td<=w.b)),J=st.jd||{},fmt=d=>pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
+ ids=JP.map(w=>jpSubs(w[4]).filter(x=>M[x])),used=new Set(ids.flat()),bon=[];A.forEach(t=>t.subs.forEach(s=>{if(!used.has(s.id))bon.push(s.id)}));
+ const pts=a=>a.reduce((n,x)=>n+M[x].its.length,0),dn=a=>a.reduce((n,x)=>n+M[x].c,0),all=[...ids.flat(),...bon],pc=Math.round(dn(all)/pts(all)*100),
+ nid=all.find(x=>!M[x].d),nw=nid?ids.findIndex(a=>a.includes(nid)):-1,ni=nid&&M[nid].its.find(z=>!z.d),
+ row=(s,c)=>row0(s,c)+(fsOpen[s.id]?tools(s.id):''),row0=(s,c)=>`<div class="row srow ${c} ${fsOpen[s.id]?'open':''}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="fso" data-v="${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)} · ${E(s.h)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">▾</span></button></div>`+(fsOpen[s.id]?`<div class="its">${s.its.map(z=>`<label class="row ${c}"><input type="checkbox" data-a="fi" data-k="${z.id}" ${z.d?'checked':''}><span>${E(z.t)}</span></label>`).join('')}</div>`:''),
+ head=(k,ic,title,sub,p,c,done)=>`<button class="tp ${c} ${jOpen[k]?'open':''} ${done?'done':''}" data-a="jw" data-v="${k}"><span class="ti">${done?'✅':ic}</span><span class="tm2"><b>${E(title)}</b><span class="mu">${sub}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+ if(!jInit){jInit=true;jOpen[cur]=true}
+ let h=`<h1>Syllabus</h1><div class="card hr"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe developer plan</div><div class="big2">Week ${cur+1} of ${JP.length}</div><div class="mu">${dn(all)}/${pts(all)} study points done · ⏱ ${hm(Object.values(st.tm||{}).reduce((x,y)=>x+y,0))}</div></div></div>`+
+ `<div class="mu" style="margin:6px 2px">About 8.5 coding hours a week. Send your first 3 applications on ${fmt(W[JP.length-2].a)}, then 10 or more before ${fmt(E0)}.</div>`+
+ (ni?`<div class="card nx"><div class="mu">▶ Study this next${nw>=0?' · Week '+(nw+1):' · Bonus'}</div><div style="font-size:18px;font-weight:700;margin:4px 0">${E(ni.t)}</div><div class="mu">${E(M[nid].t)} · ${E(M[nid].tn)}</div><button data-a="jnext" data-v="${nw>=0?nw:'b'}|${nid}">Open it</button></div>`:`<div class="card nx">🎉 Everything is done. Keep applying!</div>`);
+ h+=qzCard()+revCard()+fcBox()+HOW;
+ JP.forEach((w,i)=>{const a=ids[i],p=Math.round(dn(a)/pts(a)*100),ok=p===100&&J['w'+i],c='t-syl';
+  h+=head(i,i===cur?'📍':'🗓',`Week ${i+1}: ${w[0]}`,`${fmt(W[i].a)} to ${fmt(W[i].b)}${i===cur?' · THIS WEEK':''}`,p,c,ok);
+  if(jOpen[i])h+=`<div class="sub"><div class="card" style="margin:8px 0"><div class="mu">🎯 Goal</div><div>${E(w[1])}</div><div class="mu" style="margin-top:8px">🛠 How to study</div><div>${E(w[2])}</div></div>`+a.map(x=>row(M[x],c)).join('')+
+   `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
+ if(bon.length){const p=Math.round(dn(bon)/pts(bon)*100);h+=head('b','⭐','Bonus: after you start applying',`${bon.length} subtopics`,p,'t-syl',p===100);if(jOpen.b)h+=`<div class="sub">`+bon.map(x=>row(M[x],'t-syl')).join('')+`</div>`}
+ return h+errSec()+iqSec()}
+function jpMini(w){const i=WEEKS.indexOf(w);if(i<0||!JP[i])return '';const M={};frAll().forEach(t=>t.subs.forEach(s=>{M[s.id]=s}));
+ const a=jpSubs(JP[i][4]).filter(x=>M[x]),t=a.reduce((n,x)=>n+M[x].its.length,0),d=a.reduce((n,x)=>n+M[x].c,0),p=Math.round(d/t*100),nx=a.map(x=>M[x]).find(s=>!s.d),ni=nx&&nx.its.find(z=>!z.d);
+ return `<div class="card"><b>📚 Syllabus: Week ${i+1}</b><div style="margin:4px 0">${E(JP[i][0])}</div><div class="bar mb t-syl"><i style="width:${p}%"></i></div><div class="mu" style="margin-top:6px">${d}/${t} study points done${ni?' · Next: '+E(ni.t):' · ✅ all done'}</div><button class="sec" data-a="jweek" data-v="${i}">Open this week</button></div>`}
+function wkOut(w){return wkOut0(w)+jpMini(w)}
+function vPlan(){
+ const ks=Object.keys(SY),tot=ks.reduce((a,m)=>a+SY[m].length,0),dn=ks.reduce((a,m)=>a+SY[m].filter((_,i)=>st.syl[m+i]).length,0),pc=Math.round(dn/tot*100);
+ let h=`<h1>Syllabus</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Your learning path</div><div class="big2">${dn}/${tot}</div><div class="mu">topics completed</div></div></div>`;
+ ks.forEach(mo=>{const it=SY[mo],c=MC[mo],d=it.filter((_,i)=>st.syl[mo+i]).length,p=Math.round(d/it.length*100);
+  h+=`<div class="mh t-${c}"><div><b>${MF[mo]}${p===100?' 🎉':''}</b><br><span class="mu">${d} of ${it.length} topics</span></div><div class="pc">${p}%</div></div><div class="bar mb t-${c}"><i style="width:${p}%"></i></div>`+
+  it.map((t,i)=>`<label class="row t-${c}"><input type="checkbox" data-a="sy" data-k="${mo+i}" ${st.syl[mo+i]?'checked':''}><span>${/^(Project|Apply)/.test(t)?'🚀 ':''}${t}</span></label>`).join('')});
+ return h}
+
+/* ===== WORDS + SUNDAY TEST ===== */
+function vWords(){
+ if(test)return vTest();
+ const t=today(),n=st.words.filter(w=>w.date===t).length,by={},mis=st.words.filter(w=>w.mistake).length;
+ let h=`<h1>Words</h1><div class="card hero w"><div class="mu">Today's Words</div><div class="big2">${n}<span style="font-size:20px;opacity:.8">/10</span></div><div class="pips">${Array.from({length:10},(_,i)=>`<i class="${i<n?'on':''}" style="--k:${i}"></i>`).join('')}</div></div>`+
+ `<div class="stats"><div><b>${wkWords(today()).length}/${wkTarget(today())}</b>Weekly words</div><div><b>${mis}</b>Mistake list</div></div>`+
+ `${addBox()}`;
+ if(!st.words.length)h+=`<div class="empty">📝<br>No words yet.<br><span class="mu">Add your first word above.</span></div>`;
+ st.words.forEach(w=>(by[w.date]=by[w.date]||[]).push(w));
+ Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b>${w.mean?'<div>'+E(w.mean)+'</div>':'<div class="mu">⏳ Meaning pending. Tap Fill meaning with AI.</div>'}<div class="mu">${E(w.sent)}</div>${w.mistake&&w.wrong?'<div class="sperr">✍️ Spelling mistake: '+E(w.wrong)+' → '+E(w.word)+'</div>':''}<label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Spelling mistake</label></div>`).join('')});
+ return h}
+function vTest(){
+ const q=test.q;
+ if(test.i>=q.length)return `<h1>Test done</h1><div class="card"><div class="big">${test.right}/${q.length}</div><div class="mu">Wrong words are on your mistake list. Enter your score in Weekly.</div></div><button data-a="tend">Close</button>`;
+ const w=q[test.i],rx=new RegExp(w.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'ig'),m=w.sent.replace(rx,'_____');
+ return `<h1>Test ${test.i+1}/${q.length}</h1><div class="card" style="font-size:19px">${E(m)}</div>`+
+  (test.res==null?`<input type="text" id="ans" autocomplete="off" autocapitalize="off" placeholder="Type the word"><button data-a="chk">Check</button>`
+  :`<div class="warn ${test.res?'ok':''}">${test.res?'Correct':'Wrong. Answer: '+E(w.word)}</div><button data-a="nxt">Next</button>`)+
+  `<button class="sec" data-a="tend">Quit test</button>`}
+
+/* ===== RENDER ===== */
+function render(){
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI,spell:vSpell}[view]();
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+ if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
+ if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
+ const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'||view==='spell'){const x=$('#aians')||$('#spans');if(x)x.focus()}autoSay();checkAch()}
+
+/* ===== EVENTS ===== */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('button[data-a]');if(!b)return;
+ const a=b.dataset.a,v=b.dataset.v;
+ if(a==='nav'){view=v;test=null;calSel=null;animNext=true}
+ else if(a==='cm'){calM=v;calSel=null;animNext=true}
+ else if(a==='cd')calSel=b.dataset.d;
+ else if(a==='addw'){addWords();return}
+ else if(a==='fillai'){fillAI(st.words.filter(w=>!w.mean||!w.sent).slice(0,15).map(w=>w.id));return}
+ else if(a==='tst'){
+  const pool=st.words.filter(w=>w.date>=add(today(),-6));
+  if(!pool.length)return alert('No words from the last 7 days.');
+  test={q:pool.sort(()=>Math.random()-.5),i:0,right:0,res:null}}
+ else if(a==='chk'){const w=test.q[test.i];
+  test.res=$('#ans').value.trim().toLowerCase()===w.word.trim().toLowerCase();
+  if(test.res)test.right++;else{w.mistake=true;save()}}
+ else if(a==='nxt'){test.i++;test.res=null}
+ else if(a==='tend')test=null;
+ else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
+ else if(a==='ftx'){st.ft=null;save()}
+ else if(a==='gr'){grN=+v;animNext=true}
+ else if(a==='cf'){const q=v.split('|');st.cf=st.cf||{};st.cf[q[0]]=+q[1];if(+q[1]===1)rvAdd(q[0]);save()}
+ else if(a==='tm'){const q=v.split('|');st.tm=st.tm||{};st.tm[q[0]]=(st.tm[q[0]]||0)+(+q[1]);save()}
+ else if(a==='rok'){rvAns(v,true)}
+ else if(a==='rno'){rvAns(v,false)}
+ else if(a==='xpl'){xplain(v);return}
+ else if(a==='qz'){startQuiz(v);return}
+ else if(a==='qa'){if(qz&&qz.sel===null){qz.sel=+v;if(+v===qz.qs[qz.i].a)qz.ok++;else{const q=qz.qs[qz.i];fcAdd('q:'+qz.sub+':'+q.q,q.q,q.o[q.a]+(q.e?' - '+q.e:''),'quiz');save()}}}
+ else if(a==='qn'){qz.i++;qz.sel=null;if(qz.i>=qz.qs.length){const id=qz.sub,n=qz.qs.length;st.qh=st.qh||{};(st.qh[id]=st.qh[id]||[]).push({d:today(),s:qz.ok,n});st.cf=st.cf||{};st.cf[id]=qz.ok>=4?3:qz.ok>=3?2:1;if(qz.ok<=2)rvAdd(id);save()}}
+ else if(a==='qx'){qz=null;aiXe=''}
+ else if(a==='ea'){const e=$('#eerr').value.trim();if(!e)return alert('Write the error message first.');st.el=st.el||[];st.el.unshift({id:Date.now()+'',d:today(),e,c:$('#ecau').value.trim(),f:$('#efix').value.trim()});const en=st.el[0];if(en.c||en.f)fcAdd('e:'+en.id,'Error: '+en.e+'. What caused it, and how do you fix it?','Cause: '+(en.c||'-')+'. Fix: '+(en.f||'-'),'error');save()}
+ else if(a==='ed'){st.el=(st.el||[]).filter(x=>x.id!==v);st.fc=(st.fc||[]).filter(c=>c.key!=='e:'+v);save()}
+ else if(a==='io'){iOpen[v]=!iOpen[v]}
+ else if(a==='ia'){iCur=iCur===v?'':v;iErr=''}
+ else if(a==='ir'){st.iq=st.iq||{};st.iq[v]=st.iq[v]==='r'?'p':'r';save()}
+ else if(a==='ick'){iqCheck(v);return}
+ else if(a==='pwc'){pwCopy();return}
+ else if(a==='fsh'){fcShow=v}
+ else if(a==='fgy'){fcAns(v,true)}
+ else if(a==='fgn'){fcAns(v,false)}
+ else if(a==='jw'){jOpen[v]=!jOpen[v]}
+ else if(a==='jnext'){const q=v.split('|');jOpen[q[0]]=true;fsOpen[q[1]]=true}
+ else if(a==='jweek'){view='syl';jOpen[v]=true;animNext=true}
+ else if(a==='jgo'){const q=v.split('|');syTab='fr';syOpen[q[0]]=true;fsOpen[q[1]]=true;animNext=true}
+ else if(a==='sytab'){syTab=v;animNext=true}
+ else if(a==='syo'){syOpen[v]=!syOpen[v]}
+ else if(a==='synext'){const q=v.split('|');syOpen[q[0]]=true;fsOpen[q[1]]=true}
+ else if(a==='fso'){fsOpen[v]=!fsOpen[v]}
+ else if(a==='motgo'){motGo(true);return}
+ else if(a==='say'){sayWord(v);return}
+ else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a);return}
+ else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
+ else if(a==='th'){st.theme=v;save()}
+ else if(a==='snd'){st.mute=v==='0';save()}
+ else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true;animNext=true}
+ else if(a==='bkdone'){bks();if(!confirm('Mark this book as completed?'))return;st.bi++;save()}
+ else if(a==='bkadd'){const t=prompt('Book title?');if(!t||!t.trim())return;bks().push(t.trim());save()}
+ else if(a==='notif'){
+ if(!st.notify)st.notify={enabled:false,next:0};
+ if(st.notify.enabled){st.notify.enabled=false;st.notify.next=0;save();render();return}
+ if(!('Notification' in window))return alert('Browser notifications are not supported here.');
+ Notification.requestPermission().then(p=>{
+  if(p!=='granted')return alert('Please allow notifications in your browser.');
+  st.notify={enabled:true,next:Date.now()+2*60*60*1000};save();render();
+ });
+ return;
+ }
+ else if(a==='copy'){const t=report(wkSel),done=()=>alert('Copied');
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(done).catch(()=>{
+   const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()});return}
+ else if(a==='exp'){const l=document.createElement('a');
+  l.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,2)],{type:'application/json'}));
+  l.download='winter-arc-backup-'+today()+'.json';l.click();return}
+ else if(a==='imp'){$('#file').click();return}
+ else if(a==='rst'){if(!confirm('Delete ALL data? This cannot be undone.'))return;st=blank();localStorage.removeItem(KEY)}
+ render()});
+
+document.addEventListener('change',e=>{                     // checkboxes + week select
+ const t=e.target,a=t.dataset.a;if(!a)return;
+ const day=()=>st.days[t.dataset.d]=st.days[t.dataset.d]||{};
+ if(a==='wsel')wkSel=t.value;
+ else if(a==='tk')day()[t.dataset.k]=t.checked;
+ else if(a==='min')day().min=t.checked;
+ else if(a==='np')day().np=t.checked;
+ else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
+ else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
+ else if(a==='sy')st.syl[t.dataset.k]=t.checked;
+ else if(a==='ms')st.words.find(w=>w.id===t.dataset.id).mistake=t.checked;
+ if(a==='tk'&&t.checked){ac();popD=t.dataset.d;popK=t.dataset.k;if(cnt(t.dataset.d)===T.length)setTimeout(burst,250)}
+ save();render()});
+
+document.addEventListener('input',e=>{                      // weekly manual inputs (no re-render, keeps focus)
+ const k=e.target.dataset.w;if(!k)return;
+ (st.weeks[wkSel]=st.weeks[wkSel]||{})[k]=e.target.value;save();$('#wko').innerHTML=wkOut(wkSel)});
+
+document.addEventListener('input',e=>{                      // daily minutes (no re-render, keeps focus)
+ const k=e.target.dataset.t;if(!k)return;
+ const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};d.t=d.t||{};
+ const v=parseFloat(e.target.value);if(v>0)d.t[k]=v;else delete d.t[k];
+ save();const x=document.getElementById('tt-'+s);if(x)x.textContent=tmt(s)});
+
+document.addEventListener('input',e=>{                      // reading pages (no re-render)
+ if(!e.target.dataset.pg)return;const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};
+ const v=parseFloat(e.target.value);if(v>0)d.pg=v;else delete d.pg;save()});
+
+let tapN=0,tapT=0;                                          // triple-tap a page title = show/hide private row
+document.addEventListener('click',e=>{if(!e.target.closest('h1'))return;const n=Date.now();tapN=n-tapT<700?tapN+1:1;tapT=n;if(tapN>=3){tapN=0;showP=!showP;render()}});
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ans')$('[data-a=chk]').click()});
+
+$('#file').addEventListener('change',e=>{                   // import backup
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.days)throw 0;
+  if(!confirm('Replace current data with this backup?'))return;
+  st=Object.assign(blank(),o);save();render()}catch(x){alert('Invalid backup file.')}};
+ r.readAsText(f);e.target.value=''});
+
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='today')render()}); // new day rollover
+
+render();
+</script></body></html>
