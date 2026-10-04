@@ -175,6 +175,7 @@ button.qo{text-align:left;margin:6px 0}button.qo.ok{border-color:#34d399;backgro
 button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;flex:none}
 .tools{margin:0 0 10px 14px;padding:8px 0 4px 8px;border-left:2px dashed var(--bd)}
 .how summary{cursor:pointer;font-weight:700;list-style:none;margin:0;padding:0;background:none;border:0}
+.lnk2{color:var(--ac);font-weight:600}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -491,7 +492,7 @@ function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
+ h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+focusCard();
  return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
@@ -640,6 +641,31 @@ function vJob(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Obj
    a.map(x=>{const s=M[x];return `<div class="row srow ${c}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="jgo" data-v="${s.ti}|${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">›</span></button></div>`}).join('')+
    `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
  return h+`<div class="card" style="margin-top:18px"><b>⭐ Bonus: ${bonus} subtopics are not in the plan</b><div class="mu" style="margin-top:4px">Window functions, iterators, Jinja and web pages, Webhooks, OAuth, performance and more. Study them after you start applying. Find them in All topics.</div></div>`}
+/* ===== PROOF OF WORK + MISTAKE CARDS ===== */
+let fcShow='';
+const FCI=[1,3,7];
+const pwUrl=l=>{l=String(l||'').trim();if(!l)return '';if(/^https?:\/\//i.test(l))return l;if(/^[a-z][a-z0-9+.-]*:/i.test(l))return '';return 'https://'+l};
+function pwStreak(){const P=st.pw||{},r=clamp(today());const has=x=>P[x]&&P[x].t&&P[x].t.trim();let d=has(r)?r:add(r,-1),n=0;while(d>=S0&&has(d)){n++;d=add(d,-1)}return n}
+function pwLine(s){const P=st.pw||{},n=pwStreak();let dots='';for(let i=6;i>=0;i--){const d=add(s,-i);if(d>=S0)dots+=P[d]&&P[d].t&&P[d].t.trim()?'✅':'⚪'}return '🔥 '+n+' day'+(n===1?'':'s')+' in a row · '+dots}
+function pwCard(s){const P=st.pw||{},c=P[s]||{},u=pwUrl(c.l);
+ const past=Object.keys(P).filter(d=>d<s&&P[d].t).sort().reverse().slice(0,4);
+ return `<div class="card"><b>🛠 Proof of work</b><div class="mu">What did you build or fix today? One line. It saves as you type.</div><input type="text" id="pwt" placeholder="Example: added a validation for the follow-up date" value="${E(c.t||'')}" autocomplete="off"><input type="text" id="pwl" placeholder="GitHub link (optional)" value="${E(c.l||'')}" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="mu" id="pwst">${c.t?'✓ Saved':''}${u?` · <a class="lnk2" href="${E(u)}" target="_blank" rel="noopener">open link ↗</a>`:''}</div><div class="mu" style="margin-top:6px" id="pwsk">${pwLine(s)}</div>`+
+ past.map(d=>{const q=P[d],uu=pwUrl(q.l);return `<div class="mu" style="margin-top:4px">${pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}: ${E(q.t)}${uu?` <a class="lnk2" href="${E(uu)}" target="_blank" rel="noopener">↗</a>`:''}</div>`}).join('')+`<button class="sec" data-a="pwc" style="margin-top:10px">📋 Copy last 7 days</button></div>`}
+document.addEventListener('input',e=>{const id=e.target.id;if(id!=='pwt'&&id!=='pwl')return;const k=clamp(today());st.pw=st.pw||{};const c=st.pw[k]=st.pw[k]||{};c[id==='pwt'?'t':'l']=e.target.value;
+ const ok2=!!(c.t&&c.t.trim());if(!c.t&&!c.l)delete st.pw[k];save();const s=$('#pwst');if(s)s.textContent=ok2?'✓ Saved':'Write the line above so today counts';const sk=$('#pwsk');if(sk)sk.textContent=pwLine(k)});
+function pwCopy(){const P=st.pw||{},k=clamp(today()),L=[];for(let i=6;i>=0;i--){const d=add(k,-i);if(d<S0)continue;const q=P[d];if(q&&q.t)L.push('- '+pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+': '+q.t+(pwUrl(q.l)?' ('+pwUrl(q.l)+')':''))}
+ const t='Proof of work, last 7 days:\n'+(L.join('\n')||'- nothing written yet');(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('✅ Copied')):Promise.reject()).catch(()=>prompt('Copy this text:',t))}
+function fcAdd(key,q,a,src){st.fc=st.fc||[];const c=st.fc.find(x=>x.key===key);
+ if(c){c.q=q;c.a=a;if(c.done){c.done=false;c.n=0;c.due=add(today(),FCI[0])}return}
+ st.fc.push({id:Date.now()+Math.random().toString(36).slice(2,5),key,q,a,src,n:0,due:add(today(),FCI[0]),done:false})}
+function fcDone(key){const c=(st.fc||[]).find(x=>x.key===key);if(c)c.done=true}
+function fcAns(id,ok){const c=(st.fc||[]).find(x=>x.id===id);if(!c)return;fcShow='';
+ if(ok){c.n++;if(c.n>=FCI.length)c.done=true;else c.due=add(today(),FCI[c.n])}else{c.n=0;c.done=false;c.due=add(today(),FCI[0])}save()}
+function fcBox(){const F=st.fc||[],t=today(),act=F.filter(c=>!c.done),due=act.filter(c=>c.due<=t);
+ if(!F.length)return '<div class="mu" style="margin:6px 2px">🃏 Mistake cards: mistakes from quizzes, interview practice and the Error log will appear here.</div>';
+ if(!due.length)return `<div class="mu" style="margin:6px 2px">🃏 Mistake cards: none due today ✅ (${act.length} waiting)</div>`;
+ const c=due[0];
+ return `<div class="card nx"><div class="mu">🃏 Mistake card · ${due.length} due · ${c.src==='quiz'?'from a quiz':c.src==='interview'?'from interview practice':'from your error log'}</div><div class="aq">${E(c.q)}</div>`+(fcShow===c.id?`<div class="fb c"><div style="font-weight:500">${E(c.a)}</div></div><div class="two"><button class="sec" data-a="fgn" data-v="${c.id}">😕 Again</button><button data-a="fgy" data-v="${c.id}">✅ Got it</button></div>`:`<button data-a="fsh" data-v="${c.id}">Show answer</button>`)+'</div>'}
 /* ===== LEARNING TOOLS (revise, notes, time, quiz, errors, interview) ===== */
 const IQ=[['What is the difference between git merge and git rebase?','How do you undo your last commit?','What does async / await do in JavaScript?','What is the difference between let and const?','How do you find which process uses a port in Linux?'],
 ['What is a bench in Frappe?','How do you create a site and install an app on it?','What does bench migrate do?','What is the difference between bench start and a production setup?','How do you take and restore a backup?'],
@@ -698,7 +724,7 @@ function iqSec(){const I=st.iq||{};let tot=0,rd=0;IQ.forEach((a,t)=>a.forEach((q
 async function iqCheck(key){const el=$('#iqans'),ans=el?el.value.trim():'';if(!ans||iBusy)return;const p=key.split('_').map(Number),q=IQ[p[0]][p[1]];
  st.iqa=st.iqa||{};st.iqa[key]=Object.assign(st.iqa[key]||{},{ans});iBusy=true;iErr='';render();
  try{const o=await gem('You are a friendly interviewer for a junior '+(p[0]>=1&&p[0]<=14?'Frappe / ERPNext':'software')+' developer job. Question: "'+q+'". Learner answer: "'+ans+'". Rate the answer from 0 to 10. Reply ONLY JSON {"score":number,"good":"one short sentence","fix":"one short sentence","model":"a short model answer in simple English, max 60 words"}',1,false,'interview');
-  const sc=Math.max(0,Math.min(10,Math.round(+o.score)||0));st.iqa[key]={ans,score:sc,good:String(o.good||''),fix:String(o.fix||''),model:String(o.model||'')};st.iq=st.iq||{};st.iq[key]=sc>=7?'r':'p';save()}catch(e){iErr=aiWhy(e)}iBusy=false;render()}
+  const sc=Math.max(0,Math.min(10,Math.round(+o.score)||0));st.iqa[key]={ans,score:sc,good:String(o.good||''),fix:String(o.fix||''),model:String(o.model||'')};st.iq=st.iq||{};st.iq[key]=sc>=7?'r':'p';if(sc<7)fcAdd('i:'+key,q,(String(o.model||'')+(o.fix?' Fix: '+o.fix:'')).trim(),'interview');else fcDone('i:'+key);save()}catch(e){iErr=aiWhy(e)}iBusy=false;render()}
 document.addEventListener('input',e=>{const id=e.target.dataset&&e.target.dataset.note;if(id===undefined)return;st.nt=st.nt||{};if(e.target.value.trim())st.nt[id]=e.target.value;else delete st.nt[id];save()});
 function vSyl(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({ti:t.i,tn:t.n},s)}));
  const W=jpWeeks(),td=clamp(today()),cur=Math.max(0,W.findIndex(w=>td>=w.a&&td<=w.b)),J=st.jd||{},fmt=d=>pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
@@ -711,7 +737,7 @@ function vSyl(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Obj
  let h=`<h1>Syllabus</h1><div class="card hr"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe developer plan</div><div class="big2">Week ${cur+1} of ${JP.length}</div><div class="mu">${dn(all)}/${pts(all)} study points done · ⏱ ${hm(Object.values(st.tm||{}).reduce((x,y)=>x+y,0))}</div></div></div>`+
  `<div class="mu" style="margin:6px 2px">About 8.5 coding hours a week. Send your first 3 applications on ${fmt(W[JP.length-2].a)}, then 10 or more before ${fmt(E0)}.</div>`+
  (ni?`<div class="card nx"><div class="mu">▶ Study this next${nw>=0?' · Week '+(nw+1):' · Bonus'}</div><div style="font-size:18px;font-weight:700;margin:4px 0">${E(ni.t)}</div><div class="mu">${E(M[nid].t)} · ${E(M[nid].tn)}</div><button data-a="jnext" data-v="${nw>=0?nw:'b'}|${nid}">Open it</button></div>`:`<div class="card nx">🎉 Everything is done. Keep applying!</div>`);
- h+=qzCard()+revCard()+HOW;
+ h+=qzCard()+revCard()+fcBox()+HOW;
  JP.forEach((w,i)=>{const a=ids[i],p=Math.round(dn(a)/pts(a)*100),ok=p===100&&J['w'+i],c='t-syl';
   h+=head(i,i===cur?'📍':'🗓',`Week ${i+1}: ${w[0]}`,`${fmt(W[i].a)} to ${fmt(W[i].b)}${i===cur?' · THIS WEEK':''}`,p,c,ok);
   if(jOpen[i])h+=`<div class="sub"><div class="card" style="margin:8px 0"><div class="mu">🎯 Goal</div><div>${E(w[1])}</div><div class="mu" style="margin-top:8px">🛠 How to study</div><div>${E(w[2])}</div></div>`+a.map(x=>row(M[x],c)).join('')+
@@ -785,15 +811,19 @@ document.addEventListener('click',e=>{
  else if(a==='rno'){rvAns(v,false)}
  else if(a==='xpl'){xplain(v);return}
  else if(a==='qz'){startQuiz(v);return}
- else if(a==='qa'){if(qz&&qz.sel===null){qz.sel=+v;if(+v===qz.qs[qz.i].a)qz.ok++}}
+ else if(a==='qa'){if(qz&&qz.sel===null){qz.sel=+v;if(+v===qz.qs[qz.i].a)qz.ok++;else{const q=qz.qs[qz.i];fcAdd('q:'+qz.sub+':'+q.q,q.q,q.o[q.a]+(q.e?' - '+q.e:''),'quiz');save()}}}
  else if(a==='qn'){qz.i++;qz.sel=null;if(qz.i>=qz.qs.length){const id=qz.sub,n=qz.qs.length;st.qh=st.qh||{};(st.qh[id]=st.qh[id]||[]).push({d:today(),s:qz.ok,n});st.cf=st.cf||{};st.cf[id]=qz.ok>=4?3:qz.ok>=3?2:1;if(qz.ok<=2)rvAdd(id);save()}}
  else if(a==='qx'){qz=null;aiXe=''}
- else if(a==='ea'){const e=$('#eerr').value.trim();if(!e)return alert('Write the error message first.');st.el=st.el||[];st.el.unshift({id:Date.now()+'',d:today(),e,c:$('#ecau').value.trim(),f:$('#efix').value.trim()});save()}
- else if(a==='ed'){st.el=(st.el||[]).filter(x=>x.id!==v);save()}
+ else if(a==='ea'){const e=$('#eerr').value.trim();if(!e)return alert('Write the error message first.');st.el=st.el||[];st.el.unshift({id:Date.now()+'',d:today(),e,c:$('#ecau').value.trim(),f:$('#efix').value.trim()});const en=st.el[0];if(en.c||en.f)fcAdd('e:'+en.id,'Error: '+en.e+'. What caused it, and how do you fix it?','Cause: '+(en.c||'-')+'. Fix: '+(en.f||'-'),'error');save()}
+ else if(a==='ed'){st.el=(st.el||[]).filter(x=>x.id!==v);st.fc=(st.fc||[]).filter(c=>c.key!=='e:'+v);save()}
  else if(a==='io'){iOpen[v]=!iOpen[v]}
  else if(a==='ia'){iCur=iCur===v?'':v;iErr=''}
  else if(a==='ir'){st.iq=st.iq||{};st.iq[v]=st.iq[v]==='r'?'p':'r';save()}
  else if(a==='ick'){iqCheck(v);return}
+ else if(a==='pwc'){pwCopy();return}
+ else if(a==='fsh'){fcShow=v}
+ else if(a==='fgy'){fcAns(v,true)}
+ else if(a==='fgn'){fcAns(v,false)}
  else if(a==='jw'){jOpen[v]=!jOpen[v]}
  else if(a==='jnext'){const q=v.split('|');jOpen[q[0]]=true;fsOpen[q[1]]=true}
  else if(a==='jweek'){view='syl';jOpen[v]=true;animNext=true}
