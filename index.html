@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f1115"><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -162,10 +162,19 @@ button.tp{background:var(--card);border:1px solid var(--bd);box-shadow:none;text
 .tp .ti{font-size:26px}.tp .tm2{flex:1;min-width:0;line-height:1.3}.tp .tm2 b{display:block;font-size:16.5px}.tp .pc2{font-weight:800;color:var(--c)}.tp .chev{transition:transform .2s;color:var(--mu)}.tp.open .chev{transform:rotate(180deg)}
 .tp.done{background:color-mix(in srgb,#34d399 16%,#131530);border-color:rgba(52,211,153,.5)}
 .sub{padding:2px 0 6px 10px;border-left:2px dashed var(--bd);margin-left:16px}.sub .row{min-height:56px;font-size:15.5px;margin:7px 0}
-.nx{border:1px solid rgba(251,191,36,.45)!important;background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(244,114,182,.1))!important}
+
 .srow{padding:6px 12px}.stl{background:none;border:0;box-shadow:none;flex:1;min-width:0;text-align:left;display:flex;align-items:center;gap:8px;margin:0;padding:0;min-height:48px;font-weight:500;color:var(--tx);font-size:15.5px}
 .stl b{display:block;font-weight:600}.stl .cnt{margin-left:auto;font-weight:700;color:var(--c);font-size:14px}.stl .chev{transition:transform .2s;color:var(--mu)}.srow.open .chev{transform:rotate(180deg)}
 .its{margin:0 0 6px 14px;padding-left:8px;border-left:2px dashed var(--bd)}.its .row{min-height:46px;font-size:14.5px;margin:6px 0;background:var(--card2)}
+.t-syl{--c:var(--ac)}
+.nx{border:1px solid var(--bd)!important;border-left:5px solid var(--ac)!important;background:var(--card)!important}
+.card.hr:not(.hero) .ring{background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--gy) 0)}
+textarea{width:100%;min-height:80px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:10px 12px;font:inherit;color:inherit;margin:5px 0;outline:0;resize:vertical}textarea:focus{border-color:var(--ac)}
+.two3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.two3 button{margin:0}.cfb.on{outline:2px solid var(--ac)}
+button.qo{text-align:left;margin:6px 0}button.qo.ok{border-color:#34d399;background:rgba(52,211,153,.2)}button.qo.bad{border-color:#fb7185;background:rgba(251,113,133,.2)}
+button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;flex:none}
+.tools{margin:0 0 10px 14px;padding:8px 0 4px 8px;border-left:2px dashed var(--bd)}
+.how summary{cursor:pointer;font-weight:700;list-style:none;margin:0;padding:0;background:none;border:0}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -203,7 +212,7 @@ const dow=s=>pd(s).getDay();
 const isRest=s=>dow(s)===0||dow(s)===3;                 // Sun + Wed
 const wlab=w=>pd(w).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const WEEKS=[];for(let w='2026-10-04';w<='2026-12-27';w=add(w,7))WEEKS.push(w); // Sundays (must come after helpers)
-let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null;
+let view='today',calM='10',calSel=null,wkSel=null,test=null,showP=false,focusNw=false,animNext=true,popK=null,popD=null,setOpen=false;
 
 /* ===== DAY LOGIC ===== */
 const hm=m=>{m=Math.round(m);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'m'};
@@ -451,30 +460,39 @@ function editor(s){
 
 /* ===== TODAY ===== */
 function notifySetup(){
- const n=st.notify||{enabled:false,next:0};
- return `<div class="card"><h2 style="margin-top:0">🔔 2-Hour Notifications</h2>
- <div class="mu">Get a reminder every 2 hours while this tracker is open.</div>
- <button class="${n.enabled?'dng':'pri'}" data-a="notif">${n.enabled?'Turn OFF reminders':'Turn ON 2-hour reminders'}</button>
- ${n.enabled&&n.next?`<div class="mu" style="margin-top:8px">Next reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}
- </div>`;
-}
+ const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
+ const msg=!sup?'Not supported here. iPhone: Share → Add to Home Screen, then open from the icon.':pm==='denied'?'Blocked. Allow notifications for this site in your browser settings.':!on?'Turn ON to get a reminder every 2 hours (6 AM to 11 PM).':n.sub?'✅ Phone push ready. Copy the device code and save it in GitHub (see README).':'Reminders work while this app is open. For closed-app push, open it from your https website.';
+ return `<div class="card"><h2 style="margin-top:0">🔔 Notifications</h2><div class="mu">${msg}</div>
+ <button class="${on?'dng':'pri'}" data-a="notif">${on?'Turn OFF reminders':'Turn ON reminders'}</button>
+ ${on?`<div class="two"><button class="sec" data-a="tnot">Send test</button>${n.sub?'<button class="sec" data-a="csub">Copy device code</button>':'<span></span>'}</div>`:''}
+ ${on&&n.next?`<div class="mu" style="margin-top:8px">Next in-app reminder: ${new Date(n.next).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>`}
+const VAPID='BCRAi9qZMGFQU0moiQTCXgtxdNuXX3C9MZF0wbU5aYP2luosQLnD-b00rRDuxzBUjaSLDZyTjHsQT1l9uaVAkO8';
+const u8=b=>{const r=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(r),c=>c.charCodeAt(0))};
+async function showN(t,b){const o={body:b,icon:'icon-192.png',badge:'icon-192.png',tag:'winter-arc'};
+ const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)return r.showNotification(t,o);new Notification(t,o)}
+async function pushOn(){
+ try{
+  if(!('Notification' in window))return alert('Notifications are not supported here. iPhone: Share → Add to Home Screen first.');
+  const p=await Notification.requestPermission();if(p!=='granted')return alert('Notifications are blocked. Allow them in site settings.');
+  let sub=null;const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+  if(reg&&'PushManager' in window){await navigator.serviceWorker.ready;
+   sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)}))}
+  st.notify={enabled:true,next:Date.now()+72e5,sub:sub?sub.toJSON():null};save();render()
+ }catch(e){alert('Could not turn on: '+e.message)}}
+async function pushOff(){
+ try{const r=await navigator.serviceWorker.getRegistration(),s=r&&await r.pushManager.getSubscription();if(s)await s.unsubscribe()}catch(e){}
+ st.notify={enabled:false,next:0,sub:null};save();render()}
 function checkNotify(){
- if(!st.notify?.enabled)return;
- if(!('Notification' in window))return;
- if(Date.now()>=Number(st.notify.next||0)){
-  if(Notification.permission==='granted'){
-   new Notification('Winter Arc Reminder',{body:'2 hours are up. Check your Winter Arc tasks and keep going.'});
-  }
-  st.notify.next=Date.now()+2*60*60*1000; save();
-  if(view==='today')render();
- }
-}
+ if(!st.notify||!st.notify.enabled||!('Notification' in window)||Notification.permission!=='granted')return;
+ if(Date.now()<Number(st.notify.next||0))return;
+ const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
+ st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
 function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
  h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+focusCard();
- return h+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button>`}
+ return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
 function vCal(){
@@ -494,7 +512,7 @@ function wk(w){                                             // auto stats + scor
  c=k=>D.filter(s=>isDone(s,k)).length,wo=wd.filter(s=>isDone(s,'wo')).length,pgA=D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].pg)||0),0),wn=st.words.filter(w=>D.includes(w.date)).length,tm=k=>D.reduce((a,s)=>a+(+(st.days[s]&&st.days[s].t&&st.days[s].t[k])||0),0),fh=Math.round((tm('fr')/60||+m.fh||0)*10)/10,sc=+m.sc||0,
  P={fr:Math.min(fh/(8.5*n/7),1)*30,wo:wo/wd.length*20,sp:c('sp')/n*15,sc:Math.min(sc/max,1)*15,rd:c('rd')/n*10,co:D.filter(s=>ok(s)).length/n*10}; // 8.5h = 6x70min + 90min
  return{wo,wt:wd.length,n,fr:c('fr'),sp:c('sp'),rd:c('rd'),max,fh,sc,pg:pgA||+m.pg||0,wn,tmx:{wo:tm('wo'),wd:tm('wd'),sp:tm('sp'),fr:tm('fr'),rd:tm('rd')},m,P,score:Math.round(Object.values(P).reduce((a,b)=>a+b,0)),missed:D.filter(s=>s<today()&&!ok(s)).length}}
-function wkOut(w){
+function wkOut0(w){
  const c=wk(w),p=WEEKS[WEEKS.indexOf(w)-1],started=add(w,-6)<=today();
  let h=`<div class="stats"><div><b>${c.wo}/${c.wt}</b>Workouts</div><div><b>${c.fr}/${c.n}</b>Frappe days</div><div><b>${c.sp}/${c.n}</b>Speaking days</div><div><b>${c.rd}/${c.n}</b>Reading days</div></div><div class="card"><b>Time this week (auto)</b><div class="chips"><span style="--c:#fb923c">💪 ${hm(c.tmx.wo)}</span><span style="--c:#a78bfa">🔤 ${c.wn} words</span><span style="--c:#f472b6">🎤 ${hm(c.tmx.sp)}</span><span style="--c:#22d3ee">💻 ${hm(c.tmx.fr)}</span><span style="--c:#fbbf24">📖 ${c.pg} pages</span></div></div>`+
  `<div class="card">Score<div class="big">${c.score}/100</div><div class="mu">Frappe ${c.P.fr|0}/30, Workout ${c.P.wo|0}/20, Speaking ${c.P.sp|0}/15, Spelling ${c.P.sc|0}/15, Reading ${c.P.rd|0}/10, Consistency ${c.P.co|0}/10</div></div>`;
@@ -508,7 +526,7 @@ function vWeek(){
  if(!wkSel)wkSel=WEEKS.filter(w=>add(w,-6)<=today()).pop()||WEEKS[0];
  const m=st.weeks[wkSel]||{},max=wkSel==='2026-10-04'?30:60;
  const f=(k,l,t)=>`<div class="mu" style="margin-top:8px">${l}</div><input type="${t}" ${t==='number'?'inputmode="decimal"':''} data-w="${k}" value="${E(m[k])}">`;
- return `<h1>Weekly review</h1><select data-a="wsel">${WEEKS.map(w=>`<option value="${w}" ${w===wkSel?'selected':''}>Week ending ${wlab(w)}</option>`).join('')}</select><div id="wko">${wkOut(wkSel)}</div>`+
+ return `<h1>Weekly review</h1><select data-a="wsel">${WEEKS.map(w=>`<option value="${w}" ${w===wkSel?'selected':''}>Week ${WEEKS.indexOf(w)+1} · ending ${wlab(w)}</option>`).join('')}</select><div id="wko">${wkOut(wkSel)}</div>`+
  f('sc',`Spelling test score (/${max})`,'number')+f('built','What I built','text')+f('excuse','Biggest excuse','text')+
  `<button data-a="copy">📋 Copy Sunday report</button><div class="mu" style="text-align:center">Paste it to your coach every Sunday (Rule 10)</div>`}
 
@@ -579,7 +597,7 @@ const FI=[
 function frSet(a,k,on){st.fs=st.fs||{};st.fi=st.fi||{};const sub=a==='fi'?k.replace(/_\d+$/,''):k,p=sub.slice(1).split('_'),n=FI[+p[0]][+p[1]].split(';').length,ids=[...Array(n).keys()].map(x=>sub+'_'+x);
  ids.forEach(x=>{if(st.fi[x]===undefined)st.fi[x]=!!st.fs[sub]});
  if(a==='fi')st.fi[k]=on;else ids.forEach(x=>st.fi[x]=on);
- st.fs[sub]=ids.every(x=>st.fi[x])}
+ st.fs[sub]=ids.every(x=>st.fi[x]);if(st.fs[sub])rvAdd(sub)}
 const frAll=()=>{const F=st.fs||{},I=st.fi||{};return FR.map((t,i)=>{let nt=0,nd=0;const subs=[];t[3].forEach((x,j)=>{if(x[0]==='~')return;const p=x.split('|'),id='f'+i+'_'+j,its=FI[i][j].split(';').map((y,k)=>{const q=id+'_'+k;return{id:q,t:y,d:I[q]!==undefined?!!I[q]:!!F[id]}}),c=its.filter(z=>z.d).length;nt+=its.length;nd+=c;subs.push({id,t:p[0],h:p[1],its,c,d:c===its.length})});return{i,o:t[4]!==undefined?t[4]:i,ic:t[0],n:t[1],m:t[2],subs,nt,nd,d:subs.filter(s=>s.d).length}}).sort((a,b)=>a.o-b.o)};
 function vFrappe(){const A=frAll(),T2=A.reduce((a,t)=>a+t.nt,0),D2=A.reduce((a,t)=>a+t.nd,0),SB=A.reduce((a,t)=>a+t.subs.length,0),SD=A.reduce((a,t)=>a+t.d,0),pc=Math.round(D2/T2*100),tc=A.filter(t=>t.d===t.subs.length).length,
  day=Math.max(1,Math.min(92,Math.round((pd(clamp(today()))-pd(S0))/864e5)+1)),ex=Math.round(day/92*100),nxt=A.find(t=>t.d<t.subs.length),ns=nxt&&nxt.subs.find(s=>!s.d),ni=ns&&ns.its.find(z=>!z.d);
@@ -592,21 +610,19 @@ function vFrappe(){const A=frAll(),T2=A.reduce((a,t)=>a+t.nt,0),D2=A.reduce((a,t
   if(syOpen[t.i])h+=`<div class="sub">`+t.subs.map(s=>`<div class="row srow ${c} ${fsOpen[s.id]?'open':''}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="fso" data-v="${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.h)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">▾</span></button></div>`+(fsOpen[s.id]?`<div class="its">`+s.its.map(z=>`<label class="row ${c}"><input type="checkbox" data-a="fi" data-k="${z.id}" ${z.d?'checked':''}><span>${E(z.t)}</span></label>`).join('')+`</div>`:'')).join('')+`</div>`});
  return h+`<div class="card" style="margin-top:18px"><b>📚 Where to study</b><div class="mu" style="margin-top:4px">Frappe is not a first step into programming, so finish Python and SQL first. Use Frappe version 16.</div><a class="lnk" href="https://docs.frappe.io/framework" target="_blank" rel="noopener">Frappe Framework docs ↗</a><a class="lnk" href="https://school.frappe.io" target="_blank" rel="noopener">Frappe School (free courses) ↗</a></div>`}
 /* ===== JOB PLAN (14 weeks) ===== */
-const JP=[
-['Setup and warm-up','A working Python, Git and terminal setup on your own computer.','Follow your timetable: 70 minutes a day. Write your own one-page cheat sheet for terminal and Git commands.','Create a GitHub repo and push your first Python script.','0.6;0.5;15.0'],
-['Python core','Write small Python programs without looking at your notes.','Test-out rule: for each subtopic do 3 small exercises from memory. Pass = tick it and move on. Fail = study only that point, then retry.','Solve 15 beginner problems (strings, lists, dicts, functions) and push them to GitHub.','15.1-9'],
-['Python files, errors and OOP','Build programs with classes that save data to files.','Learn classes by building one thing: a Lead class with add, list and save to JSON. Read every error message slowly.','A class-based program that saves leads to a JSON file.','15.10-16'],
-['SQL and Project 1','Write SQL from memory and use it from Python.','Use your SQL books for syntax. Practise on a real leads table, not by reading. Connect Project 1 to SQLite.','Project 1: Python CLI Lead Tracker with SQLite, on GitHub with a README.','16.0-10;15.21'],
-['SQL finish, JavaScript and web basics','Finish SQL. Know enough JavaScript for Frappe client scripts.','Learn only the JavaScript Frappe needs: functions, objects, arrays, async. Keep HTML and CSS light: one page is enough.','One HTML page with a JS button that calls a public API and shows the data.','16.12-14;0.2;0.3;15.18;15.19'],
-['Install Frappe and understand it','Frappe and ERPNext running on your machine, and you can explain what each part is.','Install from the official docs, step by step. If you are stuck for more than 45 minutes, use Frappe Cloud or Docker and move on.','Bench running with a site and ERPNext installed. Take a screenshot.','1.0-6;2.0-2'],
-['How Frappe works and first DocTypes','Understand the request flow and create your first DocTypes.','Read one DocType JSON file line by line. Build first, then read the docs for each field you used.','Your first app with two DocTypes (Lead and Follow-up) linked by a child table.','2.3-5;3.0-4'],
-['DocTypes, permissions and Python basics','Finish DocTypes, control access, and write server-side validation.','Break things on purpose: remove a permission and see what changes. Always test as a second user.','A validation in Python (follow-up date cannot be in the past), tested with 2 roles.','3.5-7;4.0-3;5.0-2'],
-['Server and client scripts','Make forms smart with Python and JavaScript.','Write every script yourself. Read one standard ERPNext script for ideas.','A custom button on Lead that creates a Follow-up, and a filter on a Link field.','5.3-6;6.0-3'],
-['Client finish, reports and workflows','Reports, print formats and workflows for your app.','Copy the idea, not the code: look at one standard ERPNext report and workflow, then build your own.','A Script Report, a Print Format and a Workflow (Open, Contacted, Won, Lost) in your app.','6.4-6;7.0-2;7.5;8.0-2'],
-['Hooks and APIs','Run code automatically and expose your own API.','Test every function in bench console before putting it in hooks.py. Test the API in Postman.','A doc_event that sets a field, a daily scheduled job, and one whitelisted API tested in Postman.','9.0-4;11.0-3'],
-['Integrations, ERPNext and testing','Know ERPNext selling flow, call other APIs and write tests.','Run one full flow end to end: Lead, Quotation, Sales Order in ERPNext. Then connect it to your app.','Your app works with ERPNext data, and has 3 passing tests.','11.4;11.5;12.0;12.1;12.2;12.4;13.0;13.1;13.2;13.4'],
-['Portfolio project and deploy','One finished project that a recruiter can open and understand.','Make it look finished: clean names, README with screenshots, a 2 minute demo video. This is what recruiters see.','Project 2 (Sales Lead Tracker) on GitHub with README, screenshots and demo. Resume and LinkedIn updated.','14.1;14.2;13.5;14.3'],
-['Interviews and applications','Explain your skills clearly and apply every day.','Practise aloud in simple English: DocTypes, hooks, permissions, REST API and your project. Apply every day.','Send 10 applications and do 3 mock interviews.','14.4;14.5']];
+const JP=[["Python start","Python is set up. Variables, operators, strings and conditions work from memory.","Test-out rule: for each subtopic do 3 small exercises from memory. Pass = tick it and move on. Fail = study only that point from your own notes, then retry.","Write and save 10 small programs (calculator, string tricks, number checks) in one folder.","15.0-4"],
+["Python core","Loops, lists, dicts and functions without looking at notes.","Same test-out rule. Spend your time on the points you fail, not on the ones you already know.","Solve 15 problems (loops, lists, dicts, functions) and save them in the folder.","15.5-9"],
+["Python files, errors and OOP","Build programs with classes that save data to files.","Learn classes by building one thing: a Lead class with add, list and save to JSON. Read every error message slowly.","A class-based program that saves leads to a JSON file.","15.10-16"],
+["SQL from basics to subqueries","Write SELECT, JOIN, GROUP BY and subqueries from memory.","Use your SQL books for syntax. Practise on a real leads table, not by reading.","Design a leads table and write 30 queries for it (select, filter, join, group).","16.0-10"],
+["SQL finish, Project 1, Git and terminal","Use SQL from Python, build Project 1, and learn the terminal and Git.","Build Project 1 first, then learn Git by pushing it. Make your own one-page cheat sheet of terminal and Git commands.","Project 1: Python CLI Lead Tracker with SQLite, on GitHub with a README.","16.12-14;15.18;15.19;15.21;0.6;0.5"],
+["Install Frappe and understand it","Frappe and ERPNext running on your machine, and you can explain what each part is.","Install from the official docs, step by step. If you are stuck for more than 45 minutes, use Frappe Cloud or Docker and move on.","Bench running with a site and ERPNext installed. Take a screenshot.","1.0-6;2.0-2"],
+["How Frappe works and first DocTypes","Understand the request flow and create your first DocTypes.","Read one DocType JSON file line by line. Build first, then read the docs for each field you used.","Your first app with two DocTypes (Lead and Follow-up) linked by a child table.","2.3-5;3.0-4"],
+["DocTypes, permissions and Python basics","Finish DocTypes, control access, and write server-side validation.","Break things on purpose: remove a permission and see what changes. Always test as a second user.","A validation in Python (follow-up date cannot be in the past), tested with 2 roles.","3.5-7;4.0-3;5.0-2"],
+["JavaScript, server and client scripts","Learn the JavaScript Frappe needs, and make forms smart with Python and JavaScript.","Learn only the JavaScript Frappe needs: functions, objects, arrays, async. Write every script yourself.","A custom button on Lead that creates a Follow-up, and a filter on a Link field.","0.2;5.3-6;6.0-3"],
+["Client finish, HTML, reports and workflows","Reports, print formats and workflows for your app. Enough HTML and CSS to style a print format.","Copy the idea, not the code: look at one standard ERPNext report and workflow, then build your own. Keep HTML and CSS light.","A Script Report, a Print Format and a Workflow (Open, Contacted, Won, Lost) in your app.","6.4-6;0.3;7.0-2;7.5;8.0-2"],
+["Hooks and APIs","Run code automatically and expose your own API.","Test every function in bench console before putting it in hooks.py. Test the API in Postman.","A doc_event that sets a field, a daily scheduled job, and one whitelisted API tested in Postman.","9.0-4;11.0-3"],
+["Integrations, ERPNext and testing","Know ERPNext selling flow, call other APIs and write tests.","Run one full flow end to end: Lead, Quotation, Sales Order in ERPNext. Then connect it to your app.","Your app works with ERPNext data, and has 3 passing tests.","11.4;11.5;12.0;12.1;12.2;12.4;13.0;13.1;13.2;13.4"],
+["Portfolio, interviews and applications","One finished project, a ready resume, and applications sent.","Dec 21 to 27: finish the project, README and demo, and update your resume and LinkedIn. Dec 28 to 31: practise aloud in simple English (DocTypes, hooks, permissions, REST API, your project) and apply every day.","Project 2 (Sales Lead Tracker) on GitHub with README and demo, resume updated, 10 applications sent, 3 mock interviews done.","14.1;14.2;13.5;14.3;14.4;14.5"]];
 let jOpen={},jInit=false;
 const jpSubs=s=>s.split(';').flatMap(tk=>{const p=tk.split('.'),r=p[1].split('-'),lo=+r[0],hi=r[1]!==undefined?+r[1]:lo;return Array.from({length:hi-lo+1},(_,k)=>'f'+p[0]+'_'+(lo+k))});
 function jpWeeks(){const a=[S0];let m=S0;while(dow(m)!==1)m=add(m,1);for(;m<=E0;m=add(m,7))a.push(m);return a.slice(0,JP.length).map((x,i,r)=>({a:x,b:i<r.length-1?add(r[i+1],-1):E0}))}
@@ -624,7 +640,88 @@ function vJob(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Obj
    a.map(x=>{const s=M[x];return `<div class="row srow ${c}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="jgo" data-v="${s.ti}|${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">›</span></button></div>`}).join('')+
    `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
  return h+`<div class="card" style="margin-top:18px"><b>⭐ Bonus: ${bonus} subtopics are not in the plan</b><div class="mu" style="margin-top:4px">Window functions, iterators, Jinja and web pages, Webhooks, OAuth, performance and more. Study them after you start applying. Find them in All topics.</div></div>`}
-function vSyl(){const T=[['job','🎯 Job plan'],['fr','All topics'],['plan','Monthly plan']];return '<h1>Syllabus</h1><div class="tabs">'+T.map(x=>'<button class="'+(syTab===x[0]?'on':'')+'" data-a="sytab" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+(syTab==='job'?vJob():syTab==='fr'?vFrappe():vPlan().replace('<h1>Syllabus</h1>',''))}
+/* ===== LEARNING TOOLS (revise, notes, time, quiz, errors, interview) ===== */
+const IQ=[['What is the difference between git merge and git rebase?','How do you undo your last commit?','What does async / await do in JavaScript?','What is the difference between let and const?','How do you find which process uses a port in Linux?'],
+['What is a bench in Frappe?','How do you create a site and install an app on it?','What does bench migrate do?','What is the difference between bench start and a production setup?','How do you take and restore a backup?'],
+['What is the difference between Frappe, ERPNext and an app?','What happens when a browser opens a Frappe URL?','What do Redis and background workers do?','What files are inside a Frappe app?','Why is Frappe called metadata driven?'],
+['What is a DocType and what does it create?','What is the difference between a Single and a normal DocType?','How does a child table work?','What are naming series and autoname?','How do you add a field to an ERPNext DocType safely?'],
+['How do roles and permissions work in Frappe?','What is a permission level?','What is the difference between role permission and user permission?','How do you restrict a user to one Company?','What does if_owner mean?'],
+['Name five document events and when they run.','What is the difference between get_list and get_all?','How do you stop a save with an error?','What does frappe.db.get_value return?','How do you write a safe query with frappe.qb?'],
+['How do you add a custom button to a form?','How do you filter a Link field with set_query?','How do you call a server method from JavaScript?','How do you react to a change in a child table field?','What is the difference between refresh and onload?'],
+['What is the difference between a Query Report and a Script Report?','How do you add filters to a Script Report?','How do you create a print format with Jinja?','What is a Number Card?','How does a Workspace help users?'],
+['How does a Workflow control a document?','What is an Assignment Rule?','When would you use frappe.enqueue?','How do you send an email when a document is submitted?','What is a Webhook?'],
+['What is hooks.py used for?','How do you run code on save with doc_events?','How do you schedule a daily job?','What are fixtures and why use them?','How do you override a whitelisted method safely?'],
+['What is Jinja and where does Frappe use it?','How do you create a Web Form?','What is the www folder in an app?','How do you pass data to a portal page?','What is the difference between a Web Page and a Web Form?'],
+['How do you call the REST API to create a document?','How does API key and secret authentication work?','How do you expose your own function as an API?','What is the difference between /api/resource and /api/method?','How do you import data in bulk?'],
+['Explain the selling flow in ERPNext.','What is the difference between a Sales Order and a Sales Invoice?','How do you customise ERPNext without editing core code?','What is a Price List?','Which reports does a sales team use?'],
+['How do you debug an error in a Frappe app?','How do you write and run a unit test?','How do you find a slow query?','What steps do you follow to update a production site?','What is the difference between Frappe Cloud and self hosting?'],
+['Explain your best project in two minutes.','What problem did your app solve?','What was the hardest bug you fixed?','How would you improve your project?','Why do you want to be a Frappe developer?'],
+['What is the difference between a list and a tuple?','Explain a decorator with an example.','What is the difference between is and ==?','What are generators and why use them?','How does inheritance work in Python?','What is a context manager?'],
+['What is the difference between INNER JOIN and LEFT JOIN?','What is the difference between WHERE and HAVING?','What is an index and when can it hurt?','Explain primary key and foreign key.','What is a window function?','How do you avoid SQL injection?']];
+let qz=null,aiX='',aiXe='',iOpen={},iCur='',iBusy=false,iErr='';
+const RIV=[1,3,7,21];
+const subById=id=>{const q=id.slice(1).split('_').map(Number),t=FR[q[0]],p=t[3][q[1]].replace(/^~/,'').split('|');return{tn:t[1],t:p[0],h:p[1],its:FI[q[0]][q[1]].split(';'),ti:q[0]}};
+const ctxOf=id=>{const s=subById(id);return (s.ti>=1&&s.ti<=14?'Frappe Framework (version 16) and ERPNext':s.ti===15?'Python':s.ti===16?'SQL (MariaDB / MySQL)':'web development basics')+', topic "'+s.tn+'", subtopic "'+s.t+'" ('+s.h+'). Study points: '+s.its.join('; ')};
+function rvAdd(id){st.rv=st.rv||{};if(!st.rv[id])st.rv[id]={n:0,due:add(today(),RIV[0])}}
+function rvAns(id,ok){const r=(st.rv||{})[id];if(!r)return;if(ok){r.n++;if(r.n>=RIV.length){r.done=true;r.due='9999-12-31'}else r.due=add(today(),RIV[r.n])}else{r.n=0;r.done=false;r.due=add(today(),1);st.cf=st.cf||{};st.cf[id]=1}save()}
+function qzCard(){if(aiX==='quiz')return '<div class="card nx"><b>🧠 Making your quiz…</b><div class="mu">The AI is writing 5 questions.</div></div>';
+ if(!qz)return aiXe?'<div class="warn">❌ '+E(aiXe)+'</div>':'';
+ const s=subById(qz.sub);if(qz.i>=qz.qs.length)return `<div class="card nx"><b>🧠 Quiz result</b><div class="big2">${qz.ok}/${qz.qs.length}</div><div class="mu">${E(s.t)} · confidence set to ${qz.ok>=4?'💪':qz.ok>=3?'🙂':'😕 (added to Revise)'}</div><button data-a="qx">Close</button></div>`;
+ const q=qz.qs[qz.i],d=qz.sel!==null;
+ return `<div class="card nx"><div class="mu">🧠 Quiz · ${E(s.t)} · Question ${qz.i+1}/${qz.qs.length}</div><div class="aq">${E(q.q)}</div>`+q.o.map((o,k)=>`<button class="sec qo ${d?(k===q.a?'ok':k===qz.sel?'bad':''):''}" data-a="qa" data-v="${k}" ${d?'disabled':''}>${E(o)}</button>`).join('')+(d?`<div class="fb ${qz.sel===q.a?'c':'w'}">${qz.sel===q.a?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${E(q.e||'')}</div></div><button data-a="qn">${qz.i+1>=qz.qs.length?'Finish':'Next →'}</button>`:'')+`<button class="sec" data-a="qx">Stop quiz</button></div>`}
+function revCard(){const t=today(),due=Object.entries(st.rv||{}).filter(e=>!e[1].done&&e[1].due<=t);
+ if(!due.length)return '<div class="mu" style="margin:6px 2px">🔁 Revise: nothing due today ✅</div>';
+ return `<div class="card nx"><b>🔁 Revise today (${due.length})</b><div class="mu">Try to recall it without notes, then tap.</div>`+due.map(e=>{const s=subById(e[0]);return `<div class="row srow t-syl"><span style="flex:1"><b>${E(s.t)}</b><br><span class="mu">${E(s.tn)} · review ${e[1].n+1} of 4</span></span><button class="sec rb" data-a="rok" data-v="${e[0]}">✅</button><button class="sec rb" data-a="rno" data-v="${e[0]}">😕</button></div>`}).join('')+'</div>'}
+const HOW='<details class="card how"><summary>📖 How to study well</summary><div class="mu" style="margin-top:8px">1. Tick only when you can do it without notes.<br>2. Build first, read second: 40 of your 70 minutes typing code.<br>3. Revise when the Revise card asks (day 1, 3, 7, 21).<br>4. Write every error in the Error log.<br>5. Explain it aloud in 3 sentences.<br>6. Take the AI quiz after each subtopic.<br>7. Practise the interview questions aloud every week.</div></details>';
+function tools(id){const c=(st.cf||{})[id]||0,m=(st.tm||{})[id]||0,r=(st.rv||{})[id],ex=(st.exp||{})[id],h=(st.qh||{})[id]||[],last=h[h.length-1];
+ return `<div class="tools"><div class="mu">How sure are you?</div><div class="two3">${[['😕',1],['🙂',2],['💪',3]].map(p=>`<button class="sec cfb ${c===p[1]?'on':''}" data-a="cf" data-v="${id}|${p[1]}">${p[0]}</button>`).join('')}</div>`+
+ `<div class="mu" style="margin-top:8px">⏱ Time on this: <b>${hm(m)}</b></div><div class="two3">${[15,30,60].map(n=>`<button class="sec cfb" data-a="tm" data-v="${id}|${n}">+${n}m</button>`).join('')}</div>`+
+ (r?`<div class="mu" style="margin-top:8px">🔁 Next revision: ${r.done?'mastered 🏆':r.due}</div>`:'')+
+ `<div class="mu" style="margin-top:8px">📝 My notes (book, page, link)</div><textarea data-note="${id}" placeholder="Example: SQL book 1, page 42">${E((st.nt||{})[id]||'')}</textarea>`+
+ `<div class="two"><button class="sec" data-a="xpl" data-v="${id}" ${aiX?'disabled':''}>${aiX==='x'+id?'✨ Writing…':'✨ Explain simply'}</button><button class="sec" data-a="qz" data-v="${id}" ${aiX?'disabled':''}>🧠 AI quiz</button></div>`+
+ (last?`<div class="mu">Last quiz: ${last.s}/${last.n} on ${last.d}</div>`:'')+(ex?`<div class="card" style="margin:8px 0"><div class="mu">✨ Simple explanation</div><div style="white-space:pre-wrap">${E(ex)}</div></div>`:'')+'</div>'}
+async function xplain(id){if(aiX)return;aiX='x'+id;render();
+ try{const o=await gem('Explain this to a beginner in very simple English with one small example (max 120 words). Topic: '+ctxOf(id)+'. Reply ONLY JSON {"text":"..."}',1,false,'explain');st.exp=st.exp||{};st.exp[id]=String(o.text||'');save();aiXe=''}catch(e){aiXe=aiWhy(e)}aiX='';render()}
+async function startQuiz(id){if(aiX)return;aiX='quiz';aiXe='';qz=null;render();window.scrollTo({top:0,behavior:'smooth'});
+ try{const o=await gem('Make 5 multiple-choice questions to test a beginner on: '+ctxOf(id)+'. Each question has exactly 4 options and one correct option. Keep questions short and practical. Reply ONLY JSON {"qs":[{"q":"...","o":["...","...","...","..."],"a":0,"e":"short reason, max 20 words"}]} where a is the index (0 to 3) of the correct option.',1,false,'quiz');
+  const qs=(o.qs||[]).filter(q=>q&&q.q&&Array.isArray(q.o)&&q.o.length>=2&&Number.isInteger(q.a)&&q.a>=0&&q.a<q.o.length).slice(0,5);if(!qs.length)throw new Error('0|No questions');
+  qs.forEach(q=>{const c=q.o[q.a],o2=shuf(q.o);q.a=o2.indexOf(c);q.o=o2});qz={sub:id,qs,i:0,sel:null,ok:0}}catch(e){aiXe=aiWhy(e)}aiX='';render()}
+function errSec(){return '<h2>🐞 Error log</h2><div class="card"><input type="text" id="eerr" placeholder="Error message"><input type="text" id="ecau" placeholder="What caused it"><input type="text" id="efix" placeholder="How I fixed it"><button data-a="ea">Save error</button></div>'+(st.el||[]).slice(0,15).map(e=>`<div class="card"><b>${E(e.e)}</b><div class="mu">${E(e.d)} · Cause: ${E(e.c||'-')}</div><div>Fix: ${E(e.f||'-')}</div><button class="sec" data-a="ed" data-v="${e.id}">Delete</button></div>`).join('')}
+function iqPanel(key){const a=(st.iqa||{})[key];
+ return `<div class="its"><textarea id="iqans" placeholder="Answer in your own words, as in an interview">${E(a?a.ans||'':'')}</textarea><div class="two"><button data-a="ick" data-v="${key}" ${iBusy?'disabled':''}>${iBusy?'Checking…':'🤖 Check with AI'}</button><button class="sec" data-a="ir" data-v="${key}">✅ Ready / not</button></div>`+(iErr?`<div class="warn">${E(iErr)}</div>`:'')+(a&&a.score!==undefined?`<div class="fb ${a.score>=7?'c':a.score>=4?'p':'w'}">Score ${a.score}/10<div style="font-weight:500;margin-top:4px">👍 ${E(a.good||'')}<br>🔧 ${E(a.fix||'')}</div></div><div class="card"><div class="mu">Model answer</div>${E(a.model||'')}</div>`:'')+'</div>'}
+function iqSec(){const I=st.iq||{};let tot=0,rd=0;IQ.forEach((a,t)=>a.forEach((q,k)=>{tot++;if(I[t+'_'+k]==='r')rd++}));
+ let h=`<h2>🎤 Interview practice · ${rd}/${tot} ready</h2>`;
+ IQ.forEach((a,t)=>{const n=a.filter((_,k)=>I[t+'_'+k]==='r').length;
+  h+=`<button class="tp t-syl ${iOpen[t]?'open':''}" data-a="io" data-v="${t}"><span class="tm2"><b>${E(FR[t][1])}</b><span class="mu">${n}/${a.length} ready</span></span><span class="chev">▾</span></button>`;
+  if(iOpen[t])h+='<div class="sub">'+a.map((q,k)=>{const key=t+'_'+k,s=I[key];return `<div class="row srow t-syl ${iCur===key?'open':''}"><button class="stl" data-a="ia" data-v="${key}"><span><b>${E(q)}</b></span><span class="cnt">${s==='r'?'✅':s==='p'?'🔁':'⚪'}</span></button></div>`+(iCur===key?iqPanel(key):'')}).join('')+'</div>'});
+ return h}
+async function iqCheck(key){const el=$('#iqans'),ans=el?el.value.trim():'';if(!ans||iBusy)return;const p=key.split('_').map(Number),q=IQ[p[0]][p[1]];
+ st.iqa=st.iqa||{};st.iqa[key]=Object.assign(st.iqa[key]||{},{ans});iBusy=true;iErr='';render();
+ try{const o=await gem('You are a friendly interviewer for a junior '+(p[0]>=1&&p[0]<=14?'Frappe / ERPNext':'software')+' developer job. Question: "'+q+'". Learner answer: "'+ans+'". Rate the answer from 0 to 10. Reply ONLY JSON {"score":number,"good":"one short sentence","fix":"one short sentence","model":"a short model answer in simple English, max 60 words"}',1,false,'interview');
+  const sc=Math.max(0,Math.min(10,Math.round(+o.score)||0));st.iqa[key]={ans,score:sc,good:String(o.good||''),fix:String(o.fix||''),model:String(o.model||'')};st.iq=st.iq||{};st.iq[key]=sc>=7?'r':'p';save()}catch(e){iErr=aiWhy(e)}iBusy=false;render()}
+document.addEventListener('input',e=>{const id=e.target.dataset&&e.target.dataset.note;if(id===undefined)return;st.nt=st.nt||{};if(e.target.value.trim())st.nt[id]=e.target.value;else delete st.nt[id];save()});
+function vSyl(){const A=frAll(),M={};A.forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({ti:t.i,tn:t.n},s)}));
+ const W=jpWeeks(),td=clamp(today()),cur=Math.max(0,W.findIndex(w=>td>=w.a&&td<=w.b)),J=st.jd||{},fmt=d=>pd(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
+ ids=JP.map(w=>jpSubs(w[4]).filter(x=>M[x])),used=new Set(ids.flat()),bon=[];A.forEach(t=>t.subs.forEach(s=>{if(!used.has(s.id))bon.push(s.id)}));
+ const pts=a=>a.reduce((n,x)=>n+M[x].its.length,0),dn=a=>a.reduce((n,x)=>n+M[x].c,0),all=[...ids.flat(),...bon],pc=Math.round(dn(all)/pts(all)*100),
+ nid=all.find(x=>!M[x].d),nw=nid?ids.findIndex(a=>a.includes(nid)):-1,ni=nid&&M[nid].its.find(z=>!z.d),
+ row=(s,c)=>row0(s,c)+(fsOpen[s.id]?tools(s.id):''),row0=(s,c)=>`<div class="row srow ${c} ${fsOpen[s.id]?'open':''}"><input type="checkbox" data-a="fsall" data-k="${s.id}" ${s.d?'checked':''}><button class="stl" data-a="fso" data-v="${s.id}"><span><b>${E(s.t)}</b><span class="mu">${E(s.tn)} · ${E(s.h)}</span></span><span class="cnt">${s.c}/${s.its.length}</span><span class="chev">▾</span></button></div>`+(fsOpen[s.id]?`<div class="its">${s.its.map(z=>`<label class="row ${c}"><input type="checkbox" data-a="fi" data-k="${z.id}" ${z.d?'checked':''}><span>${E(z.t)}</span></label>`).join('')}</div>`:''),
+ head=(k,ic,title,sub,p,c,done)=>`<button class="tp ${c} ${jOpen[k]?'open':''} ${done?'done':''}" data-a="jw" data-v="${k}"><span class="ti">${done?'✅':ic}</span><span class="tm2"><b>${E(title)}</b><span class="mu">${sub}</span></span><span class="pc2">${p}%</span><span class="chev">▾</span></button><div class="bar mb ${c}"><i style="width:${p}%"></i></div>`;
+ if(!jInit){jInit=true;jOpen[cur]=true}
+ let h=`<h1>Syllabus</h1><div class="card hr"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Frappe developer plan</div><div class="big2">Week ${cur+1} of ${JP.length}</div><div class="mu">${dn(all)}/${pts(all)} study points done · ⏱ ${hm(Object.values(st.tm||{}).reduce((x,y)=>x+y,0))}</div></div></div>`+
+ `<div class="mu" style="margin:6px 2px">About 8.5 coding hours a week. Send your first 3 applications on ${fmt(W[JP.length-2].a)}, then 10 or more before ${fmt(E0)}.</div>`+
+ (ni?`<div class="card nx"><div class="mu">▶ Study this next${nw>=0?' · Week '+(nw+1):' · Bonus'}</div><div style="font-size:18px;font-weight:700;margin:4px 0">${E(ni.t)}</div><div class="mu">${E(M[nid].t)} · ${E(M[nid].tn)}</div><button data-a="jnext" data-v="${nw>=0?nw:'b'}|${nid}">Open it</button></div>`:`<div class="card nx">🎉 Everything is done. Keep applying!</div>`);
+ h+=qzCard()+revCard()+HOW;
+ JP.forEach((w,i)=>{const a=ids[i],p=Math.round(dn(a)/pts(a)*100),ok=p===100&&J['w'+i],c='t-syl';
+  h+=head(i,i===cur?'📍':'🗓',`Week ${i+1}: ${w[0]}`,`${fmt(W[i].a)} to ${fmt(W[i].b)}${i===cur?' · THIS WEEK':''}`,p,c,ok);
+  if(jOpen[i])h+=`<div class="sub"><div class="card" style="margin:8px 0"><div class="mu">🎯 Goal</div><div>${E(w[1])}</div><div class="mu" style="margin-top:8px">🛠 How to study</div><div>${E(w[2])}</div></div>`+a.map(x=>row(M[x],c)).join('')+
+   `<label class="row ${c}"><input type="checkbox" data-a="jd" data-k="w${i}" ${J['w'+i]?'checked':''}><span>📦 Checkpoint: ${E(w[3])}</span></label></div>`});
+ if(bon.length){const p=Math.round(dn(bon)/pts(bon)*100);h+=head('b','⭐','Bonus: after you start applying',`${bon.length} subtopics`,p,'t-syl',p===100);if(jOpen.b)h+=`<div class="sub">`+bon.map(x=>row(M[x],'t-syl')).join('')+`</div>`}
+ return h+errSec()+iqSec()}
+function jpMini(w){const i=WEEKS.indexOf(w);if(i<0||!JP[i])return '';const M={};frAll().forEach(t=>t.subs.forEach(s=>{M[s.id]=s}));
+ const a=jpSubs(JP[i][4]).filter(x=>M[x]),t=a.reduce((n,x)=>n+M[x].its.length,0),d=a.reduce((n,x)=>n+M[x].c,0),p=Math.round(d/t*100),nx=a.map(x=>M[x]).find(s=>!s.d),ni=nx&&nx.its.find(z=>!z.d);
+ return `<div class="card"><b>📚 Syllabus: Week ${i+1}</b><div style="margin:4px 0">${E(JP[i][0])}</div><div class="bar mb t-syl"><i style="width:${p}%"></i></div><div class="mu" style="margin-top:6px">${d}/${t} study points done${ni?' · Next: '+E(ni.t):' · ✅ all done'}</div><button class="sec" data-a="jweek" data-v="${i}">Open this week</button></div>`}
+function wkOut(w){return wkOut0(w)+jpMini(w)}
 function vPlan(){
  const ks=Object.keys(SY),tot=ks.reduce((a,m)=>a+SY[m].length,0),dn=ks.reduce((a,m)=>a+SY[m].filter((_,i)=>st.syl[m+i]).length,0),pc=Math.round(dn/tot*100);
  let h=`<h1>Syllabus</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${pc}"></div><div class="rt">${pc}%</div></div><div><div class="mu">Your learning path</div><div class="big2">${dn}/${tot}</div><div class="mu">topics completed</div></div></div>`;
@@ -655,7 +752,7 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- document.documentElement.dataset.theme=st.theme||'dark';const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI,spell:vSpell}[view]();
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI,spell:vSpell}[view]();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
@@ -682,7 +779,24 @@ document.addEventListener('click',e=>{
  else if(a==='fts'){ac();st.ft={end:Date.now()+(+v)*6e4,m:+v};save()}
  else if(a==='ftx'){st.ft=null;save()}
  else if(a==='gr'){grN=+v;animNext=true}
+ else if(a==='cf'){const q=v.split('|');st.cf=st.cf||{};st.cf[q[0]]=+q[1];if(+q[1]===1)rvAdd(q[0]);save()}
+ else if(a==='tm'){const q=v.split('|');st.tm=st.tm||{};st.tm[q[0]]=(st.tm[q[0]]||0)+(+q[1]);save()}
+ else if(a==='rok'){rvAns(v,true)}
+ else if(a==='rno'){rvAns(v,false)}
+ else if(a==='xpl'){xplain(v);return}
+ else if(a==='qz'){startQuiz(v);return}
+ else if(a==='qa'){if(qz&&qz.sel===null){qz.sel=+v;if(+v===qz.qs[qz.i].a)qz.ok++}}
+ else if(a==='qn'){qz.i++;qz.sel=null;if(qz.i>=qz.qs.length){const id=qz.sub,n=qz.qs.length;st.qh=st.qh||{};(st.qh[id]=st.qh[id]||[]).push({d:today(),s:qz.ok,n});st.cf=st.cf||{};st.cf[id]=qz.ok>=4?3:qz.ok>=3?2:1;if(qz.ok<=2)rvAdd(id);save()}}
+ else if(a==='qx'){qz=null;aiXe=''}
+ else if(a==='ea'){const e=$('#eerr').value.trim();if(!e)return alert('Write the error message first.');st.el=st.el||[];st.el.unshift({id:Date.now()+'',d:today(),e,c:$('#ecau').value.trim(),f:$('#efix').value.trim()});save()}
+ else if(a==='ed'){st.el=(st.el||[]).filter(x=>x.id!==v);save()}
+ else if(a==='io'){iOpen[v]=!iOpen[v]}
+ else if(a==='ia'){iCur=iCur===v?'':v;iErr=''}
+ else if(a==='ir'){st.iq=st.iq||{};st.iq[v]=st.iq[v]==='r'?'p':'r';save()}
+ else if(a==='ick'){iqCheck(v);return}
  else if(a==='jw'){jOpen[v]=!jOpen[v]}
+ else if(a==='jnext'){const q=v.split('|');jOpen[q[0]]=true;fsOpen[q[1]]=true}
+ else if(a==='jweek'){view='syl';jOpen[v]=true;animNext=true}
  else if(a==='jgo'){const q=v.split('|');syTab='fr';syOpen[q[0]]=true;fsOpen[q[1]]=true;animNext=true}
  else if(a==='sytab'){syTab=v;animNext=true}
  else if(a==='syo'){syOpen[v]=!syOpen[v]}
@@ -697,16 +811,9 @@ document.addEventListener('click',e=>{
  else if(a==='gow'){view='words';test=null;calSel=null;focusNw=true;animNext=true}
  else if(a==='bkdone'){bks();if(!confirm('Mark this book as completed?'))return;st.bi++;save()}
  else if(a==='bkadd'){const t=prompt('Book title?');if(!t||!t.trim())return;bks().push(t.trim());save()}
- else if(a==='notif'){
- if(!st.notify)st.notify={enabled:false,next:0};
- if(st.notify.enabled){st.notify.enabled=false;st.notify.next=0;save();render();return}
- if(!('Notification' in window))return alert('Browser notifications are not supported here.');
- Notification.requestPermission().then(p=>{
-  if(p!=='granted')return alert('Please allow notifications in your browser.');
-  st.notify={enabled:true,next:Date.now()+2*60*60*1000};save();render();
- });
- return;
- }
+ else if(a==='notif'){(st.notify&&st.notify.enabled?pushOff():pushOn());return}
+ else if(a==='tnot'){showN('Winter Arc test','Notifications work ✅');return}
+ else if(a==='csub'){const t=JSON.stringify(st.notify.sub);(navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('Copied')):Promise.reject()).catch(()=>prompt('Copy this code:',t));return}
  else if(a==='copy'){const t=report(wkSel),done=()=>alert('Copied');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(done).catch(()=>{
    const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done()});return}
@@ -758,6 +865,8 @@ $('#file').addEventListener('change',e=>{                   // import backup
  r.readAsText(f);e.target.value=''});
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='today')render()}); // new day rollover
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+document.addEventListener('toggle',e=>{if(e.target.id==='set')setOpen=e.target.open},true);
 
 render();
 </script></body></html>
