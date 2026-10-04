@@ -20,7 +20,15 @@ A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libr
 - **Calendar**: coloured month grid. Tap a day to edit it.
 - **Weekly**: workouts, Frappe, speaking, reading days, auto totals (Frappe hours, pages, words), score, copyable Sunday report. Short weeks use their real day count (week 1 = 3 workouts).
 - **Rules**: your 12 rules and daily timetable.
-- **Syllabus**: 26 topics (Oct / Nov / Dec) with a progress ring.
+- **Syllabus**: one single plan. 13 weeks that match the Weekly review weeks (Week 13 runs to 31 Dec). It starts with Python (Weeks 1-3), then SQL (Weeks 4-5), then Frappe. It uses one accent colour, no rainbow colours. Each week has a goal, how to study, subtopics (tap one to see its study points) and a checkpoint project. A **Study this next** card always shows the next point, and a Bonus section at the end holds the topics that did not fit. It covers a Python deep dive, SQL deep dive, web / Git / terminal, Frappe (install to hooks and APIs), ERPNext basics, projects and job applications: 17 topics, 133 subtopics, 633 study points. The Weekly screen shows this week's syllabus progress.
+
+### Learning tools (inside the Syllabus page, all AI features use your Gemini key)
+- **🔁 Revise today**: when you finish a subtopic (or mark it 😕) it is scheduled for revision after 1, 3, 7 and 21 days. Tap ✅ if you remembered, 😕 if you forgot (it restarts). After 4 reviews it is mastered 🏆.
+- **Per subtopic** (open a subtopic): confidence 😕 🙂 💪, time spent (+15 / +30 / +60 min), your own notes (book, page, link), **✨ Explain simply** and **🧠 AI quiz** (5 multiple-choice questions; your result sets confidence and may add it to Revise).
+- **🐞 Error log**: write the error, its cause and your fix.
+- **🎤 Interview practice**: 87 questions for every topic. Write your answer, the AI scores it 0-10, shows what was good, what to fix and a model answer. A score of 7 or more marks it ready.
+- **📖 How to study well**: the 7 study rules, one tap away.
+- These features use the API (Explain, Quiz, Interview). If you buy a higher plan, raise the number in Settings > API Usage.
 - **Words**: add words, spelling check, word list.
 - **Stats**: 90-day timeline, 7/30-day graph, 11 badges, theme selector (Dark / Cyber / Minimal), sound on/off.
 - **Private row**: tap the page title 3 times to show or hide it.
