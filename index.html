@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
+:root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
 body{margin:auto;background:transparent;color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 104px;max-width:560px;overflow-x:hidden}
 h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:6px 0 14px;background:linear-gradient(90deg,#fff,#a5f3fc 60%,#f9a8d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -23,7 +23,7 @@ select option{background:#14162e}
 input[type=number]{-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .row{--c:#34d399;display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 14px;margin:9px 0;background:var(--card);border:1px solid var(--bd);border-radius:18px;font-size:16.5px;font-weight:500;transition:background .2s,border-color .2s}
 .row[class*=" t-"]{border-left:5px solid var(--c)}
-.t-wo{--c:#fb923c}.t-wd{--c:#a78bfa}.t-sp{--c:#f472b6}.t-fr{--c:#22d3ee}.t-rd{--c:#fbbf24}.t-min{--c:#94a3b8}
+.t-min{--c:#94a3b8}
 .row:has(input[type=checkbox]:checked){background:color-mix(in srgb,var(--c) 20%,#131530);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
 .row:has(input[type=checkbox]:checked)>span{color:#fff}
 input[type=checkbox]{-webkit-appearance:none;appearance:none;width:30px;height:30px;border-radius:50%;border:2.5px solid var(--c,#34d399);background:transparent;display:grid;place-content:center;flex:none;cursor:pointer;margin:0;transition:background .15s}
@@ -176,6 +176,14 @@ button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;f
 .tools{margin:0 0 10px 14px;padding:8px 0 4px 8px;border-left:2px dashed var(--bd)}
 .how summary{cursor:pointer;font-weight:700;list-style:none;margin:0;padding:0;background:none;border:0}
 .lnk2{color:var(--ac);font-weight:600}
+.t-wo{--c:var(--wo)}.t-wd{--c:var(--wd)}.t-sp{--c:var(--sp)}.t-fr{--c:var(--fr)}.t-rd{--c:var(--rd)}
+.stats>div:last-child:nth-child(odd){grid-column:1/-1}
+.seg5{display:flex;gap:6px;margin:4px 0 12px}.seg5 i{flex:1;height:34px;border-radius:12px;background:var(--gy);display:grid;place-items:center;font-style:normal;font-size:16px;filter:grayscale(1);opacity:.55;transition:all .25s}
+.seg5 i.on{background:var(--c);filter:none;opacity:1;box-shadow:0 4px 14px color-mix(in srgb,var(--c) 55%,transparent)}
+.grid button{position:relative;padding-bottom:8px}.dt{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:center;gap:2px;pointer-events:none}.dt u{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);text-decoration:none}.dt u.on{background:var(--c);box-shadow:0 0 0 1px rgba(255,255,255,.9)}
+.bg{position:relative;filter:grayscale(.55);opacity:.8}.bg.on{filter:none;opacity:1;border-color:var(--c);box-shadow:0 0 18px color-mix(in srgb,var(--c) 45%,transparent)}.bg em{position:absolute;top:4px;right:6px;font-style:normal;font-size:13px}
+.bgb{display:block;height:5px;border-radius:3px;background:var(--gy);margin:6px 8px 4px;overflow:hidden}.bgb u{display:block;height:100%;background:var(--c);text-decoration:none}
+.nb{display:flex;align-items:center;gap:14px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 18%,var(--card)),var(--card))!important}.nbe{font-size:40px}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -243,20 +251,20 @@ function ctl(k,s,rest){const d=st.days[s]||{};
 const IC={wo:'💪',wd:'🔤',sp:'🎤',fr:'💻',rd:'📖'};
 function burst(){chime();for(let i=0;i<30;i++){const e=document.createElement('i');e.className='cf';e.style.cssText='left:'+(5+Math.random()*90)+'vw;background:hsl('+Math.floor(Math.random()*360)+',90%,60%);animation-delay:'+(Math.random()*.3)+'s;--x:'+Math.round((Math.random()-.5)*180)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}}
 /* ===== GAME LAYER ===== */
-const TIT=['Rookie','Starter','Grinder','Focused','Disciplined','Warrior','Elite','Master','Legend'];
+const TIT=['Rookie','Starter','Grinder','Focused','Disciplined','Warrior','Elite','Master','Champion','Legend','Mythic','Titan','Immortal','Grandmaster','Winter King'];
 let AC,grN=7;
 const ac=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume&&AC.resume()}catch(e){}return AC};
 function chime(){if(st.mute)return;const c=ac();if(!c)return;[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*.14;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.45)})}
 function gstats(){const r=today();let xp=0,tasks=0,perfect=0;
  for(let s=S0;s<=r&&s<=E0;s=add(s,1)){if(!st.days[s])continue;const c=cnt(s);tasks+=c;xp+=c*20;if(c===T.length){perfect++;xp+=30}}
  const lv=Math.floor(Math.sqrt(xp/60))+1,lo=60*(lv-1)*(lv-1),hi=60*lv*lv;
- return{xp,tasks,perfect,lv,hi,pct:(xp-lo)/(hi-lo)*100,title:TIT[Math.min(lv-1,8)]}}
+ return{xp,tasks,perfect,lv,hi,pct:(xp-lo)/(hi-lo)*100,title:TIT[Math.min(lv-1,TIT.length-1)]}}
 function playerCard(s,sk){const g=gstats(),c=cnt(s),pc=Math.round(c/T.length*100);
  return `<div class="card pl"><div class="fl ${sk.cur?'':'z'}"><span style="font-size:${38+Math.min(sk.cur,20)}px">🔥</span><b>${sk.cur}</b><small>day streak</small></div><div class="pm"><div class="mu">Level ${g.lv} · ${g.title}</div><div class="big2">${g.xp} XP</div><div class="bar xp"><i style="width:${g.pct}%"></i></div><div class="mu">${Math.round(g.hi-g.xp)} XP to Level ${g.lv+1}</div></div><div class="rw sm"><div class="ring" style="--p:${pc}"></div><div class="rt"><div>${c*2}/10<small>${pc}%</small></div></div></div></div>`}
 const MQ=[['Day not started. Do the smallest task first.','The hardest part is opening the app. You did it.','Start with the workout. Momentum follows.'],['Good start. Do one more task right now.','You moved. Keep the chain going.','Small wins add up. Pick the next mission.'],['Almost there. Finish the last missions.','You are close. Do not stop at 3.','Strong day. Two more and it is perfect.'],['Perfect day. You earned your rest.','5 of 5. This is who you are now.','Locked in. Repeat tomorrow.']];
 function motiv(s,sk){const c=cnt(s),b=c===T.length?3:c>=3?2:c>0?1:0,d=Math.round((pd(s)-pd(S0))/864e5);
  return `<div class="card mo"><span>💡</span><div>${MQ[b][((d%3)+3)%3]}${sk.cur>=7?`<div class="mu">🔥 ${sk.cur}-day streak. Protect it.</div>`:''}</div></div>`}
-const mission=s=>`<div class="mh t-oct"><div><b>🎯 Today's Mission</b><br><span class="mu">Complete these ${T.length} missions</span></div><div class="pc">${cnt(s)}/${T.length}</div></div>`;
+const mission=s=>`<div class="mh t-syl"><div><b>🎯 Today's Mission</b><br><span class="mu">Complete these ${T.length} missions</span></div><div class="pc">${cnt(s)}/${T.length}</div></div><div class="seg5">${T.map(k=>`<i class="t-${k} ${isDone(s,k)?'on':''}">${IC[k]}</i>`).join('')}</div>`;
 const fmt=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
 function focusCard(){const f=st.ft;
  return `<div class="card"><h2 style="margin-top:0">⏱ Focus timer</h2>`+(f?`<div class="ftc" id="ftc">${fmt(f.end-Date.now())}</div><div class="bar"><i id="ftb" style="width:${Math.min(100,(1-(f.end-Date.now())/(f.m*6e4))*100)}%"></i></div><button class="dng" style="margin-top:12px" data-a="ftx">Stop timer</button>`:`<div class="mu" style="margin-bottom:10px">Finished sessions are added to your Frappe minutes.</div><div class="two3"><button class="sec" data-a="fts" data-v="25">25 min</button><button class="sec" data-a="fts" data-v="50">50 min</button><button class="sec" data-a="fts" data-v="90">90 min</button></div>`)+`</div>`}
@@ -264,10 +272,36 @@ function ftTick(){const f=st.ft;if(!f)return;const left=f.end-Date.now();
  if(left<=0){const k=today(),d=st.days[k]=st.days[k]||{};d.t=d.t||{};d.t.fr=(d.t.fr||0)+f.m;st.ft=null;save();burst();navigator.vibrate&&navigator.vibrate([200,100,200]);render();return}
  const c=$('#ftc');if(c)c.textContent=fmt(left);const b=$('#ftb');if(b)b.style.width=Math.min(100,(1-left/(f.m*6e4))*100)+'%'}
 setInterval(ftTick,1000);
-function achList(){const g=gstats(),sk=streaks();return [['🚀','First Step',g.tasks,1],['🔥','3-Day Streak',sk.best,3],['⚡','7-Day Streak',sk.best,7],['💎','14-Day Streak',sk.best,14],['👑','30 Days',sk.best,30],['✅','100 Tasks',g.tasks,100],['🌟','Perfect Day',g.perfect,1],['🏆','10 Perfect Days',g.perfect,10],['🔤','50 Words',st.words.length,50],['📚','Book Done',st.bi||0,1],['🎖','Level 5',g.lv,5]]}
+const AG=[['🔥','Streaks','#ff7a3d','st',[[3,'3-Day Streak'],[7,'7-Day Streak'],[14,'14-Day Streak'],[21,'21-Day Streak'],[30,'30 Days'],[60,'60-Day Streak'],[90,'90-Day Streak']]],
+['✅','Tasks','#34d27b','tk',[[1,'First Step'],[50,'50 Tasks'],[100,'100 Tasks'],[250,'250 Tasks'],[400,'400 Tasks']]],
+['🌟','Perfect days','#ffc933','pf',[[1,'Perfect Day'],[10,'10 Perfect Days'],[25,'25 Perfect Days'],[50,'50 Perfect Days']]],
+['🔤','Words','#d65bff','wr',[[50,'50 Words'],[100,'100 Words'],[200,'200 Words'],[300,'300 Words']]],
+['📚','Books','#4da3ff','bk',[[1,'Book Done'],[2,'2 Books'],[3,'3 Books']]],
+['🎖','Levels','#ff5a4d','lv',[[3,'Level 3'],[5,'Level 5'],[8,'Level 8'],[10,'Level 10'],[13,'Level 13']]],
+['💪','Workout days','var(--wo)','d_wo',[[15,'Workout 15'],[40,'Workout 40']]],
+['🔤','Words days','var(--wd)','d_wd',[[20,'Words 20 days'],[45,'Words 45 days']]],
+['🎤','Speaking days','var(--sp)','d_sp',[[20,'Speaking 20 days'],[45,'Speaking 45 days']]],
+['💻','Coding days','var(--fr)','d_fr',[[20,'Coder 20 days'],[45,'Coder 45 days']]],
+['📖','Reading days','var(--rd)','d_rd',[[20,'Reader 20 days'],[45,'Reader 45 days']]],
+['🧠','Quizzes','#22d3ee','qz',[[1,'Quiz Starter'],[10,'Quiz 10']]],
+['🎯','Perfect quiz','#2dd4bf','qa',[[1,'Quiz Ace']]],
+['🗣','Interview ready','#ff9f43','iq',[[5,'Interview 5'],[20,'Interview 20']]],
+['🏆','Memory','#f59e0b','mm',[[5,'Memory 5']]],
+['🛠','Proof of work','#7ee081','pw',[[7,'Proof 7 days'],[30,'Proof 30 days']]],
+['📘','Study points','#60a5fa','pt',[[50,'Learner 50'],[200,'Learner 200'],[400,'Learner 400']]],
+['📝','Notes','#c4b5fd','nt',[[10,'Note Taker 10']]],
+['⏱','Study hours','#f472b6','hr',[[10,'Study 10 hours'],[30,'Study 30 hours']]]];
+function achVal(){const g=gstats(),sk=streaks(),r=today(),D={wo:0,wd:0,sp:0,fr:0,rd:0};
+ for(let s=S0;s<=r&&s<=E0;s=add(s,1)){const d=st.days[s];if(d)Object.keys(D).forEach(k=>{if(d[k])D[k]++})}
+ const qh=Object.values(st.qh||{}).flat(),pw=Object.values(st.pw||{}).filter(x=>x.t&&x.t.trim()).length,pts=frAll().reduce((a,t)=>a+t.nd,0);
+ return{st:sk.best,tk:g.tasks,pf:g.perfect,wr:st.words.length,bk:st.bi||0,lv:g.lv,d_wo:D.wo,d_wd:D.wd,d_sp:D.sp,d_fr:D.fr,d_rd:D.rd,qz:qh.length,qa:qh.filter(x=>x.s>=x.n).length,iq:Object.values(st.iq||{}).filter(x=>x==='r').length,mm:Object.values(st.rv||{}).filter(x=>x.done).length,pw,pt:pts,nt:Object.keys(st.nt||{}).length,hr:Math.floor(Object.values(st.tm||{}).reduce((a,b)=>a+b,0)/60)}}
+function achList(){const V=achVal(),o=[];AG.forEach(g=>g[4].forEach((t,i)=>o.push([g[0],t[1],V[g[3]],t[0],g[2],i,g[1]])));return o}
+const nextBadge=B=>{const L=(B||achList()).filter(b=>b[2]<b[3]);return L.length?L.sort((a,b)=>b[2]/b[3]-a[2]/a[3]||(a[3]-a[2])-(b[3]-b[2]))[0]:null};
+function nbHtml(b){const p=Math.round(b[2]/b[3]*100);return `<div class="card nb" style="--c:${b[4]}"><span class="nbe">${b[0]}</span><div style="flex:1"><div class="mu">🏆 Next badge</div><b>${E(b[1])}</b><div class="bar"><i style="width:${p}%;background:var(--c)"></i></div><div class="mu">${b[3]-b[2]} to go · ${p}%</div></div></div>`}
+const nbCard=()=>{const b=nextBadge();return b?nbHtml(b):''};
 function toast(m){const e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3300)}
 function checkAch(){const u=achList().filter(b=>b[2]>=b[3]).map(b=>b[1]);
- if(!st.ach){st.ach=u;save();return}
+ if(!st.ach||!st.ach2){st.ach=u;st.ach2=1;save();return}
  const nw=u.filter(x=>!st.ach.includes(x));if(!nw.length)return;
  st.ach=u;save();toast('🏅 Badge unlocked: '+nw.join(', '));chime()}
 function vStats(){
@@ -276,9 +310,12 @@ function vStats(){
  h+=`<h2>📈 90-day timeline</h2><div class="card">`+[['October',10,31],['November',11,30],['December',12,31]].map(([nm,m,dn])=>`<div class="mu" style="margin:6px 0 4px">${nm}</div><div class="hm">`+Array.from({length:dn},(_,i)=>{const s='2026-'+m+'-'+String(i+1).padStart(2,'0');return `<i class="sq ${s>r?'cg':col(s)} ${s===r?'td':''}" style="--k:${k++}"></i>`}).join('')+'</div>').join('')+`<div class="mu" style="margin-top:10px">Green = all 5 · Yellow = 3-4 · Red = missed</div></div>`;
  const days=Array.from({length:grN},(_,i)=>add(r,i-grN+1)),vals=days.map(s=>st.days[s]?cnt(s):0),av=Math.round(vals.reduce((a,b)=>a+b,0)/grN/T.length*100);
  h+=`<h2>📊 Consistency</h2><div class="card"><div class="tabs"><button class="${grN===7?'on':''}" data-a="gr" data-v="7">7 days</button><button class="${grN===30?'on':''}" data-a="gr" data-v="30">30 days</button></div><div class="gr">`+vals.map((c,i)=>`<i class="${days[i]>r||days[i]<S0?'x':''}" style="--k:${i};height:${Math.max(c/T.length*100,4)}%;background:${c===T.length?'#34d399':c>=3?'#fbbf24':c>0?'#fb923c':'rgba(255,255,255,.14)'}"></i>`).join('')+`</div><div class="mu" style="margin-top:8px">Average daily score: <b>${av}%</b></div></div>`;
- const B=achList();
- h+=`<h2>🏅 Achievements · ${B.filter(b=>b[2]>=b[3]).length}/${B.length}</h2><div class="bd">`+B.map(([e,t,v,gl],i)=>`<div class="bg ${v>=gl?'on':''}" style="--k:${i}"><span>${e}</span><b>${t}</b><small>${v>=gl?'Unlocked':Math.min(v,gl)+'/'+gl}</small></div>`).join('')+'</div>';
- const th=st.theme||'dark';
+ const B=achList(),un=B.filter(b=>b[2]>=b[3]).length,nb=nextBadge(B),MED=['🥉','🥈','🥇','💎','💎','💎','💎'],RC=['var(--wo)','var(--rd)','var(--fr)','var(--sp)','var(--wd)'];
+ h+=`<h2>🎖 Rank ladder</h2><div class="card"><div class="mu">Rank ${Math.min(g.lv,TIT.length)} of ${TIT.length}: <b>${g.title}</b>${g.lv<TIT.length?' · next: '+TIT[g.lv]+' at '+60*g.lv*g.lv+' XP':' · top rank!'}</div><div class="chips">${TIT.map((t,i)=>`<span style="--c:${RC[i%5]};${i+1>g.lv?'opacity:.4':''}">Lv${i+1} ${t}</span>`).join('')}</div></div>`;
+ h+=`<h2>🏅 Achievements · ${un}/${B.length}</h2>`+(nb?nbHtml(nb):'');
+ [...new Set(B.map(b=>b[6]))].forEach(gn=>{const A=B.filter(b=>b[6]===gn),c=A[0][4];h+=`<div class="mu" style="margin:14px 0 6px"><b style="color:${c}">${A[0][0]} ${gn}</b> · ${A.filter(b=>b[2]>=b[3]).length}/${A.length}</div><div class="bd">`+A.map(x=>`<div class="bg ${x[2]>=x[3]?'on':''}" style="--c:${x[4]}"><em>${MED[x[5]]}</em><span>${x[0]}</span><b>${E(x[1])}</b><i class="bgb"><u style="width:${Math.min(100,x[2]/x[3]*100)}%"></u></i><small>${x[2]>=x[3]?'Unlocked ✓':Math.min(x[2],x[3])+'/'+x[3]}</small></div>`).join('')+'</div>'});
+ 
+const th=st.theme||'dark';
  return h+`<h2>🎨 Theme</h2><div class="tabs">`+[['dark','🌙 Dark'],['cyber','⚡ Cyber'],['minimal','☀️ Minimal']].map(([k,l])=>`<button class="${th===k?'on':''}" data-a="th" data-v="${k}">${l}</button>`).join('')+'</div>'+`<h2>🔊 Sound</h2><div class="tabs"><button class="${st.mute?'':'on'}" data-a="snd" data-v="1">🔊 On</button><button class="${st.mute?'on':''}" data-a="snd" data-v="0">🔇 Off</button></div>`}
 /* ===== AI VOCABULARY (Gemini) ===== */
 const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
@@ -363,7 +400,7 @@ function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
   return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div><div class="two"><button class="sec" data-a="gow">Add words</button><button class="sec" data-a="spstart">🔊 Spelling</button></div></div>`}
-function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
 function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
  return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
@@ -414,19 +451,33 @@ async function addWords(){if(isSun())return alert('Sunday is test day. No new wo
  await fillAI(ids);if(!fillBusy)render()}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nw'){e.preventDefault();addWords()}});
 const pendingN=()=>st.words.filter(w=>!w.mean||!w.sent).length;
-function spStart(){const mk=st.sm||{},ws=wkWords(today());if(!ws.length)return alert('Add some words first.');
- sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,20).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false};view='spell';animNext=true;render()}
+const wkIdx=d=>{const i=WEEKS.findIndex(w=>d<=w);return i<0?WEEKS.length-1:i};
+const dupList=()=>{const seen={},d=[];st.words.forEach(w=>{const k=String(w.word).trim().toLowerCase();if(seen[k])d.push(w);else seen[k]=w});return{dups:d,seen}};
+function dupCheck(){const L=dupList(),dups=L.dups,seen=L.seen;
+ if(!dups.length)return toast('✅ No repeated words');
+ if(st.vt&&st.vt.ph!=='fin')return alert('A Sunday test is in progress. Finish or restart it first, then check repeated words.');
+ const names=[...new Set(dups.map(w=>String(w.word).trim().toLowerCase()))];
+ if(!confirm('Found '+dups.length+' repeated word'+(dups.length>1?'s':'')+': '+names.slice(0,8).join(', ')+(names.length>8?'...':'')+'.\nRemove the repeats and keep the first one of each?'))return;
+ dups.forEach(d=>{const k=seen[String(d.word).trim().toLowerCase()];if(!k.mean&&d.mean)k.mean=d.mean;if(!k.sent&&d.sent)k.sent=d.sent;if(d.mistake&&!k.mistake){k.mistake=true;k.wrong=d.wrong}});
+ const rm=new Set(dups.map(d=>d.id));st.words=st.words.filter(w=>!rm.has(w.id));rm.forEach(id=>{if(st.sm)delete st.sm[id];if(st.wh)delete st.wh[id]});
+ sp=null;save();toast('🗑 Removed '+dups.length+' repeated word'+(dups.length>1?'s':''));render()}
+function wTools(){const n=dupList().dups.length,C={};st.words.forEach(w=>{const i=wkIdx(w.date);C[i]=(C[i]||0)+1});const ks=Object.keys(C).map(Number).sort((a,b)=>a-b);
+ return `<button class="sec" data-a="wdup">🔍 Check repeated words${n?' ('+n+' found)':''}</button>`+(ks.length?`<div class="card"><h2 style="margin-top:0">🔁 Practice words</h2><div class="mu">Listen and write. Words you missed come first.</div><button data-a="spstart" data-v="all">Practice ALL words from the start (${st.words.length})</button><div class="mu" style="margin-top:10px">Or one week (the words added that week)</div><select id="wpk">${ks.map(i=>`<option value="w${i}">Week ${i+1} · ${C[i]} words</option>`).join('')}</select><button class="sec" data-a="spweek">Practice this week</button></div>`:'')}
+function spStart(scope){const mk=st.sm||{};let ws=wkWords(today()),cap=20;
+ if(scope==='all'){ws=st.words.slice();cap=1e9}else if(/^w\d+$/.test(scope||'')){const i=+scope.slice(1);ws=st.words.filter(w=>wkIdx(w.date)===i);cap=1e9}
+ if(!ws.length)return alert('Add some words first.');
+ sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,cap).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false,scope:scope||''};view='spell';animNext=true;render()}
 function spCheck(){const el=$('#spans'),a=el?el.value.trim():'';if(!a||!sp||sp.fb)return;const w=gw(sp.q[sp.i]),ok=nm(a)===nm(w.word);st.sm=st.sm||{};
  if(ok){sp.ok++;clearSp(w)}else{sp.bad.push({id:w.id,ans:a});markSp(w,a)}sp.fb={ok,ans:a};save();render()}
-function spAct(a){if(a==='spstart')return spStart();if(a==='spchk')return spCheck();
+function spAct(a,v){if(a==='spstart')return spStart(v);if(a==='spchk')return spCheck();
  if(a==='spnext'){sp.fb=null;sp.i++;if(sp.i>=sp.q.length)sp.done=true;return render()}
  if(a==='spquit'){view='words';sp=null;animNext=true;return render()}
  if(a==='spagain'){sp={q:shuf(sp.bad.map(e=>e.id)),i:0,ok:0,bad:[],fb:null,done:false};render()}}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='spans'){e.preventDefault();spCheck()}});
 function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothing to practice yet.</div>';
- if(sp.done){const n=sp.q.length;return `<h1>Spelling Result</h1><div class="card hero w"><div class="mu">Score</div><div class="big2">${sp.ok} / ${n}</div></div>`+(sp.bad.length?`<h2>✍️ Spelling mistakes (marked)</h2><div class="mu">Saved as spelling mistakes on your Words page.</div>`+sp.bad.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join('')+`<button data-a="spagain">🔁 Practice mistakes again</button>`:'<div class="card">🎉 All spelled correctly!</div>')+`<button class="sec" data-a="spstart">New round</button><button class="sec" data-a="spquit">Back to Words</button>`}
+ if(sp.done){const n=sp.q.length;return `<h1>Spelling Result</h1><div class="card hero w"><div class="mu">Score</div><div class="big2">${sp.ok} / ${n}</div></div>`+(sp.bad.length?`<h2>✍️ Spelling mistakes (marked)</h2><div class="mu">Saved as spelling mistakes on your Words page.</div>`+sp.bad.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join('')+`<button data-a="spagain">🔁 Practice mistakes again</button>`:'<div class="card">🎉 All spelled correctly!</div>')+`<button class="sec" data-a="spstart" data-v="${sp.scope||''}">New round</button><button class="sec" data-a="spquit">Back to Words</button>`}
  const w=gw(sp.q[sp.i]),f=sp.fb;
- let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
+ let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">${sp.scope==='all'?'All words · ':/^w\d+$/.test(sp.scope||'')?'Week '+(+sp.scope.slice(1)+1)+' · ':''}Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
  if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
  else h+=`<input type="text" id="spans" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
  return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
@@ -492,7 +543,7 @@ function vToday(){
  const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
  if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=playerCard(s,sk)+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+focusCard();
+ h+=playerCard(s,sk)+nbCard()+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+focusCard();
  return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
 
 /* ===== CALENDAR ===== */
@@ -502,7 +553,7 @@ function vCal(){
  const off=(pd('2026-'+calM+'-01').getDay()+6)%7,dim=new Date(2026,+calM,0).getDate();
  for(let i=0;i<off;i++)h+='<i></i>';
  for(let d=1;d<=dim;d++){const s=`2026-${calM}-${String(d).padStart(2,'0')}`;
-  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}</button>`}
+  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}${s<=today()&&st.days[s]?'<span class="dt">'+T.map(k=>'<u class="t-'+k+(isDone(s,k)?' on':'')+'"></u>').join('')+'</span>':''}</button>`}
  h+='</div><div class="mu" style="margin:10px 0">Green: all 5 · Yellow: 3-4 · Red: 0-2 · Grey: future</div>';
  return h+(calSel?`<h2>${pd(calSel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</h2>`+editor(calSel):'')}
 
@@ -515,7 +566,7 @@ function wk(w){                                             // auto stats + scor
  return{wo,wt:wd.length,n,fr:c('fr'),sp:c('sp'),rd:c('rd'),max,fh,sc,pg:pgA||+m.pg||0,wn,tmx:{wo:tm('wo'),wd:tm('wd'),sp:tm('sp'),fr:tm('fr'),rd:tm('rd')},m,P,score:Math.round(Object.values(P).reduce((a,b)=>a+b,0)),missed:D.filter(s=>s<today()&&!ok(s)).length}}
 function wkOut0(w){
  const c=wk(w),p=WEEKS[WEEKS.indexOf(w)-1],started=add(w,-6)<=today();
- let h=`<div class="stats"><div><b>${c.wo}/${c.wt}</b>Workouts</div><div><b>${c.fr}/${c.n}</b>Frappe days</div><div><b>${c.sp}/${c.n}</b>Speaking days</div><div><b>${c.rd}/${c.n}</b>Reading days</div></div><div class="card"><b>Time this week (auto)</b><div class="chips"><span style="--c:#fb923c">💪 ${hm(c.tmx.wo)}</span><span style="--c:#a78bfa">🔤 ${c.wn} words</span><span style="--c:#f472b6">🎤 ${hm(c.tmx.sp)}</span><span style="--c:#22d3ee">💻 ${hm(c.tmx.fr)}</span><span style="--c:#fbbf24">📖 ${c.pg} pages</span></div></div>`+
+ let h=`<div class="stats"><div style="--c:var(--wo)"><b>${c.wo}/${c.wt}</b>Workouts</div><div style="--c:var(--wd)"><b>${c.wn}/${wkTarget(w)}</b>Words added</div><div style="--c:var(--sp)"><b>${c.sp}/${c.n}</b>Speaking days</div><div style="--c:var(--fr)"><b>${c.fr}/${c.n}</b>Frappe days</div><div style="--c:var(--rd)"><b>${c.rd}/${c.n}</b>Reading days</div></div><div class="card"><b>Time this week (auto)</b><div class="chips"><span style="--c:var(--wo)">💪 ${hm(c.tmx.wo)}</span><span style="--c:var(--wd)">🔤 ${c.wn} words</span><span style="--c:var(--sp)">🎤 ${hm(c.tmx.sp)}</span><span style="--c:var(--fr)">💻 ${hm(c.tmx.fr)}</span><span style="--c:var(--rd)">📖 ${c.pg} pages</span></div></div>`+
  `<div class="card">Score<div class="big">${c.score}/100</div><div class="mu">Frappe ${c.P.fr|0}/30, Workout ${c.P.wo|0}/20, Speaking ${c.P.sp|0}/15, Spelling ${c.P.sc|0}/15, Reading ${c.P.rd|0}/10, Consistency ${c.P.co|0}/10</div></div>`;
  if(c.missed>=3)h+='<div class="warn">FAIL WEEK - repeat this week\'s Frappe topic</div>';
  if(started&&c.score<70)h+='<div class="warn">Score below 70. Fix it next week.</div>';
@@ -820,6 +871,8 @@ document.addEventListener('click',e=>{
  else if(a==='ia'){iCur=iCur===v?'':v;iErr=''}
  else if(a==='ir'){st.iq=st.iq||{};st.iq[v]=st.iq[v]==='r'?'p':'r';save()}
  else if(a==='ick'){iqCheck(v);return}
+ else if(a==='wdup'){dupCheck();return}
+ else if(a==='spweek'){spStart($('#wpk').value);return}
  else if(a==='pwc'){pwCopy();return}
  else if(a==='fsh'){fcShow=v}
  else if(a==='fgy'){fcAns(v,true)}
@@ -834,7 +887,7 @@ document.addEventListener('click',e=>{
  else if(a==='fso'){fsOpen[v]=!fsOpen[v]}
  else if(a==='motgo'){motGo(true);return}
  else if(a==='say'){sayWord(v);return}
- else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a);return}
+ else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a,v);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
  else if(a==='snd'){st.mute=v==='0';save()}
