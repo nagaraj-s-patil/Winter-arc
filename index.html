@@ -241,12 +241,12 @@ const bks=()=>{if(!st.books)st.books=['The Power of Your Subconscious Mind','The
 function bookCard(){const b=bks(),i=st.bi,dn=i>=b.length;
  return `<div class="card">📖 ${dn?'All '+b.length+' books completed 🎉':'Book '+(i+1)+' of '+b.length+': '+E(b[i])}<div class="mu" style="margin:4px 0">Completed: ${Math.min(i,b.length)}/${b.length}</div>${dn?'':'<button class="sec" data-a="bkdone">Book completed ✓ (go to next)</button>'}<button class="sec" data-a="bkadd">+ Add a book</button></div>`}
 function pst(){const r=today();let run=0,best=0;for(let s=S0;s<=r;s=add(s,1)){if(st.days[s]&&st.days[s].np){run++;best=Math.max(best,run)}else if(s<r)run=0}return{cur:run,best}}
-function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
+function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''} ${isLocked(s)?'disabled':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
 function ctl(k,s,rest){const d=st.days[s]||{};
  if(k==='wd')return isSun(s)?'<button class="plus" data-a="aistart">▶</button>':'<button class="plus" data-a="gow">+</button>';
- if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}">`;
+ if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}" ${isLocked(s)?'disabled':''}>`;
  if(rest)return '';
- return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}">`}
+ return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}" ${isLocked(s)?'disabled':''}>`}
 
 const IC={wo:'💪',wd:'🔤',sp:'🎤',fr:'💻',rd:'📖'};
 function burst(){chime();for(let i=0;i<30;i++){const e=document.createElement('i');e.className='cf';e.style.cssText='left:'+(5+Math.random()*90)+'vw;background:hsl('+Math.floor(Math.random()*360)+',90%,60%);animation-delay:'+(Math.random()*.3)+'s;--x:'+Math.round((Math.random()-.5)*180)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}}
@@ -500,13 +500,16 @@ async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr=''
  catch(e){motErr=aiWhy(e)}
  motBusy=false;refreshMot()}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
+let calUnlock={};
+const isLocked=s=>!!s&&s<today()&&!calUnlock[s];
+const lockBar=s=>s>=today()?'':isLocked(s)?`<div class="card lockbar"><div class="mu">🔒 This day is over, so it is locked. Your history stays true.</div><button class="sec" data-a="unl" data-v="${s}">🔓 Unlock to fix a mistake</button></div>`:`<div class="card lockbar"><div class="mu">🔓 Unlocked for now. It locks again when you leave.</div></div>`;
 function editor(s){
- const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0;
+ const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0,lk=isLocked(s);
  const L={wo:['Workout','10 min workout'],wd:sun?['AI Vocabulary Test','AI Vocabulary Test']:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
   fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
- let h=`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
+ let h=lockBar(s)+`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''} ${lk?'disabled':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
-  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
+  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest||lk?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
  if(showP)h+=privRow(s);
  return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
 
@@ -839,9 +842,10 @@ function render(){
 document.addEventListener('click',e=>{
  const b=e.target.closest('button[data-a]');if(!b)return;
  const a=b.dataset.a,v=b.dataset.v;
- if(a==='nav'){view=v;test=null;calSel=null;animNext=true}
+ if(a==='nav'){view=v;test=null;calSel=null;calUnlock={};animNext=true}
  else if(a==='cm'){calM=v;calSel=null;animNext=true}
- else if(a==='cd')calSel=b.dataset.d;
+ else if(a==='cd'){calSel=b.dataset.d;calUnlock={}}
+ else if(a==='unl'){if(confirm('This day is over, so it is locked to keep your history true. Unlock it to fix a mistake? It locks again when you leave.'))calUnlock[v]=true}
  else if(a==='addw'){addWords();return}
  else if(a==='fillai'){fillAI(st.words.filter(w=>!w.mean||!w.sent).slice(0,15).map(w=>w.id));return}
  else if(a==='tst'){
@@ -911,9 +915,9 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  const t=e.target,a=t.dataset.a;if(!a)return;
  const day=()=>st.days[t.dataset.d]=st.days[t.dataset.d]||{};
  if(a==='wsel')wkSel=t.value;
- else if(a==='tk')day()[t.dataset.k]=t.checked;
- else if(a==='min')day().min=t.checked;
- else if(a==='np')day().np=t.checked;
+ else if(a==='tk'){if(!isLocked(t.dataset.d))day()[t.dataset.k]=t.checked}
+ else if(a==='min'){if(!isLocked(t.dataset.d))day().min=t.checked}
+ else if(a==='np'){if(!isLocked(t.dataset.d))day().np=t.checked}
  else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
  else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
@@ -927,12 +931,12 @@ document.addEventListener('input',e=>{                      // weekly manual inp
 
 document.addEventListener('input',e=>{                      // daily minutes (no re-render, keeps focus)
  const k=e.target.dataset.t;if(!k)return;
- const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};d.t=d.t||{};
+ const s=e.target.dataset.d;if(isLocked(s))return;const d=st.days[s]=st.days[s]||{};d.t=d.t||{};
  const v=parseFloat(e.target.value);if(v>0)d.t[k]=v;else delete d.t[k];
  save();const x=document.getElementById('tt-'+s);if(x)x.textContent=tmt(s)});
 
 document.addEventListener('input',e=>{                      // reading pages (no re-render)
- if(!e.target.dataset.pg)return;const s=e.target.dataset.d,d=st.days[s]=st.days[s]||{};
+ if(!e.target.dataset.pg)return;const s=e.target.dataset.d;if(isLocked(s))return;const d=st.days[s]=st.days[s]||{};
  const v=parseFloat(e.target.value);if(v>0)d.pg=v;else delete d.pg;save()});
 
 let tapN=0,tapT=0;                                          // triple-tap a page title = show/hide private row
