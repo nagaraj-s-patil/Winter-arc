@@ -185,6 +185,11 @@ button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;f
 .bgb{display:block;height:5px;border-radius:3px;background:var(--gy);margin:6px 8px 4px;overflow:hidden}.bgb u{display:block;height:100%;background:var(--c);text-decoration:none}
 .nb{display:flex;align-items:center;gap:14px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 18%,var(--card)),var(--card))!important}.nbe{font-size:40px}
 .dt u.np.on{background:#ffd166}
+.train{margin:6px 0 14px}.track{display:flex;align-items:flex-start}.track u{flex:1;height:3px;background:var(--gy);margin-top:18px;border-radius:2px;text-decoration:none}
+button.stn{width:auto;min-width:50px;min-height:0;background:none;border:0;box-shadow:none;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--mu)}
+.stn span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--gy);font-size:15px;color:var(--tx)}
+.stn.past span{background:var(--ac);color:#fff}.stn.cur{color:var(--tx)}.stn.cur span{background:var(--g1);color:#fff;font-size:19px;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 30%,transparent);animation:chug 1s ease-in-out infinite}
+@keyframes chug{50%{transform:translateY(-2px)}}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -242,7 +247,7 @@ const bks=()=>{if(!st.books)st.books=['The Power of Your Subconscious Mind','The
 function bookCard(){const b=bks(),i=st.bi,dn=i>=b.length;
  return `<div class="card">📖 ${dn?'All '+b.length+' books completed 🎉':'Book '+(i+1)+' of '+b.length+': '+E(b[i])}<div class="mu" style="margin:4px 0">Completed: ${Math.min(i,b.length)}/${b.length}</div>${dn?'':'<button class="sec" data-a="bkdone">Book completed ✓ (go to next)</button>'}<button class="sec" data-a="bkadd">+ Add a book</button></div>`}
 function pst(){const r=today();let run=0,best=0;for(let s=S0;s<=r;s=add(s,1)){if(st.days[s]&&st.days[s].np){run++;best=Math.max(best,run)}else if(s<r)run=0}return{cur:run,best}}
-const privChip=()=>{const p=pst();return p.best>0?`<div class="mu" style="margin-top:4px">🔒 Private goal: <b>${p.cur}</b> day streak · best ${p.best}</div>`:''};
+const privChip=()=>{const p=pst();return UI('priv')&&p.best>0?`<div class="mu" style="margin-top:4px">🔒 Private goal: <b>${p.cur}</b> day streak · best ${p.best}</div>`:''};
 function privCard(){const r=clamp(today());let tot=0,dots='';for(let s=S0;s<=r&&s<=E0;s=add(s,1))if(st.days[s]&&st.days[s].np)tot++;
  if(!tot)return '';const p=pst();for(let i=13;i>=0;i--){const d=add(r,-i);if(d>=S0)dots+=st.days[d]&&st.days[d].np?'🟡':'⚪'}
  return `<div class="card nb" style="--c:#ffd166"><span class="nbe">🔒</span><div style="flex:1"><div class="mu">Private goal</div><b style="font-size:26px">${p.cur} day streak</b><div class="mu">best ${p.best} · ${tot} day${tot===1?'':'s'} in total</div><div class="mu" style="margin-top:4px;letter-spacing:2px">${dots}</div></div></div>`}
@@ -261,7 +266,7 @@ let AC,grN=7;
 const ac=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume&&AC.resume()}catch(e){}return AC};
 function chime(){if(st.mute)return;const c=ac();if(!c)return;[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*.14;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.45)})}
 function gstats(){const r=today();let xp=0,tasks=0,perfect=0;
- for(let s=S0;s<=r&&s<=E0;s=add(s,1)){if(!st.days[s])continue;const c=cnt(s);tasks+=c;xp+=c*20;if(st.days[s].np)xp+=15;if(c===T.length){perfect++;xp+=30}}
+ for(let s=S0;s<=r&&s<=E0;s=add(s,1)){if(!st.days[s])continue;const c=cnt(s);tasks+=c;xp+=c*20;if(st.days[s].np&&UI('priv'))xp+=15;if(c===T.length){perfect++;xp+=30}}
  const lv=Math.floor(Math.sqrt(xp/60))+1,lo=60*(lv-1)*(lv-1),hi=60*lv*lv;
  return{xp,tasks,perfect,lv,hi,pct:(xp-lo)/(hi-lo)*100,title:TIT[Math.min(lv-1,TIT.length-1)]}}
 function playerCard(s,sk){const g=gstats(),c=cnt(s),pc=Math.round(c/T.length*100);
@@ -301,7 +306,7 @@ function achVal(){const g=gstats(),sk=streaks(),r=today(),D={wo:0,wd:0,sp:0,fr:0
  for(let s=S0;s<=r&&s<=E0;s=add(s,1)){const d=st.days[s];if(d)Object.keys(D).forEach(k=>{if(d[k])D[k]++})}
  const qh=Object.values(st.qh||{}).flat(),pw=Object.values(st.pw||{}).filter(x=>x.t&&x.t.trim()).length,pts=frAll().reduce((a,t)=>a+t.nd,0);
  return{st:sk.best,tk:g.tasks,pf:g.perfect,wr:st.words.length,bk:st.bi||0,lv:g.lv,d_wo:D.wo,d_wd:D.wd,d_sp:D.sp,d_fr:D.fr,d_rd:D.rd,qz:qh.length,qa:qh.filter(x=>x.s>=x.n).length,iq:Object.values(st.iq||{}).filter(x=>x==='r').length,mm:Object.values(st.rv||{}).filter(x=>x.done).length,pw,pt:pts,nt:Object.keys(st.nt||{}).length,hr:Math.floor(Object.values(st.tm||{}).reduce((a,b)=>a+b,0)/60),np:pst().best}}
-function achList(){const V=achVal(),o=[];AG.forEach(g=>g[4].forEach((t,i)=>o.push([g[0],t[1],V[g[3]],t[0],g[2],i,g[1]])));return o}
+function achList(){const V=achVal(),o=[];AG.filter(g=>g[3]!=='np'||UI('priv')).forEach(g=>g[4].forEach((t,i)=>o.push([g[0],t[1],V[g[3]],t[0],g[2],i,g[1]])));return o}
 const nextBadge=B=>{const L=(B||achList()).filter(b=>b[2]<b[3]);return L.length?L.sort((a,b)=>b[2]/b[3]-a[2]/a[3]||(a[3]-a[2])-(b[3]-b[2]))[0]:null};
 function nbHtml(b){const p=Math.round(b[2]/b[3]*100);return `<div class="card nb" style="--c:${b[4]}"><span class="nbe">${b[0]}</span><div style="flex:1"><div class="mu">🏆 Next badge</div><b>${E(b[1])}</b><div class="bar"><i style="width:${p}%;background:var(--c)"></i></div><div class="mu">${b[3]-b[2]} to go · ${p}%</div></div></div>`}
 const nbCard=()=>{const b=nextBadge();return b?nbHtml(b):''};
@@ -310,15 +315,15 @@ function checkAch(){const u=achList().filter(b=>b[2]>=b[3]).map(b=>b[1]);
  if(!st.ach||!st.ach2){st.ach=u;st.ach2=1;save();return}
  const nw=u.filter(x=>!st.ach.includes(x));if(!nw.length)return;
  st.ach=u;save();toast('🏅 Badge unlocked: '+nw.join(', '));chime()}
-function vStats(){
+function vStats0(){
  const g=gstats(),sk=streaks(),r=today(),n=r<S0?0:Math.min(92,Math.round((pd(clamp(r))-pd(S0))/864e5)+1),p=Math.round(n/92*100);let k=0;
- let h=`<h1>Progress</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${p}"></div><div class="rt">${p}%</div></div><div><div class="mu">Winter Arc journey</div><div class="big2">Day ${n}/92</div><div class="mu">Level ${g.lv} · ${g.xp} XP · best streak ${sk.best}</div></div></div>`;
+ let h=`<h1>Progress</h1><div class="card hero hr s"><div class="rw"><div class="ring" style="--p:${p}"></div><div class="rt">${p}%</div></div><div><div class="mu">Winter Arc journey</div><div class="big2">Day ${n}/92</div><div class="mu">${UI('xp')?'Level '+g.lv+' · '+g.xp+' XP · ':''}best streak ${sk.best}</div></div></div>`;
  h+=`<h2>📈 90-day timeline</h2><div class="card">`+[['October',10,31],['November',11,30],['December',12,31]].map(([nm,m,dn])=>`<div class="mu" style="margin:6px 0 4px">${nm}</div><div class="hm">`+Array.from({length:dn},(_,i)=>{const s='2026-'+m+'-'+String(i+1).padStart(2,'0');return `<i class="sq ${s>r?'cg':col(s)} ${s===r?'td':''}" style="--k:${k++}"></i>`}).join('')+'</div>').join('')+`<div class="mu" style="margin-top:10px">Green = all 5 · Yellow = 3-4 · Red = missed</div></div>`;
  const days=Array.from({length:grN},(_,i)=>add(r,i-grN+1)),vals=days.map(s=>st.days[s]?cnt(s):0),av=Math.round(vals.reduce((a,b)=>a+b,0)/grN/T.length*100);
  h+=`<h2>📊 Consistency</h2><div class="card"><div class="tabs"><button class="${grN===7?'on':''}" data-a="gr" data-v="7">7 days</button><button class="${grN===30?'on':''}" data-a="gr" data-v="30">30 days</button></div><div class="gr">`+vals.map((c,i)=>`<i class="${days[i]>r||days[i]<S0?'x':''}" style="--k:${i};height:${Math.max(c/T.length*100,4)}%;background:${c===T.length?'#34d399':c>=3?'#fbbf24':c>0?'#fb923c':'rgba(255,255,255,.14)'}"></i>`).join('')+`</div><div class="mu" style="margin-top:8px">Average daily score: <b>${av}%</b></div></div>`;
  const B=achList(),un=B.filter(b=>b[2]>=b[3]).length,nb=nextBadge(B),MED=['🥉','🥈','🥇','💎','💎','💎','💎'],RC=['var(--wo)','var(--rd)','var(--fr)','var(--sp)','var(--wd)'];
- h+=privCard()+`<h2>🎖 Rank ladder</h2><div class="card"><div class="mu">Rank ${Math.min(g.lv,TIT.length)} of ${TIT.length}: <b>${g.title}</b>${g.lv<TIT.length?' · next: '+TIT[g.lv]+' at '+60*g.lv*g.lv+' XP':' · top rank!'}</div><div class="chips">${TIT.map((t,i)=>`<span style="--c:${RC[i%5]};${i+1>g.lv?'opacity:.4':''}">Lv${i+1} ${t}</span>`).join('')}</div></div>`;
- h+=`<h2>🏅 Achievements · ${un}/${B.length}</h2>`+(nb?nbHtml(nb):'');
+ if(UI('xp'))h+=`<h2>🎖 Rank ladder</h2><div class="card"><div class="mu">Rank ${Math.min(g.lv,TIT.length)} of ${TIT.length}: <b>${g.title}</b>${g.lv<TIT.length?' · next: '+TIT[g.lv]+' at '+60*g.lv*g.lv+' XP':' · top rank!'}</div><div class="chips">${TIT.map((t,i)=>`<span style="--c:${RC[i%5]};${i+1>g.lv?'opacity:.4':''}">Lv${i+1} ${t}</span>`).join('')}</div></div>`;
+ h+=`<h2>🏅 Achievements · ${un}/${B.length}</h2>`+(UI('priv')?privCard():'')+(nb?nbHtml(nb):'');
  [...new Set(B.map(b=>b[6]))].forEach(gn=>{const A=B.filter(b=>b[6]===gn),c=A[0][4];h+=`<div class="mu" style="margin:14px 0 6px"><b style="color:${c}">${A[0][0]} ${gn}</b> · ${A.filter(b=>b[2]>=b[3]).length}/${A.length}</div><div class="bd">`+A.map(x=>`<div class="bg ${x[2]>=x[3]?'on':''}" style="--c:${x[4]}"><em>${MED[x[5]]}</em><span>${x[0]}</span><b>${E(x[1])}</b><i class="bgb"><u style="width:${Math.min(100,x[2]/x[3]*100)}%"></u></i><small>${x[2]>=x[3]?'Unlocked ✓':Math.min(x[2],x[3])+'/'+x[3]}</small></div>`).join('')+'</div>'});
  
 const th=st.theme||'dark';
@@ -408,7 +413,7 @@ function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div>${n&&!(st.wp||{})[today()]?`<div class="warn" style="margin:8px 0">⏳ You added ${n} word${n===1?'':'s'} today but did not practise. Practise for 5 minutes now.</div>`:(st.wp||{})[today()]?'<div class="mu">✅ Practised today</div>':''}<div class="two"><button class="sec" data-a="gow">Add words</button><button data-a="spstart" data-v="rec">🔊 Practice now</button></div></div>`}
 function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
 function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
- return `<h1>Settings</h1><div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()}
+ return `<h1>Settings</h1>${uiCard()}<div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()+dataCard()}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
  return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!c.key?`<div class="warn">⚠️ Add your Gemini API key in Settings → AI Vocabulary.</div><button data-a="aigoset">Open Settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
 function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
@@ -506,6 +511,14 @@ async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr=''
  catch(e){motErr=aiWhy(e)}
  motBusy=false;refreshMot()}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
+const UIDEF={train:true,coach:true,xp:false,badge:false,priv:false,focus:false};
+const UI=k=>{const u=st.ui||{};return k in u?!!u[k]:UIDEF[k]};
+function uiCard(){const L=[['train','🚂 Show Today one step at a time'],['coach','💬 AI coach message'],['xp','⭐ Level and XP'],['badge','🏆 Next badge card'],['priv','🔒 Private goal numbers'],['focus','⏱ Focus timer']];
+ return '<div class="card"><h2 style="margin-top:0">🧹 What to show</h2><div class="mu">Turn things off to keep the app simple.</div>'+L.map(l=>`<label class="row"><input type="checkbox" data-a="uit" data-k="${l[0]}" ${UI(l[0])?'checked':''}><span>${l[1]}</span></label>`).join('')+'</div>'}
+const dataCard=()=>'<div class="card"><h2 style="margin-top:0">Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></div>';
+function accord(h){const p=h.split('<h2>');let out=p[0];for(let i=1;i<p.length;i++){const e=p[i].indexOf('</h2>'),k='s'+i,open=sOpen===k;
+ out+=`<button class="tp t-syl ${open?'open':''}" data-a="sacc" data-v="${k}"><span class="tm2"><b>${p[i].slice(0,e)}</b></span><span class="chev">▾</span></button>`+(open?`<div class="sub">${p[i].slice(e+5)}</div>`:'')}return out}
+function vStats(){return accord(vStats0())}
 let calUnlock={};
 const isLocked=s=>!!s&&s<today()&&!calUnlock[s];
 const lockBar=s=>s>=today()?'':isLocked(s)?`<div class="card lockbar"><div class="mu">🔒 This day is over, so it is locked. Your history stays true.</div><button class="sec" data-a="unl" data-v="${s}">🔓 Unlock to fix a mistake</button></div>`:`<div class="card lockbar"><div class="mu">🔓 Unlocked for now. It locks again when you leave.</div></div>`;
@@ -548,12 +561,16 @@ function checkNotify(){
  if(Date.now()<Number(st.notify.next||0))return;
  const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
  st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
-function vToday(){
- const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
- let h=`<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div><div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div></div>`;
- if(inPlan(y)&&!ok(y))h+='<div class="warn">You missed yesterday. Never miss twice in a row.</div>';
- h+=playerCard(s,sk)+nbCard()+aiMotiv(s,sk)+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+focusCard();
- return h+`<details id="set" ${setOpen?'open':''}><summary>⚙️ Settings: backup</summary>`+`<h2>Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></details>`}
+let tStep=0,sOpen='';
+function vToday(){const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
+ const top='<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div>',
+ hero=`<div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div>${UI('xp')?'':`<div class="mu" style="margin-top:8px">🔥 ${sk.cur} day streak</div>`}</div>`+(inPlan(y)&&!ok(y)?'<div class="warn">You missed yesterday. Never miss twice in a row.</div>':''),
+ xp=UI('xp')?playerCard(s,sk):'',nb=UI('badge')?nbCard():'',co=UI('coach')?aiMotiv(s,sk):'',fo=UI('focus')?focusCard():'';
+ if(!UI('train'))return top+hero+xp+nb+co+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+fo;
+ const S=[['Tasks',hero+mission(s)+editor(s)],['Words',vocabCard(s)],['Proof',bookCard()+pwCard(s)]],ex=xp+nb+co+fo;if(ex)S.push(['Coach',ex]);
+ const k=Math.min(tStep,S.length-1);
+ return top+'<div class="train"><div class="track">'+S.map((x,i)=>`<button class="stn ${i<k?'past':i===k?'cur':''}" data-a="tstep" data-v="${i}"><span>${i===k?'🚂':i<k?'✓':i+1}</span>${x[0]}</button>`).join('<u></u>')+'</div></div>'+S[k][1]+
+  `<div class="two" style="margin-top:14px">${k>0?`<button class="sec" data-a="tstep" data-v="${k-1}">◀ Back</button>`:'<span></span>'}${k<S.length-1?`<button data-a="tstep" data-v="${k+1}">Next: ${S[k+1][0]} ▶</button>`:'<button class="sec" data-a="tstep" data-v="0">↺ Back to Tasks</button>'}</div>`}
 
 /* ===== CALENDAR ===== */
 function vCal(){
@@ -562,7 +579,7 @@ function vCal(){
  const off=(pd('2026-'+calM+'-01').getDay()+6)%7,dim=new Date(2026,+calM,0).getDate();
  for(let i=0;i<off;i++)h+='<i></i>';
  for(let d=1;d<=dim;d++){const s=`2026-${calM}-${String(d).padStart(2,'0')}`;
-  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}${s<=today()&&st.days[s]?'<span class="dt">'+T.map(k=>'<u class="t-'+k+(isDone(s,k)?' on':'')+'"></u>').join('')+(st.days[s].np?'<u class="np on"></u>':'')+'</span>':''}</button>`}
+  h+=`<button data-a="cd" data-d="${s}" class="${col(s)} ${s===today()?'td':''} ${calSel===s?'sel':''}" ${s>today()?'disabled':''}>${d}${s<=today()&&st.days[s]?'<span class="dt">'+T.map(k=>'<u class="t-'+k+(isDone(s,k)?' on':'')+'"></u>').join('')+(st.days[s].np&&UI('priv')?'<u class="np on"></u>':'')+'</span>':''}</button>`}
  h+='</div><div class="mu" style="margin:10px 0">Green: all 5 · Yellow: 3-4 · Red: 0-2 · Grey: future</div>';
  return h+(calSel?`<h2>${pd(calSel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</h2>`+editor(calSel):'')}
 
@@ -611,8 +628,7 @@ const TL=[['6:00','💪','Workout','#fb923c'],['6:30','🔤','Words','#a78bfa'],
 const rl=x=>{const m=x.match(/^(.*?[.:])\s+(.*)$/);return m?'<b>'+E(m[1])+'</b>'+E(m[2]):E(x)};
 function vRules(){
  return '<h1>Rules</h1><div class="card hero"><b style="font-size:22px;display:block">Rules beat motivation.</b><span class="mu">Follow these 12 rules and the 92 days take care of themselves.</span></div>'+
- RG.map(([ic,t,ix,c])=>`<div class="rg" style="--c:${c}"><i>${ic}</i><h2>${t}</h2></div>`+ix.map(i=>`<div class="rule" style="--c:${c}"><span class="num">${i+1}</span><p>${rl(RULES[i])}</p></div>`).join('')).join('')+
- `<div class="rg" style="--c:#f472b6"><i>⏰</i><h2>Daily timetable</h2></div><div class="tl">`+TL.map(([t,ic,n,c])=>`<div class="tli" style="--c:${c}"><b>${t}</b><span>${ic} ${n}</span></div>`).join('')+'</div>'}
+ RG.map(([ic,t,ix,c])=>`<div class="rg" style="--c:${c}"><i>${ic}</i><h2>${t}</h2></div>`+ix.map(i=>`<div class="rule" style="--c:${c}"><span class="num">${i+1}</span><p>${rl(RULES[i])}</p></div>`).join('')).join('')}
 
 /* ===== SYLLABUS ===== */
 const MC={Oct:'oct',Nov:'nov',Dec:'dec'},MF={Oct:'October',Nov:'November',Dec:'December'};
@@ -881,6 +897,8 @@ document.addEventListener('click',e=>{
  else if(a==='ia'){iCur=iCur===v?'':v;iErr=''}
  else if(a==='ir'){st.iq=st.iq||{};st.iq[v]=st.iq[v]==='r'?'p':'r';save()}
  else if(a==='ick'){iqCheck(v);return}
+ else if(a==='tstep'){tStep=+v;animNext=true}
+ else if(a==='sacc'){sOpen=sOpen===v?'':v}
  else if(a==='wdup'){dupCheck();return}
  else if(a==='spweek'){spStart($('#wpk').value);return}
  else if(a==='pwc'){pwCopy();return}
@@ -924,6 +942,7 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  else if(a==='tk'){if(!isLocked(t.dataset.d))day()[t.dataset.k]=t.checked}
  else if(a==='min'){if(!isLocked(t.dataset.d))day().min=t.checked}
  else if(a==='np'){if(!isLocked(t.dataset.d))day().np=t.checked}
+ else if(a==='uit'){st.ui=st.ui||{};st.ui[t.dataset.k]=t.checked}
  else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
  else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
