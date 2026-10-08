@@ -251,7 +251,7 @@ const privChip=()=>{const p=pst();return UI('priv')&&p.best>0?`<div class="mu" s
 function privCard(){const r=clamp(today());let tot=0,dots='';for(let s=S0;s<=r&&s<=E0;s=add(s,1))if(st.days[s]&&st.days[s].np)tot++;
  if(!tot)return '';const p=pst();for(let i=13;i>=0;i--){const d=add(r,-i);if(d>=S0)dots+=st.days[d]&&st.days[d].np?'🟡':'⚪'}
  return `<div class="card nb" style="--c:#ffd166"><span class="nbe">🔒</span><div style="flex:1"><div class="mu">Private goal</div><b style="font-size:26px">${p.cur} day streak</b><div class="mu">best ${p.best} · ${tot} day${tot===1?'':'s'} in total</div><div class="mu" style="margin-top:4px;letter-spacing:2px">${dots}</div></div></div>`}
-function privRow(s){const p=pst();return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''} ${isLocked(s)?'disabled':''}><span>🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
+function privRow(s,lbl){const p=pst(),L=lbl||(s===clamp(today())?'':pd(s).toLocaleDateString('en-IN',{day:'numeric',month:'short'}));return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>${L?L+' · ':''}🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
 function ctl(k,s,rest){const d=st.days[s]||{};
  if(k==='wd')return isSun(s)?'<button class="plus" data-a="aistart">▶</button>':'<button class="plus" data-a="gow">+</button>';
  if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}" ${isLocked(s)?'disabled':''}>`;
@@ -529,7 +529,7 @@ function editor(s){
  let h=lockBar(s)+`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''} ${lk?'disabled':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
   h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest||lk?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
- if(showP)h+=privRow(s);
+ if(showP){h+=privRow(s);if(s===clamp(today())&&add(s,-1)>=S0)h+=privRow(add(s,-1),'Yesterday')}
  return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
 
 /* ===== TODAY ===== */
@@ -941,7 +941,7 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  if(a==='wsel')wkSel=t.value;
  else if(a==='tk'){if(!isLocked(t.dataset.d))day()[t.dataset.k]=t.checked}
  else if(a==='min'){if(!isLocked(t.dataset.d))day().min=t.checked}
- else if(a==='np'){if(!isLocked(t.dataset.d))day().np=t.checked}
+ else if(a==='np')day().np=t.checked;
  else if(a==='uit'){st.ui=st.ui||{};st.ui[t.dataset.k]=t.checked}
  else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
  else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
