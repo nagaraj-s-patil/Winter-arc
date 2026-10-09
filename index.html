@@ -17,8 +17,8 @@ button:active{transform:scale(.97);filter:brightness(.9)}
 button.sec{background:var(--card2);border:1px solid var(--bd);box-shadow:none}
 button.dng{background:transparent;border:1px solid rgba(251,113,133,.5);color:#fda4af;box-shadow:none}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two button{margin:0}
-input[type=text],input[type=number],select{width:100%;min-height:50px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:0 14px;margin:5px 0;outline:0;transition:border-color .15s,box-shadow .15s}
-input[type=text]:focus,input[type=number]:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(34,211,238,.25)}
+input[type=text],input[type=password],input[type=number],select{width:100%;min-height:50px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:0 14px;margin:5px 0;outline:0;transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(34,211,238,.25)}
 select option{background:#14162e}
 input[type=number]{-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .row{--c:#34d399;display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 14px;margin:9px 0;background:var(--card);border:1px solid var(--bd);border-radius:18px;font-size:16.5px;font-weight:500;transition:background .2s,border-color .2s}
@@ -190,13 +190,31 @@ button.stn{width:auto;min-width:50px;min-height:0;background:none;border:0;box-s
 .stn span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--gy);font-size:15px;color:var(--tx)}
 .stn.past span{background:var(--ac);color:#fff}.stn.cur{color:var(--tx)}.stn.cur span{background:var(--g1);color:#fff;font-size:19px;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 30%,transparent);animation:chug 1s ease-in-out infinite}
 @keyframes chug{50%{transform:translateY(-2px)}}
+/* design v2 */
+:root{--g1:linear-gradient(135deg,#6366f1,#8b5cf6)}
+button{box-shadow:none}
+h1{background:none;-webkit-text-fill-color:var(--tx);color:var(--tx)}
+.hero{color:#fff;background:linear-gradient(135deg,#3b5bdb,#7048e8);box-shadow:none}
+.hero .big2{color:#fff}
+.row{min-height:78px;padding:12px 16px;border-radius:20px}.row>span{flex:1;min-width:0;line-height:1.3}.row>span b{font-size:17px}
+.mini{display:block;height:6px;border-radius:3px;background:var(--gy);margin-top:8px;overflow:hidden}.mini u{display:block;height:100%;background:var(--c);text-decoration:none;border-radius:3px;transition:width .3s}
+.seg{display:flex;gap:4px;background:var(--card2);border-radius:16px;padding:4px;margin:2px 0 14px}.seg button{flex:1;margin:0;min-height:40px;background:none;border:0;color:var(--mu);font-size:14px;border-radius:12px;box-shadow:none}.seg button.on{background:var(--card);color:var(--tx)}
+nav button{font-size:11px;min-height:62px}nav .on::before{display:none}nav .ic{width:fit-content;margin:0 auto;padding:1px 16px;border-radius:14px}nav .on .ic{background:color-mix(in srgb,var(--ac) 22%,transparent);filter:none}
+.flame{display:inline-block}.flame.pop{animation:flamepop .8s ease 2}@keyframes flamepop{40%{transform:scale(1.7) rotate(-12deg)}}
+.rings{display:flex;justify-content:space-around;margin-top:14px}.mr3{text-align:center}.mr{--p:0;width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--gy) 0);display:grid;place-items:center;position:relative;margin:0 auto 6px}.mr::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--card)}.mr b{position:relative;font-size:18px}
+.bars7{display:flex;gap:8px;height:120px;margin-top:12px}.b7{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}.b7 .col{flex:1;width:100%;display:flex;align-items:flex-end}.b7 i{width:100%;border-radius:8px;background:var(--ac);display:block}.b7 span{font-size:12px;color:var(--mu)}
+.hrate{display:flex;align-items:center;gap:12px;margin:10px 0}.hrate span{width:110px;font-weight:600;font-size:14px}.hrate .bar{flex:1}.hrate b{width:44px;text-align:right}
+.noanim *,.noanim *::before,.noanim *::after{animation:none!important;transition:none!important}
+button.qchip{width:auto;min-height:38px;padding:0 14px;margin:0;font-size:13px;border-radius:999px;background:var(--card2);border:1px solid var(--bd);color:var(--tx);box-shadow:none}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:48vh;overflow:auto;padding:4px 2px;margin-bottom:10px}
+.bub{max-width:88%;padding:10px 14px;border-radius:18px;white-space:pre-wrap;line-height:1.45;font-size:15px}.bub.u{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:6px}.bub.a{align-self:flex-start;background:var(--card2);border:1px solid var(--bd);border-bottom-left-radius:6px}.bub.dim{opacity:.6}
+.cbar{display:flex;gap:8px;align-items:center}.cbar input{margin:0;flex:1}.cbar button{width:84px;margin:0}
+div[style*="display:flex"]>input{flex:1;min-width:0}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
 <nav>
-<button data-a="nav" data-v="today"><span class="ic">✅</span>Today</button><button data-a="nav" data-v="cal"><span class="ic">🗓</span>Calendar</button>
-<button data-a="nav" data-v="week"><span class="ic">📊</span>Weekly</button><button data-a="nav" data-v="rules"><span class="ic">📌</span>Rules</button><button data-a="nav" data-v="syl"><span class="ic">📚</span>Syllabus</button>
-<button data-a="nav" data-v="words"><span class="ic">🔤</span>Words</button><button data-a="nav" data-v="stats"><span class="ic">🏆</span>Stats</button>
+<button data-a="nav" data-v="today"><span class="ic">✅</span>Today</button><button data-a="nav" data-v="cal"><span class="ic">🗓</span>Calendar</button><button data-a="nav" data-v="prog"><span class="ic">📊</span>Progress</button><button data-a="nav" data-v="learn"><span class="ic">📚</span>Learn</button><button data-a="nav" data-v="coach"><span class="ic">🤖</span>Coach</button><button data-a="nav" data-v="stats"><span class="ic">🏆</span>Stats</button>
 </nav>
 <script>
 /* ===== CONFIG ===== */
@@ -259,7 +277,7 @@ function ctl(k,s,rest){const d=st.days[s]||{};
  return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}" ${isLocked(s)?'disabled':''}>`}
 
 const IC={wo:'💪',wd:'🔤',sp:'🎤',fr:'💻',rd:'📖'};
-function burst(){chime();for(let i=0;i<30;i++){const e=document.createElement('i');e.className='cf';e.style.cssText='left:'+(5+Math.random()*90)+'vw;background:hsl('+Math.floor(Math.random()*360)+',90%,60%);animation-delay:'+(Math.random()*.3)+'s;--x:'+Math.round((Math.random()-.5)*180)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}}
+function burst(){if(!UI('anim'))return;chime();for(let i=0;i<30;i++){const e=document.createElement('i');e.className='cf';e.style.cssText='left:'+(5+Math.random()*90)+'vw;background:hsl('+Math.floor(Math.random()*360)+',90%,60%);animation-delay:'+(Math.random()*.3)+'s;--x:'+Math.round((Math.random()-.5)*180)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),2400)}}
 /* ===== GAME LAYER ===== */
 const TIT=['Rookie','Starter','Grinder','Focused','Disciplined','Warrior','Elite','Master','Champion','Legend','Mythic','Titan','Immortal','Grandmaster','Winter King'];
 let AC,grN=7;
@@ -511,14 +529,14 @@ async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr=''
  catch(e){motErr=aiWhy(e)}
  motBusy=false;refreshMot()}
 /* ===== SHARED DAY EDITOR (Today + Calendar) ===== */
-const UIDEF={train:true,coach:true,xp:false,badge:false,priv:false,focus:false};
+const UIDEF={train:true,coach:true,xp:false,badge:false,priv:false,focus:false,anim:true};
 const UI=k=>{const u=st.ui||{};return k in u?!!u[k]:UIDEF[k]};
-function uiCard(){const L=[['train','🚂 Show Today one step at a time'],['coach','💬 AI coach message'],['xp','⭐ Level and XP'],['badge','🏆 Next badge card'],['priv','🔒 Private goal numbers'],['focus','⏱ Focus timer']];
- return '<div class="card"><h2 style="margin-top:0">🧹 What to show</h2><div class="mu">Turn things off to keep the app simple.</div>'+L.map(l=>`<label class="row"><input type="checkbox" data-a="uit" data-k="${l[0]}" ${UI(l[0])?'checked':''}><span>${l[1]}</span></label>`).join('')+'</div>'}
+function uiCard(){const L=[['train','🚂 Show Today one step at a time'],['coach','💬 AI coach message'],['xp','⭐ Level and XP'],['badge','🏆 Next badge card'],['priv','🔒 Private goal numbers'],['focus','⏱ Focus timer'],['snd','🔊 Sound'],['anim','✨ Animations']];
+ return '<div class="card"><h2 style="margin-top:0">🧹 What to show</h2><div class="mu">Turn things off to keep the app simple.</div>'+L.map(l=>`<label class="row"><input type="checkbox" data-a="uit" data-k="${l[0]}" ${(l[0]==='snd'?!st.mute:UI(l[0]))?'checked':''}><span>${l[1]}</span></label>`).join('')+'</div>'}
 const dataCard=()=>'<div class="card"><h2 style="margin-top:0">Data</h2><div class="two"><button class="sec" data-a="exp">Export backup</button><button class="sec" data-a="imp">Import backup</button></div><button class="dng" style="margin-top:12px" data-a="rst">Reset all data</button></div>';
 function accord(h){const p=h.split('<h2>');let out=p[0];for(let i=1;i<p.length;i++){const e=p[i].indexOf('</h2>'),k='s'+i,open=sOpen===k;
  out+=`<button class="tp t-syl ${open?'open':''}" data-a="sacc" data-v="${k}"><span class="tm2"><b>${p[i].slice(0,e)}</b></span><span class="chev">▾</span></button>`+(open?`<div class="sub">${p[i].slice(e+5)}</div>`:'')}return out}
-function vStats(){return accord(vStats0())}
+function vStats(){return accord(vStats0().replace(/<h2>📊 Consistency<\/h2>[\s\S]*?(?=<h2>)/,'').replace(/<h2>🔊 Sound<\/h2>[\s\S]*$/,''))}
 let calUnlock={};
 const isLocked=s=>!!s&&s<today()&&!calUnlock[s];
 const lockBar=s=>s>=today()?'':isLocked(s)?`<div class="card lockbar"><div class="mu">🔒 This day is over, so it is locked. Your history stays true.</div><button class="sec" data-a="unl" data-v="${s}">🔓 Unlock to fix a mistake</button></div>`:`<div class="card lockbar"><div class="mu">🔓 Unlocked for now. It locks again when you leave.</div></div>`;
@@ -528,10 +546,65 @@ function editor(s){
   fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
  let h=lockBar(s)+`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''} ${lk?'disabled':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
-  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest||lk?'disabled':''}><span>${IC[k]} ${rest?'Rest day ✓':L[k][+m]+(k==='wd'&&!sun?' <span class="mu">('+st.words.filter(w=>w.date===s).length+' added)</span>':'')}</span>${ctl(k,s,rest)}</label>`});
+  h+=`<label class="row t-${k}"><input type="checkbox" data-a="tk" data-d="${s}" data-k="${k}" ${isDone(s,k)?'checked':''} ${rest||lk?'disabled':''}><span>${rowText(k,s,m,sun,rest)}</span>${ctl(k,s,rest)}</label>`});
  if(showP){h+=privRow(s);if(s===clamp(today())&&add(s,-1)>=S0)h+=privRow(add(s,-1),'Yesterday')}
  return h+`<div class="mu">${cnt(s)}/${T.length} done · Time logged: <span id="tt-${s}">${tmt(s)}</span></div>`}
 
+/* ===== DESIGN V2: groups, progress, habit cards ===== */
+let learnTab='syl',progTab='prog';
+const SEG={learn:[['syl','Syllabus'],['words','Words'],['rules','Rules']],prog:[['prog','Overview'],['week','Weekly']]};
+const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',stats:'stats',coach:'coach'}[v]||'');
+function withSeg(v,h){const g=['syl','words','rules'].includes(v)?'learn':['prog','week'].includes(v)?'prog':'';if(!g)return h;
+ return '<div class="seg">'+SEG[g].map(x=>`<button class="${x[0]===v?'on':''}" data-a="vw" data-v="${x[0]}">${x[1]}</button>`).join('')+'</div>'+h}
+function rowText(k,s,m,sun,rest){const N={wo:'Workout',wd:sun?'AI Vocabulary Test':'English words',sp:'Speaking',fr:'Frappe',rd:'Reading'},d=st.days[s]||{},t=d.t||{};let sub='',p=-1;
+ if(k==='wo')sub=rest?'Rest day · counts as done ✓':m?'Minimum: 10 min workout':'Do your workout';
+ else if(k==='wd'){if(sun)sub='Test your week of words';else{const n=st.words.filter(w=>w.date===s).length,g=m?5:10;sub='Target '+g+' words · '+n+' added';p=n/g}}
+ else if(k==='sp'){const g=m?5:15,x=+t.sp||0;sub='Target '+g+' min'+(x?' · '+x+' logged':'');p=x/g}
+ else if(k==='fr'){const g=m?20:(sun?90:70),x=+t.fr||0;sub='Target '+g+' min'+(x?' · '+x+' logged':'');p=x/g}
+ else{const g=m?5:8,x=+d.pg||0;sub='Target '+g+' pages'+(x?' · '+x+' read':'');p=x/g}
+ return IC[k]+' <b>'+N[k]+'</b><br><span class="mu">'+sub+'</span>'+(p>=0?'<i class="mini"><u style="width:'+Math.min(100,Math.round(p*100))+'%"></u></i>':'')}
+function vProg(){const r=clamp(today()),days=[];for(let d=S0;d<=r&&d<=E0;d=add(d,1))days.push(d);
+ const last=n=>days.slice(-n),pct=a=>a.length?Math.round(a.reduce((n,d)=>n+cnt(d),0)/(a.length*T.length)*100):0,N={wo:'Workout',wd:'Words',sp:'Speaking',fr:'Frappe',rd:'Reading'},
+ rate=k=>days.length?Math.round(days.filter(d=>isDone(d,k)).length/days.length*100):0,sum=f=>days.reduce((n,d)=>n+(f(st.days[d]||{})||0),0),
+ ring=(p,l)=>`<div class="mr3"><div class="mr" style="--p:${p}"><b>${p}%</b></div><div class="mu">${l}</div></div>`,
+ b7=last(7).map(d=>{const p=Math.round(cnt(d)/T.length*100);return `<div class="b7"><div class="col"><i style="height:${Math.max(5,p)}%"></i></div><span>${pd(d).toLocaleDateString('en-IN',{weekday:'narrow'})}</span></div>`}).join('');
+ return `<h1>Progress</h1><div class="card"><b>Completion</b><div class="mu">Day ${days.length} of 92</div><div class="bar" style="margin:8px 0"><i style="width:${days.length/92*100}%"></i></div><div class="rings">${ring(pct(last(7)),'Last 7 days')}${ring(pct(last(30)),'Last 30 days')}${ring(pct(days),'So far')}</div></div>`+
+ `<div class="card"><b>Last 7 days</b><div class="bars7">${b7}</div></div><h2>Habit completion</h2>`+T.map(k=>`<div class="hrate t-${k}"><span>${IC[k]} ${N[k]}</span><div class="bar"><i style="width:${rate(k)}%;background:var(--c)"></i></div><b>${rate(k)}%</b></div>`).join('')+
+ `<h2>Totals</h2><div class="stats"><div style="--c:var(--wo)"><b>${days.filter(d=>(st.days[d]||{}).wo).length}</b>Workout days</div><div style="--c:var(--wd)"><b>${st.words.length}</b>Words learned</div><div style="--c:var(--sp)"><b>${days.filter(d=>(st.days[d]||{}).sp).length}</b>Speaking days</div><div style="--c:var(--fr)"><b>${hm(sum(d=>d.t&&d.t.fr))}</b>Frappe time</div><div style="--c:var(--rd)"><b>${sum(d=>d.pg)}</b>Pages read</div></div>`}
+/* ===== AI COACH TAB (OpenAI) ===== */
+const OAK='winterArc.openai.v1',OCK='winterArc.chat.v1',QP=['What should I study today?','Why am I behind?','Quiz me on my next topic','Motivate me','Review my last 7 days'];
+const oaiGet=()=>{let o={key:'',model:'gpt-5.4-mini',status:'none'};try{Object.assign(o,JSON.parse(localStorage.getItem(OAK)||'{}'))}catch(e){}return o};
+const oaiSet=o=>{try{localStorage.setItem(OAK,JSON.stringify(Object.assign(oaiGet(),o)))}catch(e){}};
+let chat=(()=>{try{const a=JSON.parse(localStorage.getItem(OCK)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}})(),chatBusy=false,chatErr='',chatFocus=false;
+const chatSave=()=>{try{localStorage.setItem(OCK,JSON.stringify(chat.slice(-30)))}catch(e){}};
+async function oaiPick(){const c=oaiGet(),r=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+c.key}});if(!r.ok)return null;const j=await r.json(),ids=(j.data||[]).map(m=>m.id);
+ return ['gpt-5.4-mini','gpt-5.5-mini','gpt-5-mini','gpt-4.1-mini','gpt-4o-mini'].find(p=>ids.includes(p))||ids.filter(i=>/^gpt-[\d.]+-(mini|nano)$/.test(i)).sort().reverse()[0]||ids.filter(i=>/^gpt-[\d.]+$/.test(i)).sort().reverse()[0]||null}
+async function oai(messages,picked){const c=oaiGet();if(!c.key)throw new Error('nokey');
+ const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.key},body:JSON.stringify({model:c.model||'gpt-5.4-mini',messages})});
+ if(!r.ok){const j=await r.json().catch(()=>({})),e=j.error||{};
+  if((r.status===404||e.code==='model_not_found')&&!picked){const m=await oaiPick();if(m&&m!==c.model){oaiSet({model:m});toast('Model switched to '+m);return oai(messages,true)}}
+  throw new Error(r.status+'|'+(e.message||r.statusText||''))}
+ const j=await r.json();return String(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content||'').trim()}
+function oaiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,100);
+ if(e&&e.message==='nokey')return 'Save your OpenAI key first.';if(e instanceof TypeError)return 'Cannot reach OpenAI. Check internet, VPN or ad-blocker.';
+ if(c==='401')return 'The key is not valid. Paste it again.';if(c==='429')return /quota|billing/i.test(d)?'No credit left. Add billing on platform.openai.com.':'Too many requests. Wait a minute.';
+ if(c==='404'||c==='400')return 'Model problem: '+d;if(c==='0')return 'The coach sent an empty reply. Try again.';return 'Error '+c+(d?': '+d:'')}
+function nextPt(){const M={};frAll().forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({tn:t.n},s)}));for(const w of JP)for(const id of jpSubs(w[4])){const s=M[id];if(s&&!s.d){const z=s.its.find(x=>!x.d);return (z?z.t:s.t)+' ('+s.t+', '+s.tn+')'}}return 'everything is done'}
+function coachSys(){const s=clamp(today());let data='';try{data=motPrompt(s).split('DATA:\n')[1].split('\nReply ONLY JSON')[0]}catch(e){}
+ return 'You are a strict but caring personal coach for a learner who wants to become a Frappe developer within 92 days (Oct 1 to Dec 31, 2026). Reply in very simple English, short (max 80 words), honest, no fake praise, and end with one clear next action. Use ONLY these facts about the learner:\n'+data+'\nNext study point: '+nextPt()+'\nWords added this week: '+wkWords(s).length+'.'}
+async function coachSend(txt){txt=String(txt||'').trim();if(!txt||chatBusy)return;chat.push({r:'u',t:txt});chatSave();chatBusy=true;chatErr='';render();
+ try{const msgs=[{role:'system',content:coachSys()}].concat(chat.slice(-12).map(m=>({role:m.r==='u'?'user':'assistant',content:m.t})));const a=await oai(msgs);if(!a)throw new Error('0|Empty reply');chat.push({r:'a',t:a});chatSave()}catch(e){chatErr=oaiWhy(e)}
+ chatBusy=false;chatFocus=true;render()}
+function oaiSaveF(){const k=$('#oaik'),m=$('#oaim');if(k&&k.value.trim()){oaiSet({key:k.value.trim().replace(/^["']+|["']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())oaiSet({model:m.value.trim()})}
+async function oaiTest(){const s=$('#oakst');if(s)s.textContent='Testing…';
+ try{await oai([{role:'user',content:'Reply with the word OK.'}]);oaiSet({status:'ok'});const mi=$('#oaim');if(mi)mi.value=oaiGet().model;if(s)s.textContent='🟢 Key works ('+oaiGet().model+')'}catch(e){oaiSet({status:'fail'});if(s)s.textContent='🔴 '+oaiWhy(e)}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='cin'){e.preventDefault();coachSend(e.target.value)}});
+function vCoach(){const c=oaiGet(),has=!!c.key,stt=c.status==='ok'?'🟢 Key works':c.status==='fail'?'🔴 Key failed':'⚪ Not tested';
+ const key=`<div class="card"><h2 style="margin-top:0">🔑 OpenAI key</h2><div class="warn">Your key is stored only in this browser, in its own place. It is never put in your backup file. Do not use a personal key on a public website such as GitHub Pages.</div><div class="mu">API key</div><div style="display:flex;gap:8px"><input type="password" id="oaik" placeholder="${has?'•••••••• saved (leave empty to keep)':'sk-...'}" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="sec" data-a="oke" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="oaim" value="${E(c.model)}" autocapitalize="off" spellcheck="false"><div class="two" style="margin-top:10px"><button data-a="oks">Save key</button><button class="sec" data-a="okt">Test key</button></div>${has?'<button class="dng" data-a="okr" style="margin-top:8px">Remove key</button>':''}<div class="mu" style="margin-top:8px" id="oakst">${has?stt:'⚪ No key saved'}</div></div>`;
+ if(!has)return '<h1>AI Coach</h1><div class="mu">A coach that knows your progress. Save your OpenAI key to start chatting.</div>'+key;
+ const bub=chat.map(m=>`<div class="bub ${m.r}">${E(m.t)}</div>`).join('')+(chatBusy?'<div class="bub a dim">Coach is thinking…</div>':'');
+ return `<h1>AI Coach</h1><div class="chips" style="margin-bottom:10px">${QP.map((q,i)=>`<button class="qchip" data-a="cq" data-v="${i}" ${chatBusy?'disabled':''}>${E(q)}</button>`).join('')}</div><div id="chat" class="chat">${bub||'<div class="mu" style="text-align:center;padding:30px 0">Ask anything about your study plan.</div>'}</div>`+(chatErr?`<div class="warn">${E(chatErr)}</div>`:'')+
+  `<div class="cbar"><input type="text" id="cin" placeholder="Ask your coach…" autocomplete="off" ${chatBusy?'disabled':''}><button data-a="cs" ${chatBusy?'disabled':''}>Send</button></div><button class="sec" data-a="cc">Clear chat</button><details class="card how"><summary>🔑 Key settings · ${stt}</summary>${key.replace('<div class="card">','<div>')}</details>`}
 /* ===== TODAY ===== */
 function notifySetup(){
  const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
@@ -563,8 +636,8 @@ function checkNotify(){
  st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
 let tStep=0,sOpen='';
 function vToday(){const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
- const top='<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div>',
- hero=`<div class="card hero"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar"><i style="width:${n/92*100}%"></i></div>${UI('xp')?'':`<div class="mu" style="margin-top:8px">🔥 ${sk.cur} day streak</div>`}</div>`+(inPlan(y)&&!ok(y)?'<div class="warn">You missed yesterday. Never miss twice in a row.</div>':''),
+ const bump=sk.cur>(st.ls||0);st.ls=sk.cur;const top='<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div>',
+ hero=`<div class="card hero hr"><div style="flex:1;min-width:0"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big2">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar" style="margin:8px 0"><i style="width:${n/92*100}%"></i></div><div class="mu"><span class="flame ${bump?'pop':''}">🔥</span> ${sk.cur} day streak · best ${sk.best}</div></div><div class="rw"><div class="ring" style="--p:${Math.round(cnt(s)/T.length*100)}"></div><div class="rt">${cnt(s)}/${T.length}</div></div></div>`+(inPlan(y)&&!ok(y)?'<div class="warn">You missed yesterday. Never miss twice in a row.</div>':''),
  xp=UI('xp')?playerCard(s,sk):'',nb=UI('badge')?nbCard():'',co=UI('coach')?aiMotiv(s,sk):'',fo=UI('focus')?focusCard():'';
  if(!UI('train'))return top+hero+xp+nb+co+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+fo;
  const S=[['Tasks',hero+mission(s)+editor(s)],['Words',vocabCard(s)],['Proof',bookCard()+pwCard(s)]],ex=xp+nb+co+fo;if(ex)S.push(['Coach',ex]);
@@ -854,17 +927,25 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');app.innerHTML={today:vToday,cal:vCal,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,set:vSet,ai:vAI,spell:vSpell}[view]();
- document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===grpOf(view)));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
- const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'||view==='spell'){const x=$('#aians')||$('#spans');if(x)x.focus()}autoSay();checkAch()}
+ const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'||view==='spell'){const x=$('#aians')||$('#spans');if(x)x.focus()}if(view==='coach'){const l=$('#chat');if(l)l.scrollTop=l.scrollHeight;const x=$('#cin');if(x&&chatFocus&&!chatBusy)x.focus();chatFocus=false}autoSay();checkAch()}
 
 /* ===== EVENTS ===== */
 document.addEventListener('click',e=>{
  const b=e.target.closest('button[data-a]');if(!b)return;
  const a=b.dataset.a,v=b.dataset.v;
- if(a==='nav'){view=v;test=null;calSel=null;calUnlock={};animNext=true}
+ if(a==='nav'){view=v;if(v==='learn')view=learnTab;if(v==='prog')view=progTab;test=null;calSel=null;calUnlock={};animNext=true}
+ else if(a==='oke'){const i=$('#oaik'),b=document.querySelector('[data-a=oke]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
+ else if(a==='oks'){oaiSaveF();toast('✅ Key saved')}
+ else if(a==='okt'){oaiSaveF();oaiTest();return}
+ else if(a==='okr'){if(confirm('Remove your OpenAI key from this browser?'))oaiSet({key:'',status:'none'})}
+ else if(a==='cq'){coachSend(QP[+v]);return}
+ else if(a==='cs'){coachSend(($('#cin')||{}).value);return}
+ else if(a==='cc'){if(confirm('Clear the chat?')){chat=[];chatSave()}}
+ else if(a==='vw'){view=v;test=null;animNext=true}
  else if(a==='cm'){calM=v;calSel=null;animNext=true}
  else if(a==='cd'){calSel=b.dataset.d;calUnlock={}}
  else if(a==='unl'){if(confirm('This day is over, so it is locked to keep your history true. Unlock it to fix a mistake? It locks again when you leave.'))calUnlock[v]=true}
@@ -942,7 +1023,7 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  else if(a==='tk'){if(!isLocked(t.dataset.d))day()[t.dataset.k]=t.checked}
  else if(a==='min'){if(!isLocked(t.dataset.d))day().min=t.checked}
  else if(a==='np')day().np=t.checked;
- else if(a==='uit'){st.ui=st.ui||{};st.ui[t.dataset.k]=t.checked}
+ else if(a==='uit'){st.ui=st.ui||{};if(t.dataset.k==='snd')st.mute=!t.checked;else st.ui[t.dataset.k]=t.checked}
  else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
  else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
