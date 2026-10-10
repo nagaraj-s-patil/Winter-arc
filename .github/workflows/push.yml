@@ -1,0 +1,26 @@
+name: Winter Arc push
+on:
+  schedule:
+    # every 2 hours, 6:30 AM to 10:30 PM IST (cron is in UTC)
+    - cron: '0 1,3,5,7,9,11,13,15,17 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Send now, ignore quiet hours (1 = yes)'
+        required: false
+        default: '1'
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install web-push
+      - run: node scripts/send.js
+        env:
+          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
+          VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          FORCE: ${{ github.event.inputs.force }}
