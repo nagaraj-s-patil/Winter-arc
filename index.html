@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-10.3" data-note="Safer ticking: asks before marking a whole subtopic done."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-10.4" data-note="One AI section: Gemini and OpenAI together in Coach."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -356,25 +356,29 @@ const th=st.theme||'dark';
 const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
 const SC=['Your manager asks you to finish a task by Friday. Reply to your manager.','A customer calls and is angry about a late delivery. Reply to the customer.','You are on a sales call and the client asks about the price. Reply.','In a team meeting your lead asks for your update. Give your update.','Write one or two lines of an email to a client about a new meeting time.','A user asks for help with an IT ticket. Reply to the user.','A friend asks what you did yesterday. Answer in a daily conversation.'];
 let aiBusy=false,aiErr=false,aiMsg='',fillBusy=false;
-const aiGet=()=>{let o={key:'',model:'gemini-flash-latest',status:'none'};try{Object.assign(o,JSON.parse(localStorage.getItem(AIK)||'{}'))}catch(e){}if(o.model==='gemini-2.5-flash')o.model='gemini-flash-latest';return o};
+const aiGet=()=>{let o={key:'',model:'gemini-flash-latest',status:'none',prov:'gemini'};try{Object.assign(o,JSON.parse(localStorage.getItem(AIK)||'{}'))}catch(e){}if(o.model==='gemini-2.5-flash')o.model='gemini-flash-latest';return o};
 const aiSet=o=>{try{localStorage.setItem(AIK,JSON.stringify(Object.assign(aiGet(),o)))}catch(e){}};
 const isSun=s=>dow(s||today())===0,mon=s=>add(s,isSun(s)?-6:-(dow(s)-1)),gw=id=>st.words.find(w=>w.id===id);
 const wkWords=s=>{const m=mon(s),e=add(m,5);return st.words.filter(w=>w.date>=m&&w.date<=e)};
 const wkTarget=s=>{const m=mon(s);let n=0;for(let i=0;i<6;i++){const d=add(m,i);if(d>=S0&&d<=E0)n++}return n*10};
 const nm=x=>String(x).trim().toLowerCase().replace(/[.!?,]+$/,''),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
-async function gem(p,retry=1,picked=false,feat='other'){const c=aiGet();if(!c.key)throw new Error('nokey');
+async function gemG(p,retry=1,picked=false,feat='other'){const c=aiGet();if(!c.key)throw new Error('nokey');
  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(c.model||'gemini-flash-latest')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':c.key},body:JSON.stringify({contents:[{parts:[{text:p}]}],generationConfig:{responseMimeType:'application/json'}})});
  if(r.status===429){const j=await (r.clone?r.clone():r).json().catch(()=>({}));useAdd(feat,0,(j.error&&j.error.message)||'429 Too many requests')}
- if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gem(p,retry,true,feat)}}
- if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gem(p,retry-1,picked,feat)}
+ if(r.status===404&&!picked){const m=await pickModel();if(m&&m!==c.model){aiSet({model:m});toast('Model switched to '+m);return gemG(p,retry,true,feat)}}
+ if(r.status===429&&retry){await new Promise(x=>setTimeout(x,4000));return gemG(p,retry-1,picked,feat)}
  if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(r.status+'|'+((j.error&&j.error.message)||r.statusText||''))}
  const j=await r.json();useAdd(feat,j.usageMetadata&&j.usageMetadata.totalTokenCount);const cd=j.candidates&&j.candidates[0],t=cd&&cd.content&&cd.content.parts?cd.content.parts.map(x=>x.text||'').join(''):'';
  if(!t)throw new Error('0|Empty reply'+(cd&&cd.finishReason?' ('+cd.finishReason+')':''));
  return JSON.parse(t.replace(/```json|```/g,'').trim())}
+const aiReady=()=>aiGet().prov==='openai'?!!oaiGet().key:!!aiGet().key;
+async function gem(p,retry,picked,feat){
+ if(aiGet().prov==='openai'){const t=await oai([{role:'user',content:p+'\n\nReply with valid JSON only. No other text.'}],false,true);return JSON.parse(String(t).replace(/```json|```/g,'').trim())}
+ return gemG(p,retry===undefined?1:retry,!!picked,feat||'other')}
 async function pickModel(){const c=aiGet(),r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':c.key}});if(!r.ok)return null;
  const j=await r.json(),ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''));
  return ['gemini-3.5-flash','gemini-flash-latest','gemini-3.1-flash-lite','gemini-3-flash-preview','gemini-2.5-flash'].find(p=>ok.includes(p))||ok.find(n=>/flash/.test(n)&&!/image|tts|live|audio|embed|thinking/.test(n))||null}
-function aiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,90);
+function aiWhy(e){if(e instanceof SyntaxError)return 'AI reply was not understood. Try again.';if(aiGet().prov==='openai')return oaiWhy(e);const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,90);
  if(e&&e.message==='nokey')return 'No API key saved.';
  if(e instanceof TypeError)return 'Cannot reach Google. Check internet, VPN or ad-blocker.';
  if(e instanceof SyntaxError)return 'AI reply was not understood. Try again.';
@@ -402,7 +406,7 @@ async function aiAns(retry){if(aiBusy)return;const v=st.vt,q2=v.ph==='q2',q=(q2?
 function finMain(v){v.ph='res';v.log.forEach(e=>{if(e.r==='w'||e.sp)st.wh[e.id]=(st.wh[e.id]||0)+1});if(isSun()){const d=st.days[today()]=st.days[today()]||{};d.wd=true}}
 function nextQ(){const v=st.vt;v.fb=null;if(v.ph==='q2'){v.i2++;if(v.i2>=v.q2.length){v.ph='fin';v.log2.forEach(e=>{if(e.t==='spell'&&e.r==='c')delete st.sm[e.id]})}}else{v.i++;if(v.i>=v.q.length)finMain(v)}save();render()}
 function cats(v){const by={},S=[],N=[],K=[];v.log.forEach(e=>by[e.id]=e);Object.values(by).forEach(e=>{const w=gw(e.id);if(!w)return;const f=e.r==='w'||e.sp;if(e.r==='c'&&!e.sp)S.push(w);else if(f&&(st.wh[e.id]||0)>=2)K.push(w);else N.push(w)});return{S,N,K}}
-function aiBegin(){const ws=wkWords(today());if(!ws.length||!aiGet().key)return render();st.sm=st.sm||{};st.wh=st.wh||{};st.vt={wk:mon(today()),ph:'q',q:mkQ(ws,0),i:0,log:[],q2:[],i2:0,log2:[],fb:null,pend:'',rev:[]};save();render()}
+function aiBegin(){const ws=wkWords(today());if(!ws.length||!aiReady())return render();st.sm=st.sm||{};st.wh=st.wh||{};st.vt={wk:mon(today()),ph:'q',q:mkQ(ws,0),i:0,log:[],q2:[],i2:0,log2:[],fb:null,pend:'',rev:[]};save();render()}
 function startRe(){const v=st.vt,c=cats(v),ws=[...c.N,...c.K];v.rev=ws.map(w=>w.id);v.q2=mkQ(ws,1);v.i2=0;v.log2=[];v.ph='q2';v.fb=null;save();render()}
 /* ===== API USAGE ===== */
 const ptDay=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'});
@@ -420,7 +424,7 @@ async function aiAct(a){const v=st.vt;
  if(a==='aisave'){aiSaveF();toast('✅ API settings saved');render();return}
  if(a==='aitest'){aiSaveF();const s=$('#aist');s.textContent='Testing…';try{await gem('Reply ONLY with JSON {"ok":true}',1,false,'connection');aiSet({status:'ok'});const mi=$('#aim');if(mi)mi.value=aiGet().model;s.textContent='Status: 🟢 Connected ('+aiGet().model+')'}catch(e){aiSet({status:'fail'});s.textContent='Status: 🔴 Connection failed: '+aiWhy(e)}return}
  if(a==='aistart'){view='ai';animNext=true;render();return}
- if(a==='aigoset'){view='set';animNext=true;render();return}
+ if(a==='aigoset'){view='coach';animNext=true;render();return}
  if(a==='aibegin')return aiBegin();
  if(a==='aians')return aiAns(false);
  if(a==='airetry')return aiAns(true);
@@ -436,15 +440,18 @@ function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
   return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div>${n&&!(st.wp||{})[today()]?`<div class="warn" style="margin:8px 0">⏳ You added ${n} word${n===1?'':'s'} today but did not practise. Practise for 5 minutes now.</div>`:(st.wp||{})[today()]?'<div class="mu">✅ Practised today</div>':''}<div class="two"><button class="sec" data-a="gow">Add words</button><button data-a="spstart" data-v="rec">🔊 Practice now</button></div></div>`}
 function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
-function vSet(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
- return `<h1>Settings</h1>${uiCard()}<div class="card"><h2 style="margin-top:0">🤖 AI Vocabulary Settings</h2><div class="warn">Your API key is stored locally in this browser. Do not use a personal API key on a public website such as GitHub Pages.</div><div class="mu">AI Provider</div><select id="aip"><option>Google Gemini</option></select><div class="mu" style="margin-top:8px">API Key</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div></div><button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel()+dataCard()}
+function geminiCard(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
+ return `<div class="mu">API key (Google AI Studio)</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div>`}
+function aiHub(){const p=aiGet().prov==='openai'?'openai':'gemini';
+ return `<div class="card"><h2 style="margin-top:0">🤖 AI settings</h2><div class="warn">Keys are stored only in this browser, in their own place, never in your backup file. Do not use a personal key on a public website such as GitHub Pages.</div><div class="seg"><button class="${p==='gemini'?'on':''}" data-a="aprov" data-v="gemini">Google Gemini</button><button class="${p==='openai'?'on':''}" data-a="aprov" data-v="openai">OpenAI</button></div><div class="mu" style="margin-bottom:6px">The selected AI is used for everything: coach chat, daily message, vocabulary test, quizzes and word help.</div>${p==='openai'?openaiCard():geminiCard()}</div>`+(p==='gemini'?`<button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel():'')}
+function vSet(){return `<h1>Settings</h1>${uiCard()}<div class="card"><h2 style="margin-top:0">🤖 AI</h2><div class="mu">Gemini and OpenAI are now in one place.</div><button data-a="nav" data-v="coach">Open AI settings</button></div>`+dataCard()}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
- return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!c.key?`<div class="warn">⚠️ Add your Gemini API key in Settings → AI Vocabulary.</div><button data-a="aigoset">Open Settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
+ return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!aiReady()?`<div class="warn">⚠️ Add an AI key in Coach → AI settings.</div><button data-a="aigoset">Open AI settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
 function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
  let h=`<h1>${q2?'Weak Word Retest':'Sunday AI Vocabulary Test'}</h1><div class="card hero w"><div class="mu">Progress</div><div class="big2">Question ${i+1} / ${L.length}</div><div class="bar" style="margin-top:10px"><i style="width:${i/L.length*100}%"></i></div></div><div class="stats"><div><b>${n('c')}</b>Correct</div><div><b>${n('w')}</b>Wrong</div><div><b>${n('p')}</b>Partial</div><div><b>${lg.filter(e=>e.sp).length}</b>Spelling mistakes</div></div><div class="card"><div class="mu">${TN[q.t]}</div><div class="aq">${b.text}</div>`;
  if(f)h+=`<div class="fb ${f.r}">${{c:'✅ Correct',p:'🟡 Partly correct',w:'❌ Wrong'}[f.r]}<div style="font-weight:500;margin-top:4px">${E(f.note)}</div></div><button data-a="ainext">${i+1>=L.length?'Finish':'Next →'}</button>`;
  else{h+=`<input type="text" id="aians" placeholder="Your answer" ${(q.t==='spell'||q.t==='blank')?NOSUG:'autocomplete="off" autocapitalize="off" spellcheck="false"'} value="${E(v.pend||'')}" ${aiBusy?'disabled':''}>`;
-  if(aiErr)h+=`<div class="warn">${aiErr==='nokey'?'⚠️ Add your Gemini API key in Settings → AI Vocabulary.':'❌ AI connection failed. Check your API key and internet connection.'}${aiErr==='fail'?'<div class="mu" style="margin-top:4px;font-weight:500">'+E(aiMsg)+'</div>':''}</div><button data-a="airetry">Try Again</button>`+(aiErr==='nokey'?'<button class="sec" data-a="aigoset">Open Settings</button>':'');
+  if(aiErr)h+=`<div class="warn">${aiErr==='nokey'?'⚠️ Add an AI key in Coach → AI settings.':'❌ AI connection failed. Check your API key and internet connection.'}${aiErr==='fail'?'<div class="mu" style="margin-top:4px;font-weight:500">'+E(aiMsg)+'</div>':''}</div><button data-a="airetry">Try Again</button>`+(aiErr==='nokey'?'<button class="sec" data-a="aigoset">Open Settings</button>':'');
   else h+=`<button data-a="aians" ${aiBusy?'disabled':''}>${aiBusy?'Checking…':'Submit answer'}</button>`}
  return h+`</div><button class="sec" data-a="aiquit">Save and exit</button>`}
 function vRes(v){const c=cats(v),n=k=>v.log.filter(e=>e.r===k).length,T=v.log.length,sc=Math.round((n('c')+n('p')/2)/T*100),sp=v.log.filter(e=>e.sp),bad=c.N.length+c.K.length;
@@ -466,7 +473,7 @@ function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;
 function markSp(w,a){st.sm=st.sm||{};st.sm[w.id]=1;w.mistake=true;w.wrong=a}
 function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
 async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
- if(!aiGet().key){toast('Add your Gemini API key in Settings to get meaning and example');return}
+ if(!aiReady()){toast('Add an AI key in Coach → AI settings to get meaning and example');return}
  fillBusy=true;render();
  try{const o=await gem('You help an English learner in India (beginner level). For each word below give a very simple meaning (max 10 words) and one short simple example sentence (max 12 words) that uses the exact word. Words: '+JSON.stringify(ws.map(w=>w.word))+'. Reply ONLY a JSON array like [{"word":"...","mean":"...","sent":"..."}]',1,false,'words');
   const arr=Array.isArray(o)?o:(o.words||[]);let n=0;
@@ -525,12 +532,12 @@ function motPrompt(s){const N={wo:'Workout',wd:'Words',sp:'Speaking',fr:'Frappe 
  past=[];for(let i=1;i<=7;i++){const d=add(s,-i);if(d<S0)break;past.push(pd(d).toLocaleDateString('en-IN',{weekday:'short'})+' '+d.slice(5)+': '+day(d))}
  return 'You are a strict but caring personal coach for a learner in a 92-day challenge (Oct 1 to Dec 31). Use ONLY the data below. Write 2 or 3 short sentences in very simple English. Mention one real fact from the data (a streak, a missed task, a good day). Be honest, no fake praise. End with one clear next action for right now. Max 45 words. No hashtags.\nDATA:\nChallenge day '+dn+' of 92. Local time '+h+':00.\nStreak '+sk.cur+' days (best '+sk.best+'). Level '+(g.lv||1)+'.\nToday: '+day(s,true)+'. Frappe minutes today '+(t.fr||0)+'. Words added today '+st.words.filter(w=>w.date===s).length+'/10.\nLast days:\n'+(past.join('\n')||'No past days yet (this is the first day).')+'\nOpen spelling mistakes: '+Object.keys(st.sm||{}).length+'.\nReply ONLY JSON {"msg":"..."}'}
 function aiMotiv(s,sk){const m=st.mot;let b;
- if(!aiGet().key)b='<div class="mu" style="margin:6px 0">Add your Gemini API key in Settings to get your daily AI coach message.</div><button class="sec" data-a="aigoset">Open Settings</button>';
+ if(!aiReady())b='<div class="mu" style="margin:6px 0">Add an AI key in Coach → AI settings to get your daily AI coach message.</div><button class="sec" data-a="aigoset">Open AI settings</button>';
  else{b=(m&&m.msg?'<div class="mq'+(motBusy?' dim':'')+'">'+E(m.msg)+'</div>':motBusy?'<div class="mq dim">Your coach is reading your last days…</div>':'')+(motErr&&!motBusy?'<div class="mu" style="margin:6px 0">❌ '+E(motErr)+'</div>':'')+'<button class="sec" data-a="motgo" '+(motBusy?'disabled':'')+'>'+(motBusy?'✨ Thinking…':'🔄 New message')+'</button>';
   if(s===today()&&!motBusy&&!motErr&&(!m||m.sig!==motSig(s))){clearTimeout(motT);motT=setTimeout(()=>motGo(false),1500)}}
  return '<div class="card mot" id="motc" style="animation:none"><div class="mu">💬 AI Coach</div>'+b+'</div>'}
 const refreshMot=()=>{const e=$('#motc');if(e&&view==='today')e.outerHTML=aiMotiv(today(),streaks())};
-async function motGo(manual){if(motBusy||!aiGet().key)return;if(manual)motErr='';const s=today();motBusy=true;refreshMot();
+async function motGo(manual){if(motBusy||!aiReady())return;if(manual)motErr='';const s=today();motBusy=true;refreshMot();
  try{const o=await gem(motPrompt(s),1,false,'coach'),msg=String(o.msg||'').trim();if(!msg)throw new Error('0|Empty reply');st.mot={d:s,sig:motSig(s),msg,at:Date.now()};save()}
  catch(e){motErr=aiWhy(e)}
  motBusy=false;refreshMot()}
@@ -585,10 +592,10 @@ let chat=(()=>{try{const a=JSON.parse(localStorage.getItem(OCK)||'[]');return Ar
 const chatSave=()=>{try{localStorage.setItem(OCK,JSON.stringify(chat.slice(-30)))}catch(e){}};
 async function oaiPick(){const c=oaiGet(),r=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+c.key}});if(!r.ok)return null;const j=await r.json(),ids=(j.data||[]).map(m=>m.id);
  return ['gpt-5.4-mini','gpt-5.5-mini','gpt-5-mini','gpt-4.1-mini','gpt-4o-mini'].find(p=>ids.includes(p))||ids.filter(i=>/^gpt-[\d.]+-(mini|nano)$/.test(i)).sort().reverse()[0]||ids.filter(i=>/^gpt-[\d.]+$/.test(i)).sort().reverse()[0]||null}
-async function oai(messages,picked){const c=oaiGet();if(!c.key)throw new Error('nokey');
- const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.key},body:JSON.stringify({model:c.model||'gpt-5.4-mini',messages})});
+async function oai(messages,picked,json){const c=oaiGet();if(!c.key)throw new Error('nokey');
+ const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+c.key},body:JSON.stringify(Object.assign({model:c.model||'gpt-5.4-mini',messages},json?{response_format:{type:'json_object'}}:{}))});
  if(!r.ok){const j=await r.json().catch(()=>({})),e=j.error||{};
-  if((r.status===404||e.code==='model_not_found')&&!picked){const m=await oaiPick();if(m&&m!==c.model){oaiSet({model:m});toast('Model switched to '+m);return oai(messages,true)}}
+  if((r.status===404||e.code==='model_not_found')&&!picked){const m=await oaiPick();if(m&&m!==c.model){oaiSet({model:m});toast('Model switched to '+m);return oai(messages,true,json)}}
   throw new Error(r.status+'|'+(e.message||r.statusText||''))}
  const j=await r.json();return String(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content||'').trim()}
 function oaiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split('|')[1]||'').slice(0,100);
@@ -598,19 +605,23 @@ function oaiWhy(e){const m=String(e&&e.message||e),c=m.split('|')[0],d=(m.split(
 function nextPt(){const M={};frAll().forEach(t=>t.subs.forEach(s=>{M[s.id]=Object.assign({tn:t.n},s)}));for(const w of JP)for(const id of jpSubs(w[4])){const s=M[id];if(s&&!s.d){const z=s.its.find(x=>!x.d);return (z?z.t:s.t)+' ('+s.t+', '+s.tn+')'}}return 'everything is done'}
 function coachSys(){const s=clamp(today());let data='';try{data=motPrompt(s).split('DATA:\n')[1].split('\nReply ONLY JSON')[0]}catch(e){}
  return 'You are a strict but caring personal coach for a learner who wants to become a Frappe developer within 92 days (Oct 1 to Dec 31, 2026). Reply in very simple English, short (max 80 words), honest, no fake praise, and end with one clear next action. Use ONLY these facts about the learner:\n'+data+'\nNext study point: '+nextPt()+'\nWords added this week: '+wkWords(s).length+'.'}
+async function coachGem(msgs){const sys=msgs[0].content,h=msgs.slice(1).map(m=>(m.role==='user'?'Learner: ':'Coach: ')+m.content).join('\n');
+ const o=await gemG(sys+'\n\nConversation so far:\n'+h+'\n\nWrite only the Coach reply. Reply ONLY JSON {"reply":"..."}',1,false,'coach');return String(o.reply||'').trim()}
 async function coachSend(txt){txt=String(txt||'').trim();if(!txt||chatBusy)return;chat.push({r:'u',t:txt});chatSave();chatBusy=true;chatErr='';render();
- try{const msgs=[{role:'system',content:coachSys()}].concat(chat.slice(-12).map(m=>({role:m.r==='u'?'user':'assistant',content:m.t})));const a=await oai(msgs);if(!a)throw new Error('0|Empty reply');chat.push({r:'a',t:a});chatSave()}catch(e){chatErr=oaiWhy(e)}
+ try{const msgs=[{role:'system',content:coachSys()}].concat(chat.slice(-12).map(m=>({role:m.r==='u'?'user':'assistant',content:m.t})));const a=aiGet().prov==='openai'?await oai(msgs):await coachGem(msgs);if(!a)throw new Error('0|Empty reply');chat.push({r:'a',t:a});chatSave()}catch(e){chatErr=aiWhy(e)}
  chatBusy=false;chatFocus=true;render()}
 function oaiSaveF(){const k=$('#oaik'),m=$('#oaim');if(k&&k.value.trim()){oaiSet({key:k.value.trim().replace(/^["']+|["']+$/g,'').replace(/\s+/g,''),status:'none'});k.value=''}if(m&&m.value.trim())oaiSet({model:m.value.trim()})}
 async function oaiTest(){const s=$('#oakst');if(s)s.textContent='Testing…';
  try{await oai([{role:'user',content:'Reply with the word OK.'}]);oaiSet({status:'ok'});const mi=$('#oaim');if(mi)mi.value=oaiGet().model;if(s)s.textContent='🟢 Key works ('+oaiGet().model+')'}catch(e){oaiSet({status:'fail'});if(s)s.textContent='🔴 '+oaiWhy(e)}}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='cin'){e.preventDefault();coachSend(e.target.value)}});
-function vCoach(){const c=oaiGet(),has=!!c.key,stt=c.status==='ok'?'🟢 Key works':c.status==='fail'?'🔴 Key failed':'⚪ Not tested';
- const key=`<div class="card"><h2 style="margin-top:0">🔑 OpenAI key</h2><div class="warn">Your key is stored only in this browser, in its own place. It is never put in your backup file. Do not use a personal key on a public website such as GitHub Pages.</div><div class="mu">API key</div><div style="display:flex;gap:8px"><input type="password" id="oaik" placeholder="${has?'•••••••• saved (leave empty to keep)':'sk-...'}" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="sec" data-a="oke" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="oaim" value="${E(c.model)}" autocapitalize="off" spellcheck="false"><div class="two" style="margin-top:10px"><button data-a="oks">Save key</button><button class="sec" data-a="okt">Test key</button></div>${has?'<button class="dng" data-a="okr" style="margin-top:8px">Remove key</button>':''}<div class="mu" style="margin-top:8px" id="oakst">${has?stt:'⚪ No key saved'}</div></div>`;
- if(!has)return '<h1>AI Coach</h1><div class="mu">A coach that knows your progress. Save your OpenAI key to start chatting.</div>'+key;
+function openaiCard(){const c=oaiGet(),has=!!c.key,stt=c.status==='ok'?'🟢 Key works':c.status==='fail'?'🔴 Key failed':'⚪ Not tested';
+ return `<div class="mu">API key</div><div style="display:flex;gap:8px"><input type="password" id="oaik" placeholder="${has?'•••••••• saved (leave empty to keep)':'sk-...'}" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="sec" data-a="oke" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="oaim" value="${E(c.model)}" autocapitalize="off" spellcheck="false"><div class="two" style="margin-top:10px"><button data-a="oks">Save key</button><button class="sec" data-a="okt">Test key</button></div>${has?'<button class="dng" data-a="okr" style="margin-top:8px">Remove key</button>':''}<div class="mu" style="margin-top:8px" id="oakst">${has?stt:'⚪ No key saved'}</div>`}
+function vCoach(){const has=aiReady(),pn=aiGet().prov==='openai'?'OpenAI':'Gemini';
+ const key=aiHub();
+ if(!has)return '<h1>AI Coach</h1><div class="mu">A coach that knows your progress. Pick an AI and save its key to start chatting.</div>'+key;
  const bub=chat.map(m=>`<div class="bub ${m.r}">${E(m.t)}</div>`).join('')+(chatBusy?'<div class="bub a dim">Coach is thinking…</div>':'');
  return `<h1>AI Coach</h1><div class="chips" style="margin-bottom:10px">${QP.map((q,i)=>`<button class="qchip" data-a="cq" data-v="${i}" ${chatBusy?'disabled':''}>${E(q)}</button>`).join('')}</div><div id="chat" class="chat">${bub||'<div class="mu" style="text-align:center;padding:30px 0">Ask anything about your study plan.</div>'}</div>`+(chatErr?`<div class="warn">${E(chatErr)}</div>`:'')+
-  `<div class="cbar"><input type="text" id="cin" placeholder="Ask your coach…" autocomplete="off" ${chatBusy?'disabled':''}><button data-a="cs" ${chatBusy?'disabled':''}>Send</button></div><button class="sec" data-a="cc">Clear chat</button><details class="card how"><summary>🔑 Key settings · ${stt}</summary>${key.replace('<div class="card">','<div>')}</details>`}
+  `<div class="cbar"><input type="text" id="cin" placeholder="Ask your coach…" autocomplete="off" ${chatBusy?'disabled':''}><button data-a="cs" ${chatBusy?'disabled':''}>Send</button></div><button class="sec" data-a="cc">Clear chat</button><details class="card how"><summary>🤖 AI settings · ${pn}</summary>${key.replace('<div class="card">','<div>')}</details>`}
 /* ===== TODAY ===== */
 function notifySetup(){
  const n=st.notify||{},on=!!n.enabled,sup='Notification' in window,pm=sup?Notification.permission:'none';
@@ -952,6 +963,7 @@ document.addEventListener('click',e=>{
  const b=e.target.closest('button[data-a]');if(!b)return;
  const a=b.dataset.a,v=b.dataset.v;
  if(a==='nav'){view=v;if(v==='learn')view=learnTab;if(v==='prog')view=progTab;test=null;calSel=null;calUnlock={};animNext=true}
+ else if(a==='aprov'){aiSet({prov:v==='openai'?'openai':'gemini'});animNext=false}
  else if(a==='oke'){const i=$('#oaik'),b=document.querySelector('[data-a=oke]');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'Show':'Hide';return}
  else if(a==='oks'){oaiSaveF();toast('✅ Key saved')}
  else if(a==='okt'){oaiSaveF();oaiTest();return}
