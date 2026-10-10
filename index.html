@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-10.1" data-note="New logo icon and in-app update notice."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-10.2" data-note="Revise: Studied-on date, Skip, 5 per day."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -172,6 +172,7 @@ button.tp{background:var(--card);border:1px solid var(--bd);box-shadow:none;text
 textarea{width:100%;min-height:80px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:14px;padding:10px 12px;font:inherit;color:inherit;margin:5px 0;outline:0;resize:vertical}textarea:focus{border-color:var(--ac)}
 .two3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.two3 button{margin:0}.cfb.on{outline:2px solid var(--ac)}
 button.qo{text-align:left;margin:6px 0}button.qo.ok{border-color:#34d399;background:rgba(52,211,153,.2)}button.qo.bad{border-color:#fb7185;background:rgba(251,113,133,.2)}
+div.rvx{display:flex;align-items:center;gap:8px;margin:-2px 0 10px 4px;flex-wrap:wrap}div.rvx input[type=date]{width:auto;min-height:40px;margin:0;font-size:14px}div.rvx button{width:auto;min-height:40px;margin:0;padding:0 14px;font-size:13px}
 button.rb{width:52px;min-height:44px;margin:0 0 0 6px;padding:0;font-size:18px;flex:none}
 .tools{margin:0 0 10px 14px;padding:8px 0 4px 8px;border-left:2px dashed var(--bd)}
 .how summary{cursor:pointer;font-weight:700;list-style:none;margin:0;padding:0;background:none;border:0}
@@ -328,7 +329,7 @@ const AG=[['🔥','Streaks','#ff7a3d','st',[[3,'3-Day Streak'],[7,'7-Day Streak'
 function achVal(){const g=gstats(),sk=streaks(),r=today(),D={wo:0,wd:0,sp:0,fr:0,rd:0};
  for(let s=S0;s<=r&&s<=E0;s=add(s,1)){const d=st.days[s];if(d)Object.keys(D).forEach(k=>{if(d[k])D[k]++})}
  const qh=Object.values(st.qh||{}).flat(),pw=Object.values(st.pw||{}).filter(x=>x.t&&x.t.trim()).length,pts=frAll().reduce((a,t)=>a+t.nd,0);
- return{st:sk.best,tk:g.tasks,pf:g.perfect,wr:st.words.length,bk:st.bi||0,lv:g.lv,d_wo:D.wo,d_wd:D.wd,d_sp:D.sp,d_fr:D.fr,d_rd:D.rd,qz:qh.length,qa:qh.filter(x=>x.s>=x.n).length,iq:Object.values(st.iq||{}).filter(x=>x==='r').length,mm:Object.values(st.rv||{}).filter(x=>x.done).length,pw,pt:pts,nt:Object.keys(st.nt||{}).length,hr:Math.floor(Object.values(st.tm||{}).reduce((a,b)=>a+b,0)/60),np:pst().best}}
+ return{st:sk.best,tk:g.tasks,pf:g.perfect,wr:st.words.length,bk:st.bi||0,lv:g.lv,d_wo:D.wo,d_wd:D.wd,d_sp:D.sp,d_fr:D.fr,d_rd:D.rd,qz:qh.length,qa:qh.filter(x=>x.s>=x.n).length,iq:Object.values(st.iq||{}).filter(x=>x==='r').length,mm:Object.values(st.rv||{}).filter(x=>x.done&&!x.skip).length,pw,pt:pts,nt:Object.keys(st.nt||{}).length,hr:Math.floor(Object.values(st.tm||{}).reduce((a,b)=>a+b,0)/60),np:pst().best}}
 function achList(){const V=achVal(),o=[];AG.filter(g=>g[3]!=='np'||UI('priv')).forEach(g=>g[4].forEach((t,i)=>o.push([g[0],t[1],V[g[3]],t[0],g[2],i,g[1]])));return o}
 const nextBadge=B=>{const L=(B||achList()).filter(b=>b[2]<b[3]);return L.length?L.sort((a,b)=>b[2]/b[3]-a[2]/a[3]||(a[3]-a[2])-(b[3]-b[2]))[0]:null};
 function nbHtml(b){const p=Math.round(b[2]/b[3]*100);return `<div class="card nb" style="--c:${b[4]}"><span class="nbe">${b[0]}</span><div style="flex:1"><div class="mu">🏆 Next badge</div><b>${E(b[1])}</b><div class="bar"><i style="width:${p}%;background:var(--c)"></i></div><div class="mu">${b[3]-b[2]} to go · ${p}%</div></div></div>`}
@@ -842,16 +843,23 @@ let qz=null,aiX='',aiXe='',iOpen={},iCur='',iBusy=false,iErr='';
 const RIV=[1,3,7,21];
 const subById=id=>{const q=id.slice(1).split('_').map(Number),t=FR[q[0]],p=t[3][q[1]].replace(/^~/,'').split('|');return{tn:t[1],t:p[0],h:p[1],its:FI[q[0]][q[1]].split(';'),ti:q[0]}};
 const ctxOf=id=>{const s=subById(id);return (s.ti>=1&&s.ti<=14?'Frappe Framework (version 16) and ERPNext':s.ti===15?'Python':s.ti===16?'SQL (MariaDB / MySQL)':'web development basics')+', topic "'+s.tn+'", subtopic "'+s.t+'" ('+s.h+'). Study points: '+s.its.join('; ')};
-function rvAdd(id){st.rv=st.rv||{};if(!st.rv[id])st.rv[id]={n:0,due:add(today(),RIV[0])}}
+function rvAdd(id){st.rv=st.rv||{};if(!st.rv[id])st.rv[id]={n:0,due:add(today(),RIV[0]),sd:today()}}
+const RV_CAP=5;
+function rvFromDate(id,d){const r=(st.rv||{})[id],t=today();if(!r||!d)return;if(d>t)d=t;r.sd=d;r.done=false;r.skip=false;
+ const p=RIV.map(x=>add(d,x)).filter(x=>x<=t).length;
+ if(p===0){r.n=0;r.due=add(d,RIV[0])}else{r.n=Math.min(p,RIV.length)-1;r.due=t}}
+function rvSkip(id){const r=(st.rv||{})[id];if(r){r.done=true;r.skip=true;r.due='9999-12-31'}}
+function rvSpread(){const t=today(),l=Object.entries(st.rv||{}).filter(e=>!e[1].done&&e[1].due<=t).sort((a,b)=>a[1].due<b[1].due?-1:1);
+ l.forEach((e,i)=>{if(i>=RV_CAP)e[1].due=add(t,Math.floor(i/RV_CAP))})}
 function rvAns(id,ok){const r=(st.rv||{})[id];if(!r)return;if(ok){r.n++;if(r.n>=RIV.length){r.done=true;r.due='9999-12-31'}else r.due=add(today(),RIV[r.n])}else{r.n=0;r.done=false;r.due=add(today(),1);st.cf=st.cf||{};st.cf[id]=1}save()}
 function qzCard(){if(aiX==='quiz')return '<div class="card nx"><b>🧠 Making your quiz…</b><div class="mu">The AI is writing 5 questions.</div></div>';
  if(!qz)return aiXe?'<div class="warn">❌ '+E(aiXe)+'</div>':'';
  const s=subById(qz.sub);if(qz.i>=qz.qs.length)return `<div class="card nx"><b>🧠 Quiz result</b><div class="big2">${qz.ok}/${qz.qs.length}</div><div class="mu">${E(s.t)} · confidence set to ${qz.ok>=4?'💪':qz.ok>=3?'🙂':'😕 (added to Revise)'}</div><button data-a="qx">Close</button></div>`;
  const q=qz.qs[qz.i],d=qz.sel!==null;
  return `<div class="card nx"><div class="mu">🧠 Quiz · ${E(s.t)} · Question ${qz.i+1}/${qz.qs.length}</div><div class="aq">${E(q.q)}</div>`+q.o.map((o,k)=>`<button class="sec qo ${d?(k===q.a?'ok':k===qz.sel?'bad':''):''}" data-a="qa" data-v="${k}" ${d?'disabled':''}>${E(o)}</button>`).join('')+(d?`<div class="fb ${qz.sel===q.a?'c':'w'}">${qz.sel===q.a?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${E(q.e||'')}</div></div><button data-a="qn">${qz.i+1>=qz.qs.length?'Finish':'Next →'}</button>`:'')+`<button class="sec" data-a="qx">Stop quiz</button></div>`}
-function revCard(){const t=today(),due=Object.entries(st.rv||{}).filter(e=>!e[1].done&&e[1].due<=t);
+function revCard(){const t=today(),all=Object.entries(st.rv||{}).filter(e=>!e[1].done&&e[1].due<=t).sort((a,b)=>a[1].due<b[1].due?-1:1),due=all.slice(0,RV_CAP),more=all.length-due.length;
  if(!due.length)return '<div class="mu" style="margin:6px 2px">🔁 Revise: nothing due today ✅</div>';
- return `<div class="card nx"><b>🔁 Revise today (${due.length})</b><div class="mu">Try to recall it without notes, then tap.</div>`+due.map(e=>{const s=subById(e[0]);return `<div class="row srow t-syl"><span style="flex:1"><b>${E(s.t)}</b><br><span class="mu">${E(s.tn)} · review ${e[1].n+1} of 4</span></span><button class="sec rb" data-a="rok" data-v="${e[0]}">✅</button><button class="sec rb" data-a="rno" data-v="${e[0]}">😕</button></div>`}).join('')+'</div>'}
+ return `<div class="card nx"><b>🔁 Revise today (${all.length})</b><div class="mu">Try to recall it without notes, then tap.</div>`+due.map(e=>{const s=subById(e[0]);return `<div class="row srow t-syl"><span style="flex:1"><b>${E(s.t)}</b><br><span class="mu">${E(s.tn)} · review ${e[1].n+1} of 4</span></span><button class="sec rb" data-a="rok" data-v="${e[0]}">✅</button><button class="sec rb" data-a="rno" data-v="${e[0]}">😕</button></div><div class="rvx"><span class="mu">Studied on</span><input type="date" data-a="rdt" data-k="${e[0]}" value="${e[1].sd||''}" max="${t}"><button class="sec" data-a="rsk" data-v="${e[0]}">Skip</button></div>`}).join('')+(more>0?`<div class="mu" style="margin-top:8px">+${more} more waiting. Studied many topics before? Spread them, ${RV_CAP} per day.</div><button class="sec" data-a="rsp">Spread the rest (${RV_CAP} a day)</button>`:'')+'</div>'}
 const HOW='<details class="card how"><summary>📖 How to study well</summary><div class="mu" style="margin-top:8px">1. Tick only when you can do it without notes.<br>2. Build first, read second: 40 of your 70 minutes typing code.<br>3. Revise when the Revise card asks (day 1, 3, 7, 21).<br>4. Write every error in the Error log.<br>5. Explain it aloud in 3 sentences.<br>6. Take the AI quiz after each subtopic.<br>7. Practise the interview questions aloud every week.</div></details>';
 function tools(id){const c=(st.cf||{})[id]||0,m=(st.tm||{})[id]||0,r=(st.rv||{})[id],ex=(st.exp||{})[id],h=(st.qh||{})[id]||[],last=h[h.length-1];
  return `<div class="tools"><div class="mu">How sure are you?</div><div class="two3">${[['😕',1],['🙂',2],['💪',3]].map(p=>`<button class="sec cfb ${c===p[1]?'on':''}" data-a="cf" data-v="${id}|${p[1]}">${p[0]}</button>`).join('')}</div>`+
@@ -972,6 +980,8 @@ document.addEventListener('click',e=>{
  else if(a==='tm'){const q=v.split('|');st.tm=st.tm||{};st.tm[q[0]]=(st.tm[q[0]]||0)+(+q[1]);save()}
  else if(a==='rok'){rvAns(v,true)}
  else if(a==='rno'){rvAns(v,false)}
+ else if(a==='rsk'){if(!confirm('Remove this topic from Revise? It will not count as mastered.'))return;rvSkip(v);save()}
+ else if(a==='rsp'){rvSpread();save()}
  else if(a==='xpl'){xplain(v);return}
  else if(a==='qz'){startQuiz(v);return}
  else if(a==='qa'){if(qz&&qz.sel===null){qz.sel=+v;if(+v===qz.qs[qz.i].a)qz.ok++;else{const q=qz.qs[qz.i];fcAdd('q:'+qz.sub+':'+q.q,q.q,q.o[q.a]+(q.e?' - '+q.e:''),'quiz');save()}}}
@@ -1032,6 +1042,7 @@ document.addEventListener('change',e=>{                     // checkboxes + week
  else if(a==='jd'){st.jd=st.jd||{};st.jd[t.dataset.k]=t.checked}
  else if(a==='fi'||a==='fsall')frSet(a,t.dataset.k,t.checked);
  else if(a==='sy')st.syl[t.dataset.k]=t.checked;
+ else if(a==='rdt')rvFromDate(t.dataset.k,t.value);
  else if(a==='ms')st.words.find(w=>w.id===t.dataset.id).mistake=t.checked;
  if(a==='tk'&&t.checked){ac();popD=t.dataset.d;popK=t.dataset.k;if(cnt(t.dataset.d)===T.length)setTimeout(burst,250)}
  save();render()});
