@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.1" data-note="Sunday test works without AI: write, see mistakes, copy to ChatGPT or Gemini."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.2" data-note="Notebook: save AI answers and word notes after the Sunday test."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -217,6 +217,9 @@ div[style*="display:flex"]>input{flex:1;min-width:0}
 #upd button{width:auto;flex:none;margin:0;min-height:44px;border:0;border-radius:12px;padding:0 14px;font-weight:700;cursor:pointer;background:#fff;color:#1e1b4b}#upd button.l{background:rgba(255,255,255,.18);color:#fff}
 @keyframes updin{from{transform:translateY(-20px);opacity:0}to{transform:none;opacity:1}}
 a.btn{display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:14px;text-decoration:none;font-weight:700;margin:5px 0}a.btn.sec{background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--bd)}
+.seg{overflow:hidden}.seg button{flex:1 1 0;min-width:0;padding:0 6px;font-size:13px;white-space:nowrap}.rule.nbrow{display:block}
+.ta{width:100%;margin:8px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--bd);min-height:90px;font:inherit;color:inherit;outline:0}
+.wnl{margin:8px 0 0;font-size:14px;text-align:left}.wnl .two{margin-top:6px}.wnl>button.sec{width:auto;min-height:36px;margin:2px 0;padding:0 14px;font-size:13px}.wnl button[aria-label]{width:auto;min-height:30px;margin:0 0 0 6px;padding:0 10px;font-size:12px}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -463,6 +466,32 @@ function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
  return `<h1>Weak Word Revision</h1><div class="mu">Read each word. Then say or write one new sentence with it.</div>`+ws.map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean)}</div><div class="mu">Spelling: <b>${E(w.word)}</b></div><div class="mu">Example: ${E(w.sent||'-')}</div><input type="text" placeholder="✍️ Now use it in your own sentence"></div>`).join('')+`<button data-a="aiq2">Start Weak Word Retest</button>`}
 function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
  return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
+/* ===== NOTEBOOK: word notes + saved AI answers ===== */
+let wnOpen='';
+const wnList=id=>((st.wn||{})[id]||[]),wnHas=id=>wnList(id).length>0;
+function wnAdd(id,t){t=String(t||'').trim();const w=gw(id);if(!t||!w)return false;st.wn=st.wn||{};(st.wn[id]=st.wn[id]||[]).unshift({d:today(),t});w.mistake=true;save();return true}
+function wnDel(id,i){const a=(st.wn||{})[id];if(!a)return;a.splice(i,1);if(!a.length)delete st.wn[id];save()}
+function arAdd(t){t=String(t||'').trim();if(!t)return false;st.ar=st.ar||[];st.ar.unshift({d:today(),wk:mon(today()),t});save();return true}
+function wnShow(id){const l=wnList(id);return l.length?`<div class="wnl">${l.map(n=>`<div>📝 <span class="mu">${E(n.d)}</span> ${E(n.t)}</div>`).join('')}</div>`:''}
+function wnBox(id){if(wnOpen===id)return `<div class="wnl"><textarea id="wnin" class="ta" rows="3" placeholder="Write or paste the correction from AI" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><div class="two"><button data-a="wnx" data-v="save|${id}">Save note</button><button class="sec" data-a="wnx" data-v="cancel">Cancel</button></div></div>`;
+ return `<div class="wnl"><button class="sec" data-a="wnx" data-v="open|${id}">📝 ${wnHas(id)?'Add another note':'Add note'}</button></div>`}
+function nbAct(a,v){const p=String(v).split('|');
+ if(a==='wnx'){
+  if(p[0]==='open'){wnOpen=p[1];render();setTimeout(()=>{const e=$('#wnin');if(e)e.focus()},40);return}
+  if(p[0]==='cancel'){wnOpen='';render();return}
+  if(p[0]==='save'){const e=$('#wnin');if(wnAdd(p[1],e&&e.value)){wnOpen='';toast('✅ Note saved')}else toast('Write something first');render();return}
+  if(p[0]==='del'){if(confirm('Delete this note?')){wnDel(p[1],+p[2]);render()}return}
+  if(p[0]==='nbadd'){const w=$('#nbw'),t=$('#nbt');if(w&&wnAdd(w.value,t&&t.value)){toast('✅ Note saved');render()}else toast('Pick a word and write a note');return}}
+ if(a==='arx'){
+  if(p[0]==='save'){const e=$('#arin');if(arAdd(e&&e.value)){toast('✅ AI answer saved');render()}else toast('Paste the AI answer first');return}
+  if(p[0]==='del'){if(confirm('Delete this saved AI answer?')){(st.ar||[]).splice(+p[1],1);save();render()}return}}}
+document.addEventListener('input',e=>{if(e.target.id!=='nbq')return;const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.nbrow').forEach(r=>{r.style.display=!q||r.dataset.w.includes(q)?'':'none'})});
+function vNB(){const ids=Object.keys(st.wn||{}).filter(id=>gw(id)).sort((a,b)=>(wnList(b)[0].d>wnList(a)[0].d?1:-1)),ar=st.ar||[],ws=st.words.slice().sort((a,b)=>a.word.localeCompare(b.word));
+ let h='<h1>Notebook</h1><div class="mu">Corrections and AI answers you saved. Words with notes come first in spelling practice.</div>';
+ h+=`<div class="card"><h2 style="margin-top:0">➕ Add a note to a word</h2>`+(ws.length?`<select id="nbw">${ws.map(w=>`<option value="${E(w.id)}">${E(w.word)}</option>`).join('')}</select><textarea id="nbt" class="ta" rows="3" placeholder="Write or paste the correction from AI" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="wnx" data-v="nbadd">Save note</button>`:'<div class="mu">Add words first (Monday to Saturday).</div>')+'</div>';
+ h+=`<h2>📝 Word notes (${ids.length})</h2>`+(ids.length?`<input type="text" id="nbq" placeholder="Search a word" autocomplete="off" autocapitalize="off" spellcheck="false">`+ids.map(id=>{const w=gw(id);return `<div class="rule nbrow" data-w="${E(w.word.toLowerCase())}" style="--c:#38bdf8"><p><b style="display:inline">${E(w.word)}</b></p>${wnList(id).map((n,i)=>`<div class="wnl">📝 <span class="mu">${E(n.d)}</span> ${E(n.t)} <button class="sec" data-a="wnx" data-v="del|${E(id)}|${i}" aria-label="Delete note">✕</button></div>`).join('')}</div>`}).join(''):'<div class="mu">No notes yet. After a test, tap "Add note" under a word.</div>');
+ h+=`<h2>🤖 Saved AI answers (${ar.length})</h2>`+(ar.length?ar.map((x,i)=>`<details class="card how"><summary>${E(x.d)} · ${E(x.t.slice(0,50).replace(/\s+/g,' '))}${x.t.length>50?'…':''}</summary><div style="white-space:pre-wrap;margin-top:8px">${E(x.t)}</div><button class="sec" data-a="arx" data-v="del|${i}">Delete</button></details>`).join(''):'<div class="mu">Nothing saved yet. After you check a test in ChatGPT or Gemini, paste the answer on the test result screen.</div>');
+ return h}
 /* ===== SUNDAY WRITTEN TEST (no AI needed) ===== */
 const OTN={spell:'🔊 Listen and spell',sent:'✍️ Write a sentence',mean:'💬 Write the meaning'};
 const otKey=q=>q.id+q.t,otAns=(o,q)=>String((o.ans||{})[otKey(q)]||'').trim();
@@ -507,9 +536,11 @@ function vOT(){const o=st.ot;if(!o||o.wk!==mon(today()))return otHome();if(o.don
  return `<h1>Sunday Test</h1><div class="card hero w"><div class="mu">Question ${o.i+1} / ${n} · ${ans} answered</div><div class="bar" style="margin-top:10px"><i style="width:${o.i/n*100}%"></i></div></div><div class="card" style="text-align:center"><div class="mu" style="margin-bottom:6px">${OTN[q.t]}</div>${body}${inp}<button data-a="otx" data-v="next">${o.i+1>=n?'Finish':'Next →'}</button><div class="two"><button class="sec" data-a="otx" data-v="back" ${o.i?'':'disabled'}>← Back</button><button class="sec" data-a="otx" data-v="skip">Skip</button></div></div><div class="two"><button class="sec" data-a="otx" data-v="fin">Finish now</button><button class="sec" data-a="otx" data-v="exit">Save and exit</button></div>`}
 function otRes(o){const R=otRows(o),sp=R.filter(r=>r.q.t==='spell'&&r.a),ok=sp.filter(r=>nm(r.a)===nm(r.w.word)),bad=otMistakes(o),wr=R.filter(r=>r.q.t!=='spell'&&r.a),sk=R.filter(r=>!r.a).length,txt=otAllText(o);
  let h=`<h1>Test Result</h1><div class="card hero w"><div class="mu">Spelling (checked by the app)</div><div class="big2">${ok.length} / ${sp.length}</div><div class="mu">${wr.length} written answers to check with AI · ${sk} skipped</div></div>`;
- h+=bad.length?`<h2>✍️ Spelling mistakes</h2><div class="mu">Wrong → correct. They are saved on your Words page.</div>`+sp.filter(r=>nm(r.a)!==nm(r.w.word)).map(r=>`<div class="rule" style="--c:#fb7185"><p>${E(r.a)} → <b style="display:inline">${E(r.w.word)}</b></p></div>`).join('')+`<button data-a="otx" data-v="cp1">📋 Copy my mistakes</button>`:(sp.length?'<div class="card">🎉 All spelling answers are correct!</div>':'');
- if(wr.length)h+=`<h2>📝 Your written answers</h2><div class="mu">The app cannot judge these. Check them with AI.</div>`+wr.map(r=>`<div class="rule" style="--c:#38bdf8"><p><b style="display:inline">${E(r.w.word)}</b> · ${r.q.t==='sent'?'sentence':'meaning'}<br>${E(r.a)}${r.q.t==='mean'&&r.w.mean?`<br><span class="mu">Saved meaning: ${E(r.w.mean)}</span>`:''}${r.q.t==='sent'&&r.w.sent?`<br><span class="mu">Saved example: ${E(r.w.sent)}</span>`:''}</p></div>`).join('');
+ h+=bad.length?`<h2>✍️ Spelling mistakes</h2><div class="mu">Wrong → correct. They are saved on your Words page.</div>`+sp.filter(r=>nm(r.a)!==nm(r.w.word)).map(r=>`<div class="rule" style="--c:#fb7185"><p>${E(r.a)} → <b style="display:inline">${E(r.w.word)}</b></p>${wnShow(r.w.id)}${wnBox(r.w.id)}</div>`).join('')+`<button data-a="otx" data-v="cp1">📋 Copy my mistakes</button>`:(sp.length?'<div class="card">🎉 All spelling answers are correct!</div>':'');
+ if(wr.length)h+=`<h2>📝 Your written answers</h2><div class="mu">The app cannot judge these. Check them with AI.</div>`+wr.map(r=>`<div class="rule" style="--c:#38bdf8"><p><b style="display:inline">${E(r.w.word)}</b> · ${r.q.t==='sent'?'sentence':'meaning'}<br>${E(r.a)}${r.q.t==='mean'&&r.w.mean?`<br><span class="mu">Saved meaning: ${E(r.w.mean)}</span>`:''}${r.q.t==='sent'&&r.w.sent?`<br><span class="mu">Saved example: ${E(r.w.sent)}</span>`:''}</p>${wnShow(r.w.id)}${wnBox(r.w.id)}</div>`).join('');
  h+=`<button data-a="otx" data-v="cp2">📋 Copy everything for AI check</button><div class="two"><a class="btn sec" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT</a><a class="btn sec" href="https://gemini.google.com/app" target="_blank" rel="noopener">Open Gemini</a></div><details class="card how"><summary>Show the text (press and hold to copy)</summary><textarea readonly rows="8" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--bd)">${E(txt)}</textarea></details>`;
+ const mine=(st.ar||[]).filter(x=>x.wk===o.wk);
+ h+=`<div class="card"><h2 style="margin-top:0">🤖 Paste the AI answer</h2><div class="mu">Saved with today's date. Read it again any time in Learn → Notebook.</div><textarea id="arin" class="ta" rows="5" placeholder="Paste the AI reply here" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="arx" data-v="save">Save AI answer</button>`+(mine.length?`<div class="mu">Saved this week: ${mine.length}. See them in Learn → Notebook.</div>`:'')+`<button class="sec" data-a="nav" data-v="nb">📒 Open Notebook</button></div>`;
  if(bad.length)h+=`<button class="sec" data-a="spstart" data-v="">🔁 Practise spelling mistakes</button>`;
  return h+`<button class="sec" data-a="otx" data-v="restart">New test</button><button class="sec" data-a="nav" data-v="today">Back to Today</button>`}
 function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
@@ -558,7 +589,7 @@ function wTools(){const n=dupList().dups.length,C={};st.words.forEach(w=>{const 
 function spStart(scope){const mk=st.sm||{};let ws=wkWords(today()),cap=20;
  if(scope==='all'){ws=st.words.slice();cap=1e9}else if(scope==='rec'){const f=add(today(),-2);ws=st.words.filter(w=>w.date>=f);if(!ws.length)ws=wkWords(today())}else if(/^w\d+$/.test(scope||'')){const i=+scope.slice(1);ws=st.words.filter(w=>wkIdx(w.date)===i);cap=1e9}
  if(!ws.length)return alert('Add some words first.');
- sp={q:shuf(ws).sort((a,b)=>(mk[b.id]?1:0)-(mk[a.id]?1:0)).slice(0,cap).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false,scope:scope||''};view='spell';animNext=true;render()}
+ sp={q:shuf(ws).sort((a,b)=>((mk[b.id]||wnHas(b.id))?1:0)-((mk[a.id]||wnHas(a.id))?1:0)).slice(0,cap).map(w=>w.id),i:0,ok:0,bad:[],fb:null,done:false,scope:scope||''};view='spell';animNext=true;render()}
 function spCheck(){const el=$('#spans'),a=el?el.value.trim():'';if(!a||!sp||sp.fb)return;const w=gw(sp.q[sp.i]),ok=nm(a)===nm(w.word);st.sm=st.sm||{};
  if(ok){sp.ok++;clearSp(w)}else{sp.bad.push({id:w.id,ans:a});markSp(w,a)}sp.fb={ok,ans:a};save();render()}
 function spAct(a,v){if(a==='spstart')return spStart(v);if(a==='spchk')return spCheck();
@@ -570,7 +601,7 @@ function vSpell(){if(!sp)return '<h1>Spelling Check</h1><div class="card">Nothin
  if(sp.done){const n=sp.q.length;return `<h1>Spelling Result</h1><div class="card hero w"><div class="mu">Score</div><div class="big2">${sp.ok} / ${n}</div></div>`+(sp.bad.length?`<h2>✍️ Spelling mistakes (marked)</h2><div class="mu">Saved as spelling mistakes on your Words page.</div>`+sp.bad.map(e=>`<div class="rule" style="--c:#fb7185"><p>${E(e.ans)} → <b style="display:inline">${E(gw(e.id).word)}</b></p></div>`).join('')+`<button data-a="spagain">🔁 Practice mistakes again</button>`:'<div class="card">🎉 All spelled correctly!</div>')+`<button class="sec" data-a="spstart" data-v="${sp.scope||''}">New round</button><button class="sec" data-a="spquit">Back to Words</button>`}
  const w=gw(sp.q[sp.i]),f=sp.fb;
  let h=`<h1>Spelling Check</h1><div class="card hero w"><div class="mu">${sp.scope==='all'?'All words · ':sp.scope==='rec'?'Recent words · ':/^w\d+$/.test(sp.scope||'')?'Week '+(+sp.scope.slice(1)+1)+' · ':''}Word ${sp.i+1} / ${sp.q.length}</div><div class="bar" style="margin-top:10px"><i style="width:${sp.i/sp.q.length*100}%"></i></div></div><div class="card" style="text-align:center">`+(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="warn">Your browser cannot speak. Try Chrome.</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters</div>`;
- if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
+ if(f)h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.ans)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}${wnShow(w.id)}</div></div><button data-a="spnext">${sp.i+1>=sp.q.length?'Finish':'Next →'}</button>`;
  else h+=`<input type="text" id="spans" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="spchk">Check</button>`;
  return h+`</div><button class="sec" data-a="spquit">Exit</button>`}
 /* ===== AI COACH MOTIVATION ===== */
@@ -615,9 +646,9 @@ function editor(s){
 
 /* ===== DESIGN V2: groups, progress, habit cards ===== */
 let learnTab='syl',progTab='prog';
-const SEG={learn:[['syl','Syllabus'],['words','Words'],['rules','Rules']],prog:[['prog','Overview'],['week','Weekly']]};
-const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',ot:'today',stats:'stats',coach:'coach'}[v]||'');
-function withSeg(v,h){const g=['syl','words','rules'].includes(v)?'learn':['prog','week'].includes(v)?'prog':'';if(!g)return h;
+const SEG={learn:[['syl','Syllabus'],['words','Words'],['rules','Rules'],['nb','Notebook']],prog:[['prog','Overview'],['week','Weekly']]};
+const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',nb:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',ot:'today',stats:'stats',coach:'coach'}[v]||'');
+function withSeg(v,h){const g=['syl','words','rules','nb'].includes(v)?'learn':['prog','week'].includes(v)?'prog':'';if(!g)return h;
  return '<div class="seg">'+SEG[g].map(x=>`<button class="${x[0]===v?'on':''}" data-a="vw" data-v="${x[0]}">${x[1]}</button>`).join('')+'</div>'+h}
 function rowText(k,s,m,sun,rest){const N={wo:'Workout',wd:sun?'Vocabulary Test':'English words',sp:'Speaking',fr:'Frappe',rd:'Reading'},d=st.days[s]||{},t=d.t||{};let sub='',p=-1;
  if(k==='wo')sub=rest?'Rest day · counts as done ✓':m?'Minimum: 10 min workout':'Do your workout';
@@ -1002,7 +1033,7 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules','nb'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,nb:vNB,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===grpOf(view)));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
@@ -1076,6 +1107,7 @@ document.addEventListener('click',e=>{
  else if(a==='say'){sayWord(v);return}
  else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a,v);return}
  else if(a==='otx'){otAct(v);return}
+ else if(a==='wnx'||a==='arx'){nbAct(a,v);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
  else if(a==='snd'){st.mute=v==='0';save()}
