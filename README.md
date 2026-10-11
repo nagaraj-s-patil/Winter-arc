@@ -19,7 +19,7 @@ A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libr
 - **Today**: day X of 92, level / XP / streak flame, daily score, **AI Coach**, vocabulary card, book card, today's 5 missions, 25/50/90-min focus timer, backup buttons. The ⚙️ button opens Settings.
 - **Calendar**: coloured month grid. Tap a day to edit it.
 - **Weekly**: workouts, Frappe, speaking, reading days, auto totals (Frappe hours, pages, words), score, copyable Sunday report. Short weeks use their real day count (week 1 = 3 workouts).
-- **Rules**: your 12 rules and daily timetable.
+- **Rules**: your 12 rules (the daily timetable was removed).
 - **Syllabus**: one single plan. 13 weeks that match the Weekly review weeks (Week 13 runs to 31 Dec). It starts with Python (Weeks 1-3), then SQL (Weeks 4-5), then Frappe. It uses one accent colour, no rainbow colours. Each week has a goal, how to study, subtopics (tap one to see its study points) and a checkpoint project. A **Study this next** card always shows the next point, and a Bonus section at the end holds the topics that did not fit. It covers a Python deep dive, SQL deep dive, web / Git / terminal, Frappe (install to hooks and APIs), ERPNext basics, projects and job applications: 17 topics, 133 subtopics, 633 study points. The Weekly screen shows this week's syllabus progress.
 
 ### Learning tools (inside the Syllabus page, all AI features use your Gemini key)
@@ -59,3 +59,38 @@ A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libr
 - Voice needs a browser that can speak (Chrome works). Phone keyboard suggestions can only be requested off; turn them off in the keyboard settings if they still show.
 - AI meanings can be wrong. Read new word cards.
 - No reminder notifications. Use your phone alarm.
+
+### Words, colours and achievements (latest update)
+- **Words page**: **🔍 Check repeated words** finds words written twice (ignores capital letters and spaces), asks before removing, keeps the first copy and its meaning, example and mistake mark. It will not run while a Sunday test is in progress.
+- **🔁 Practice words**: one button practises **ALL words from the start**, and a week list practises **only the words added in that week** (Week 1, Week 2 ...). Same listen-and-write mode, missed words first, no 20-word limit.
+- **5 task colours**: Workout red, Words purple, Speaking blue, Frappe green, Reading yellow. They are used on task rows, a 5-block strip in Today's Mission, 5 dots on every Calendar day, the 5 Weekly tiles and the time chips.
+- **Achievements**: 52 badges in 19 groups with bronze / silver / gold / diamond medals, a progress bar on each, a **Next badge** card on Today and Stats, and a **Rank ladder** of 15 ranks (Rookie to Winter King).
+- **Calendar lock**: once a day is over it is locked (tasks, minutes, pages and the private row cannot be changed), so your history stays true. A past day shows 🔒 and a **Unlock to fix a mistake** button; it locks again when you leave or pick another day. Today stays editable.
+- **Private goal in public**: the private row stays hidden (triple-tap the title), but its numbers now count openly under the neutral name "Private goal": +15 XP a day, a streak line on the Today player card, a card in Stats, a gold dot on the Calendar day, and 6 badges (3 to 90 days). The words never say what it is.
+- **Practice nudge**: if you added words today and did not practise, Today shows a reminder and a **Practice now** button (your words from the last 3 days). A finished practice round counts as "Practised today".
+- **Simple mode (default)**: Today shows one step at a time on a little train track: Tasks, Words, Proof (book and proof of work), Coach. Use Next and Back. In Settings > What to show you can turn on or off: one-step mode, AI coach, Level and XP, Next badge, Private goal numbers, Focus timer. Level and XP, Next badge, Private goal numbers and Focus timer are OFF by default. Stats shows one section at a time (tap a section to open it). Backup buttons moved to Settings.
+- **Simple by default**: Today shows one step at a time on a little "train" track (Tasks, Words, Proof, Coach) with Back / Next buttons. Level and XP, the next-badge card, private goal numbers and the focus timer are hidden by default. Turn each one on in Settings under **What to show** (or switch off the train to see everything at once). Stats is a list of closed sections, one opens at a time. Export / Import / Reset moved to Settings.
+- **Private goal correction**: the private row is the one thing that can still be corrected on a locked past day. When it is shown (triple-tap the title), Today also shows a **Yesterday** row, and any past day in the Calendar lets you tick or untick it. Everything else stays locked.
+
+
+## One AI section
+- Coach tab -> AI settings holds both Google Gemini and OpenAI. Pick one with the switch; it powers coach chat, daily message, vocabulary test, quizzes and word help.
+- Keys are stored separately per provider and are never in the Export backup.
+- Settings now only links to it.
+
+
+## Sunday written test (no AI needed)
+- Sunday: Today -> Words step -> Start test. One question at a time: listen and spell, write a sentence, or write the meaning.
+- At the end the app checks spelling only (wrong -> correct, saved to your Spelling mistakes). Sentences and meanings are listed for you.
+- Copy my mistakes / Copy everything for AI check, then paste into ChatGPT or Gemini.
+- The old AI test stays as an optional button only when an AI key is saved.
+
+
+## Notebook (Learn -> Notebook)
+- After the Sunday test: paste the whole AI reply once into "Paste the AI answer" and tap Save. The app finds each word in the reply and saves a note for every word at the same time. Undo is one tap. You can also add a single note by hand under any word.
+- Learn -> Notebook lists all word notes (with search) and saved AI answers. You can add a note to any word there too.
+- Words with notes come first in Spelling check, and the note is shown after you answer.
+- Notes and saved answers are part of the Export backup.
+
+## Daily 10 practice
+Every day: 5 words you got wrong + 5 known words (if nothing is wrong, 10 known words). Spelling is auto-checked; sentences you write are copied and checked manually with AI. A wrong word leaves the wrong list after one correct spelling.

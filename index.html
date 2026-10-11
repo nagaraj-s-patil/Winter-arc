@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.3" data-note="Paste the whole AI answer once: notes are saved for every word at the same time."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-12.1" data-note="Daily 10 practice: 5 wrong + 5 known words (or 10 known if nothing is wrong)."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -442,7 +442,7 @@ const chipsOf=(ws,c)=>ws.length?`<div class="chips">${ws.map(w=>`<span style="--
 function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
  if(isSun(s)){const c=wkWords(s).length,o=st.ot,same=o&&o.wk===mon(s),go=same&&!o.done,dn=same&&o.done;
   return `<div class="card hero w"><div style="font-weight:700">📝 Sunday Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">Write answers • see mistakes • copy to AI</div><button data-a="otx" data-v="start" style="background:#fff;color:#7c3aed;margin-top:12px">${dn?'See result':go?'Continue test':'Start test'}</button></div>`}
- return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div>${n&&!(st.wp||{})[today()]?`<div class="warn" style="margin:8px 0">⏳ You added ${n} word${n===1?'':'s'} today but did not practise. Practise for 5 minutes now.</div>`:(st.wp||{})[today()]?'<div class="mu">✅ Practised today</div>':''}<div class="two"><button class="sec" data-a="gow">Add words</button><button data-a="spstart" data-v="rec">🔊 Practice now</button></div></div>`}
+ return dpCard()+`<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div>${n&&!(st.wp||{})[today()]?`<div class="warn" style="margin:8px 0">⏳ You added ${n} word${n===1?'':'s'} today but did not practise. Practise for 5 minutes now.</div>`:(st.wp||{})[today()]?'<div class="mu">✅ Practised today</div>':''}<div class="two"><button class="sec" data-a="gow">Add words</button><button data-a="spstart" data-v="rec">🔊 Practice now</button></div></div>`}
 function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Write the test, see your mistakes, then check them with AI.</div><button data-a="otx" data-v="start">📝 Start test</button>${aiReady()?'<button class="sec" data-a="aistart">🧠 AI test (optional)</button>':''}</div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
 function geminiCard(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
  return `<div class="mu">API key (Google AI Studio)</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div>`}
@@ -466,6 +466,48 @@ function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
  return `<h1>Weak Word Revision</h1><div class="mu">Read each word. Then say or write one new sentence with it.</div>`+ws.map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean)}</div><div class="mu">Spelling: <b>${E(w.word)}</b></div><div class="mu">Example: ${E(w.sent||'-')}</div><input type="text" placeholder="✍️ Now use it in your own sentence"></div>`).join('')+`<button data-a="aiq2">Start Weak Word Retest</button>`}
 function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
  return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
+/* ===== DAILY 10 PRACTICE: 5 wrong + 5 known (or 10 known when nothing is wrong) ===== */
+const dpBad=w=>!!((st.sm&&st.sm[w.id])||w.mistake||wnHas(w.id));
+function dpPick(){const all=st.words.filter(w=>w.word),L=st.wl||{},bad=shuf(all.filter(dpBad)).sort((a,b)=>(L[a.id]||'')<(L[b.id]||'')?-1:1),good=shuf(all.filter(w=>!dpBad(w))).sort((a,b)=>(L[a.id]||'')<(L[b.id]||'')?-1:1);
+ const ng=Math.min(good.length,10-Math.min(bad.length,5)),nb=Math.min(bad.length,10-ng);
+ return{bad:bad.slice(0,nb),good:good.slice(0,ng),nBad:bad.length,nGood:good.length}}
+function dpCard(){const p=dpPick(),n=p.bad.length+p.good.length,d=st.dp,go=d&&d.d===today()&&!d.done,dn=d&&d.d===today()&&d.done;
+ if(!n)return '';
+ return `<div class="card"><b>🎯 Daily 10 practice</b><div class="mu">${p.nBad?`🔴 ${p.nBad} wrong words need work · 🟢 ${p.nGood} known`:`🟢 No wrong words. ${p.nGood} words to keep fresh`}</div><div class="mu">${p.bad.length?`Today: ${p.bad.length} wrong + ${p.good.length} known`:`Today: ${p.good.length} words`}</div><button data-a="dpx" data-v="start">${dn?'See today\'s result':go?'Continue practice':'▶ Start practice'}</button>${dn?'<button class="sec" data-a="dpx" data-v="restart">Practise again</button>':''}</div>`}
+function dpStart(){const p=dpPick(),q=shuf(p.bad.map(w=>({id:w.id,g:'b'})).concat(p.good.map(w=>({id:w.id,g:'g'}))));if(!q.length){toast('Add some words first.');return}
+ st.dp={d:today(),q,i:0,fb:null,res:{},done:false};save();view='dp';animNext=true;render()}
+function dpCheck(){const o=st.dp,el=$('#dpin'),a=el?el.value.trim():'';if(!o||o.fb||!a)return;const q=o.q[o.i],w=gw(q.id);if(!w)return;
+ const ok=nm(a)===nm(w.word);st.sm=st.sm||{};st.wl=st.wl||{};st.wl[w.id]=today();if(ok)clearSp(w);else markSp(w,a);
+ o.res[q.id]={ok,a,s:''};o.fb={ok,a};save();render()}
+function dpNext(){const o=st.dp;if(!o||!o.fb)return;const q=o.q[o.i],el=$('#dps');if(el&&o.res[q.id])o.res[q.id].s=el.value.trim();o.fb=null;o.i++;
+ if(o.i>=o.q.length){o.done=true;st.wp=st.wp||{};st.wp[today()]=(st.wp[today()]||0)+1}save();render()}
+function dpRes(o){return o.q.map(q=>({q,w:gw(q.id),r:o.res[q.id]})).filter(x=>x.w&&x.r)}
+function dpMistakes(o){return dpRes(o).filter(x=>!x.r.ok).map(x=>x.r.a+' → '+x.w.word)}
+function dpSentText(o){const L=['Please check my English sentences. For each one say Correct, Partly correct or Wrong. Show the corrected sentence and one short reason in very simple English.',''];let n=0;
+ dpRes(o).forEach(x=>{if(x.r.s){n++;L.push(n+') Word: '+x.w.word+' | My sentence: '+x.r.s)}});return n?L.join('\n'):''}
+function dpAct(v){const o=st.dp;
+ if(v==='start'){if(o&&o.d===today()){view='dp';animNext=true;render()}else dpStart();return}
+ if(v==='restart'){dpStart();return}
+ if(!o)return;
+ if(v==='chk')return dpCheck();
+ if(v==='next')return dpNext();
+ if(v==='exit'){view='today';animNext=true;render();return}
+ if(v==='cp1'){copyText(dpMistakes(o).join('\n')||'No mistakes');return}
+ if(v==='cp2'){const t=dpSentText(o);if(t)copyText(t);else toast('You did not write any sentences');return}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dpin'){e.preventDefault();dpAct('chk')}});
+function vDP(){const o=st.dp;if(!o||o.d!==today())return `<h1>Daily 10</h1>${dpCard()||'<div class="card">Add some words first.</div>'}<button class="sec" data-a="nav" data-v="today">Back</button>`;
+ if(o.done){const R=dpRes(o),ok=R.filter(x=>x.r.ok).length,bad=R.filter(x=>!x.r.ok),sents=R.filter(x=>x.r.s);
+  return `<h1>Practice Result</h1><div class="card hero w"><div class="mu">Spelling</div><div class="big2">${ok} / ${R.length}</div><div class="mu">${bad.length?bad.length+' still wrong. They stay on your wrong list.':'All correct. Great.'}</div></div>`
+  +(bad.length?`<h2>✍️ Wrong → correct</h2>`+bad.map(x=>`<div class="rule" style="--c:#fb7185"><p>${E(x.r.a)} → <b style="display:inline">${E(x.w.word)}</b></p>${wnShow(x.w.id)}${wnBox(x.w.id)}</div>`).join('')+`<button data-a="dpx" data-v="cp1">📋 Copy my mistakes</button>`:'')
+  +(sents.length?`<h2>📝 Your sentences (${sents.length})</h2>`+sents.map(x=>`<div class="rule" style="--c:#38bdf8"><p><b style="display:inline">${E(x.w.word)}</b><br>${E(x.r.s)}</p></div>`).join('')+`<button data-a="dpx" data-v="cp2">📋 Copy sentences for AI check</button>`:'')
+  +(sents.length||bad.length?arBox('dp'):'')
+  +`<button class="sec" data-a="dpx" data-v="restart">🔁 Practise again</button><button class="sec" data-a="nav" data-v="today">Back to Today</button>`}
+ const q=o.q[o.i],w=gw(q.id),n=o.q.length;if(!w){o.i++;if(o.i>=n)o.done=true;save();return vDP()}
+ let h=`<h1>Daily 10</h1><div class="card hero w"><div class="mu">Word ${o.i+1} / ${n} · ${q.g==='b'?'🔴 needs work':'🟢 keep fresh'}</div><div class="bar" style="margin-top:10px"><i style="width:${o.i/n*100}%"></i></div></div><div class="card" style="text-align:center">`
+ +(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="mu">Your browser cannot speak. Starts with "${E(w.word[0])}".</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters${w.mean?' · Meaning: '+E(w.mean):''}</div>`;
+ if(o.fb){const f=o.fb;h+=`<div class="fb ${f.ok?'c':'w'}">${f.ok?'✅ Correct':'❌ Wrong'}<div style="font-weight:500;margin-top:4px">${f.ok?E(w.word):E(f.a)+' → <b>'+E(w.word)+'</b><div class="mu">'+w.word.split('').join(' · ')+'</div>'}${wnShow(w.id)}</div></div><div class="mu" style="margin-top:8px">Write one sentence with "${E(w.word)}" about your own life or work (optional)</div><textarea id="dps" class="ta" rows="2" placeholder="My sentence" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="dpx" data-v="next">${o.i+1>=n?'Finish':'Next →'}</button>`}
+ else h+=`<input type="text" id="dpin" placeholder="Type the spelling" ${NOSUG} style="text-align:center;font-size:20px"><button data-a="dpx" data-v="chk">Check</button>`;
+ return h+`</div><button class="sec" data-a="dpx" data-v="exit">Save and exit</button>`}
 /* ===== NOTEBOOK: word notes + saved AI answers ===== */
 let wnOpen='';
 const wnList=id=>((st.wn||{})[id]||[]),wnHas=id=>wnList(id).length>0;
@@ -505,7 +547,7 @@ function nbAct(a,v){const p=String(v).split('|');
   if(p[0]==='nbadd'){const w=$('#nbw'),t=$('#nbt');if(w&&wnAdd(w.value,t&&t.value)){toast('✅ Note saved');render()}else toast('Pick a word and write a note');return}}
  if(a==='arx'){
   if(p[0]==='save'){const e=$('#arin'),t=e&&e.value.trim();if(!t){toast('Paste the AI answer first');return}
-   const c=p[1]==='ot'&&st.ot?otRows(st.ot).map(r=>r.w):st.words;arRes=Object.assign({v:view},arSaveAll(t,c));render();return}
+   const c=p[1]==='ot'&&st.ot?otRows(st.ot).map(r=>r.w):p[1]==='dp'&&st.dp?dpRes(st.dp).map(x=>x.w):st.words;arRes=Object.assign({v:view},arSaveAll(t,c));render();return}
   if(p[0]==='undo'){arUndo();arRes=null;render();return}
   if(p[0]==='del'){if(confirm('Delete this saved AI answer?')){(st.ar||[]).splice(+p[1],1);save();render()}return}}}
 document.addEventListener('input',e=>{if(e.target.id!=='nbq')return;const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.nbrow').forEach(r=>{r.style.display=!q||r.dataset.w.includes(q)?'':'none'})});
@@ -570,9 +612,9 @@ function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v
 const NOSUG='autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" enterkeyhint="done" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"';
 const canSay='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';let lastSay='',sp=null;
 function say(t,rate){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.8;const v=speechSynthesis.getVoices().find(x=>/^en[-_](US|GB|IN)/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
-function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);if(view==='ot'&&st.ot&&!st.ot.done){const q=st.ot.q[st.ot.i];if(q&&q.t==='spell')return gw(q.id)}const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
+function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);if(view==='dp'&&st.dp&&!st.dp.done&&!st.dp.fb){const q=st.dp.q[st.dp.i];if(q)return gw(q.id)}if(view==='ot'&&st.ot&&!st.ot.done){const q=st.ot.q[st.ot.i];if(q&&q.t==='spell')return gw(q.id)}const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
 function sayWord(m){const w=curWord();if(!w)return;if(m==='s'&&w.sent)say(w.word+'. '+w.sent+'. '+w.word,.85);else say(w.word,m==='slow'?.5:.75)}
-function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'')+(st.ot?st.ot.i:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
+function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'')+(st.ot?st.ot.i:'')+(st.dp?st.dp.i:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
 function markSp(w,a){st.sm=st.sm||{};st.sm[w.id]=1;w.mistake=true;w.wrong=a}
 function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
 async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
@@ -669,7 +711,7 @@ function editor(s){
 /* ===== DESIGN V2: groups, progress, habit cards ===== */
 let learnTab='syl',progTab='prog';
 const SEG={learn:[['syl','Syllabus'],['words','Words'],['rules','Rules'],['nb','Notebook']],prog:[['prog','Overview'],['week','Weekly']]};
-const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',nb:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',ot:'today',stats:'stats',coach:'coach'}[v]||'');
+const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',nb:'learn',dp:'today',words:'learn',rules:'learn',spell:'learn',ai:'learn',ot:'today',stats:'stats',coach:'coach'}[v]||'');
 function withSeg(v,h){const g=['syl','words','rules','nb'].includes(v)?'learn':['prog','week'].includes(v)?'prog':'';if(!g)return h;
  return '<div class="seg">'+SEG[g].map(x=>`<button class="${x[0]===v?'on':''}" data-a="vw" data-v="${x[0]}">${x[1]}</button>`).join('')+'</div>'+h}
 function rowText(k,s,m,sun,rest){const N={wo:'Workout',wd:sun?'Vocabulary Test':'English words',sp:'Speaking',fr:'Frappe',rd:'Reading'},d=st.days[s]||{},t=d.t||{};let sub='',p=-1;
@@ -1039,7 +1081,7 @@ function vWords(){
  const t=today(),n=st.words.filter(w=>w.date===t).length,by={},mis=st.words.filter(w=>w.mistake).length;
  let h=`<h1>Words</h1><div class="card hero w"><div class="mu">Today's Words</div><div class="big2">${n}<span style="font-size:20px;opacity:.8">/10</span></div><div class="pips">${Array.from({length:10},(_,i)=>`<i class="${i<n?'on':''}" style="--k:${i}"></i>`).join('')}</div></div>`+
  `<div class="stats"><div><b>${wkWords(today()).length}/${wkTarget(today())}</b>Weekly words</div><div><b>${mis}</b>Mistake list</div></div>`+
- `${addBox()}`;
+ `${dpCard()}${addBox()}`;
  if(!st.words.length)h+=`<div class="empty">📝<br>No words yet.<br><span class="mu">Add your first word above.</span></div>`;
  st.words.forEach(w=>(by[w.date]=by[w.date]||[]).push(w));
  Object.keys(by).sort().reverse().forEach(d=>{h+=`<div class="mh t-wd"><div><b>${pd(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b></div><div class="pc">${by[d].length}</div></div>`+by[d].map(w=>`<div class="card wcard"><b>${E(w.word)}</b>${w.mean?'<div>'+E(w.mean)+'</div>':'<div class="mu">⏳ Meaning pending. Tap Fill meaning with AI.</div>'}<div class="mu">${E(w.sent)}</div>${w.mistake&&w.wrong?'<div class="sperr">✍️ Spelling mistake: '+E(w.wrong)+' → '+E(w.word)+'</div>':''}<label class="mk"><input type="checkbox" data-a="ms" data-id="${w.id}" ${w.mistake?'checked':''}> ⚠ Spelling mistake</label></div>`).join('')});
@@ -1055,7 +1097,7 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules','nb'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,nb:vNB,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules','nb'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,nb:vNB,dp:vDP,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===grpOf(view)));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
@@ -1129,6 +1171,7 @@ document.addEventListener('click',e=>{
  else if(a==='say'){sayWord(v);return}
  else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a,v);return}
  else if(a==='otx'){otAct(v);return}
+ else if(a==='dpx'){dpAct(v);return}
  else if(a==='wnx'||a==='arx'){nbAct(a,v);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
