@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.2" data-note="Notebook: save AI answers and word notes after the Sunday test."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.3" data-note="Paste the whole AI answer once: notes are saved for every word at the same time."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -475,6 +475,27 @@ function arAdd(t){t=String(t||'').trim();if(!t)return false;st.ar=st.ar||[];st.a
 function wnShow(id){const l=wnList(id);return l.length?`<div class="wnl">${l.map(n=>`<div>📝 <span class="mu">${E(n.d)}</span> ${E(n.t)}</div>`).join('')}</div>`:''}
 function wnBox(id){if(wnOpen===id)return `<div class="wnl"><textarea id="wnin" class="ta" rows="3" placeholder="Write or paste the correction from AI" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><div class="two"><button data-a="wnx" data-v="save|${id}">Save note</button><button class="sec" data-a="wnx" data-v="cancel">Cancel</button></div></div>`;
  return `<div class="wnl"><button class="sec" data-a="wnx" data-v="open|${id}">📝 ${wnHas(id)?'Add another note':'Add note'}</button></div>`}
+let arRes=null;
+const wRe=w=>new RegExp('(^|[^a-z])'+String(w.word).trim().toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(s|es|ed|d|ing)?(?![a-z])','i');
+function arClean(t){return t.replace(/\*\*|__|`/g,'').replace(/^\s*#{1,6}\s*/,'').replace(/^\s*(?:\d+[.)]|[-*•])\s*/,'').replace(/[ \t]+\n/g,'\n').trim().slice(0,700)}
+function arSplit(text){const L=String(text).replace(/\r/g,'').split('\n'),num=/^(?:\d+[.)]\s|#{1,6}\s)/,bul=/^[-*•]\s/,hasNum=L.some(l=>num.test(l)),hasBul=!hasNum&&L.some(l=>bul.test(l)),st0=l=>hasNum?num.test(l):hasBul?bul.test(l):false;
+ const out=[];let cur=[],gap=false;
+ const flush=()=>{if(cur.length)out.push(cur.join('\n'));cur=[]};
+ L.forEach(l=>{if(!l.trim()){if(!hasNum&&!hasBul)flush();else gap=true;return}
+  if(st0(l)){flush();cur=[l];gap=false;return}
+  if((hasNum||hasBul)&&gap&&!/^\s/.test(l)&&!bul.test(l)){flush();cur=[l];gap=false;return}
+  gap=false;cur.push(l)});flush();
+ return out.map(x=>x.trim()).filter(Boolean)}
+function arSaveAll(text,cands){const items=arSplit(text),by={};let un=0;
+ items.forEach(it=>{let best=null;cands.forEach(w=>{const m=wRe(w).exec(it);if(m&&(best===null||m.index<best.i))best={w,i:m.index}});if(best)(by[best.w.id]=by[best.w.id]||[]).push(arClean(it));else un++});
+ const ids=Object.keys(by),refs=[];ids.forEach(id=>{if(wnAdd(id,by[id].join('\n')))refs.push([id,st.wn[id][0]])});
+ arAdd(text);arLast={a:st.ar[0],refs};return{n:refs.length,words:refs.map(r=>gw(r[0]).word),un}}
+function arUndo(){if(!arLast)return;arLast.refs.forEach(r=>{const a=(st.wn||{})[r[0]];if(!a)return;const i=a.indexOf(r[1]);if(i>=0)a.splice(i,1);if(!a.length)delete st.wn[r[0]]});const j=(st.ar||[]).indexOf(arLast.a);if(j>=0)st.ar.splice(j,1);arLast=null;save()}
+let arLast=null;
+function arBox(src){const r=arRes&&arRes.v===view?arRes:null;
+ return `<div class="card"><h2 style="margin-top:0">🤖 Paste the AI answer</h2><div class="mu">Paste the whole reply once. The app finds each word and saves its correction as a note. The full answer is kept too.</div><textarea id="arin" class="ta" rows="6" placeholder="Paste the AI reply here" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="arx" data-v="save|${src}">Save answer and notes</button>`
+ +(r?`<div class="fb c" style="margin-top:8px">${r.n?`✅ Saved ${r.n} word note${r.n===1?'':'s'}: ${r.words.map(E).join(', ')}`:'✅ Answer saved. No word matched, so no notes were added.'}${r.n&&r.un?`<div class="mu">${r.un} part${r.un===1?'':'s'} did not match a word. They are kept in the full answer.</div>`:''}</div><button class="sec" data-a="arx" data-v="undo">↩ Undo</button>`:'')
+ +(src==='ot'?`<button class="sec" data-a="nav" data-v="nb">📒 Open Notebook</button>`:'')+`</div>`}
 function nbAct(a,v){const p=String(v).split('|');
  if(a==='wnx'){
   if(p[0]==='open'){wnOpen=p[1];render();setTimeout(()=>{const e=$('#wnin');if(e)e.focus()},40);return}
@@ -483,12 +504,14 @@ function nbAct(a,v){const p=String(v).split('|');
   if(p[0]==='del'){if(confirm('Delete this note?')){wnDel(p[1],+p[2]);render()}return}
   if(p[0]==='nbadd'){const w=$('#nbw'),t=$('#nbt');if(w&&wnAdd(w.value,t&&t.value)){toast('✅ Note saved');render()}else toast('Pick a word and write a note');return}}
  if(a==='arx'){
-  if(p[0]==='save'){const e=$('#arin');if(arAdd(e&&e.value)){toast('✅ AI answer saved');render()}else toast('Paste the AI answer first');return}
+  if(p[0]==='save'){const e=$('#arin'),t=e&&e.value.trim();if(!t){toast('Paste the AI answer first');return}
+   const c=p[1]==='ot'&&st.ot?otRows(st.ot).map(r=>r.w):st.words;arRes=Object.assign({v:view},arSaveAll(t,c));render();return}
+  if(p[0]==='undo'){arUndo();arRes=null;render();return}
   if(p[0]==='del'){if(confirm('Delete this saved AI answer?')){(st.ar||[]).splice(+p[1],1);save();render()}return}}}
 document.addEventListener('input',e=>{if(e.target.id!=='nbq')return;const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.nbrow').forEach(r=>{r.style.display=!q||r.dataset.w.includes(q)?'':'none'})});
 function vNB(){const ids=Object.keys(st.wn||{}).filter(id=>gw(id)).sort((a,b)=>(wnList(b)[0].d>wnList(a)[0].d?1:-1)),ar=st.ar||[],ws=st.words.slice().sort((a,b)=>a.word.localeCompare(b.word));
- let h='<h1>Notebook</h1><div class="mu">Corrections and AI answers you saved. Words with notes come first in spelling practice.</div>';
- h+=`<div class="card"><h2 style="margin-top:0">➕ Add a note to a word</h2>`+(ws.length?`<select id="nbw">${ws.map(w=>`<option value="${E(w.id)}">${E(w.word)}</option>`).join('')}</select><textarea id="nbt" class="ta" rows="3" placeholder="Write or paste the correction from AI" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="wnx" data-v="nbadd">Save note</button>`:'<div class="mu">Add words first (Monday to Saturday).</div>')+'</div>';
+ let h='<h1>Notebook</h1><div class="mu">Paste an AI answer once and the app saves a note for each word. Words with notes come first in spelling practice.</div>';
+ h+=arBox('nb');h+=`<div class="card"><h2 style="margin-top:0">➕ Add one note by hand</h2>`+(ws.length?`<select id="nbw">${ws.map(w=>`<option value="${E(w.id)}">${E(w.word)}</option>`).join('')}</select><textarea id="nbt" class="ta" rows="3" placeholder="Write or paste the correction from AI" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="wnx" data-v="nbadd">Save note</button>`:'<div class="mu">Add words first (Monday to Saturday).</div>')+'</div>';
  h+=`<h2>📝 Word notes (${ids.length})</h2>`+(ids.length?`<input type="text" id="nbq" placeholder="Search a word" autocomplete="off" autocapitalize="off" spellcheck="false">`+ids.map(id=>{const w=gw(id);return `<div class="rule nbrow" data-w="${E(w.word.toLowerCase())}" style="--c:#38bdf8"><p><b style="display:inline">${E(w.word)}</b></p>${wnList(id).map((n,i)=>`<div class="wnl">📝 <span class="mu">${E(n.d)}</span> ${E(n.t)} <button class="sec" data-a="wnx" data-v="del|${E(id)}|${i}" aria-label="Delete note">✕</button></div>`).join('')}</div>`}).join(''):'<div class="mu">No notes yet. After a test, tap "Add note" under a word.</div>');
  h+=`<h2>🤖 Saved AI answers (${ar.length})</h2>`+(ar.length?ar.map((x,i)=>`<details class="card how"><summary>${E(x.d)} · ${E(x.t.slice(0,50).replace(/\s+/g,' '))}${x.t.length>50?'…':''}</summary><div style="white-space:pre-wrap;margin-top:8px">${E(x.t)}</div><button class="sec" data-a="arx" data-v="del|${i}">Delete</button></details>`).join(''):'<div class="mu">Nothing saved yet. After you check a test in ChatGPT or Gemini, paste the answer on the test result screen.</div>');
  return h}
@@ -539,8 +562,7 @@ function otRes(o){const R=otRows(o),sp=R.filter(r=>r.q.t==='spell'&&r.a),ok=sp.f
  h+=bad.length?`<h2>✍️ Spelling mistakes</h2><div class="mu">Wrong → correct. They are saved on your Words page.</div>`+sp.filter(r=>nm(r.a)!==nm(r.w.word)).map(r=>`<div class="rule" style="--c:#fb7185"><p>${E(r.a)} → <b style="display:inline">${E(r.w.word)}</b></p>${wnShow(r.w.id)}${wnBox(r.w.id)}</div>`).join('')+`<button data-a="otx" data-v="cp1">📋 Copy my mistakes</button>`:(sp.length?'<div class="card">🎉 All spelling answers are correct!</div>':'');
  if(wr.length)h+=`<h2>📝 Your written answers</h2><div class="mu">The app cannot judge these. Check them with AI.</div>`+wr.map(r=>`<div class="rule" style="--c:#38bdf8"><p><b style="display:inline">${E(r.w.word)}</b> · ${r.q.t==='sent'?'sentence':'meaning'}<br>${E(r.a)}${r.q.t==='mean'&&r.w.mean?`<br><span class="mu">Saved meaning: ${E(r.w.mean)}</span>`:''}${r.q.t==='sent'&&r.w.sent?`<br><span class="mu">Saved example: ${E(r.w.sent)}</span>`:''}</p>${wnShow(r.w.id)}${wnBox(r.w.id)}</div>`).join('');
  h+=`<button data-a="otx" data-v="cp2">📋 Copy everything for AI check</button><div class="two"><a class="btn sec" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT</a><a class="btn sec" href="https://gemini.google.com/app" target="_blank" rel="noopener">Open Gemini</a></div><details class="card how"><summary>Show the text (press and hold to copy)</summary><textarea readonly rows="8" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--bd)">${E(txt)}</textarea></details>`;
- const mine=(st.ar||[]).filter(x=>x.wk===o.wk);
- h+=`<div class="card"><h2 style="margin-top:0">🤖 Paste the AI answer</h2><div class="mu">Saved with today's date. Read it again any time in Learn → Notebook.</div><textarea id="arin" class="ta" rows="5" placeholder="Paste the AI reply here" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea><button data-a="arx" data-v="save">Save AI answer</button>`+(mine.length?`<div class="mu">Saved this week: ${mine.length}. See them in Learn → Notebook.</div>`:'')+`<button class="sec" data-a="nav" data-v="nb">📒 Open Notebook</button></div>`;
+ h+=arBox('ot');
  if(bad.length)h+=`<button class="sec" data-a="spstart" data-v="">🔁 Practise spelling mistakes</button>`;
  return h+`<button class="sec" data-a="otx" data-v="restart">New test</button><button class="sec" data-a="nav" data-v="today">Back to Today</button>`}
 function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
