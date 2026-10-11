@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-10.4" data-note="One AI section: Gemini and OpenAI together in Coach."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-11.1" data-note="Sunday test works without AI: write, see mistakes, copy to ChatGPT or Gemini."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -216,6 +216,7 @@ div[style*="display:flex"]>input{flex:1;min-width:0}
 #upd.show{display:flex}#upd b{display:block;font-size:15px}#upd span{font-size:12.5px;opacity:.92}#upd .t{flex:1;min-width:0}
 #upd button{width:auto;flex:none;margin:0;min-height:44px;border:0;border-radius:12px;padding:0 14px;font-weight:700;cursor:pointer;background:#fff;color:#1e1b4b}#upd button.l{background:rgba(255,255,255,.18);color:#fff}
 @keyframes updin{from{transform:translateY(-20px);opacity:0}to{transform:none;opacity:1}}
+a.btn{display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:14px;text-decoration:none;font-weight:700;margin:5px 0}a.btn.sec{background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--bd)}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
@@ -277,7 +278,7 @@ function privCard(){const r=clamp(today());let tot=0,dots='';for(let s=S0;s<=r&&
  return `<div class="card nb" style="--c:#ffd166"><span class="nbe">🔒</span><div style="flex:1"><div class="mu">Private goal</div><b style="font-size:26px">${p.cur} day streak</b><div class="mu">best ${p.best} · ${tot} day${tot===1?'':'s'} in total</div><div class="mu" style="margin-top:4px;letter-spacing:2px">${dots}</div></div></div>`}
 function privRow(s,lbl){const p=pst(),L=lbl||(s===clamp(today())?'':pd(s).toLocaleDateString('en-IN',{day:'numeric',month:'short'}));return `<label class="row"><input type="checkbox" data-a="np" data-d="${s}" ${st.days[s]&&st.days[s].np?'checked':''}><span>${L?L+' · ':''}🔒 Private: No-M day<br><span class="mu">Streak ${p.cur} · Best ${p.best}</span></span></label>`}
 function ctl(k,s,rest){const d=st.days[s]||{};
- if(k==='wd')return isSun(s)?'<button class="plus" data-a="aistart">▶</button>':'<button class="plus" data-a="gow">+</button>';
+ if(k==='wd')return isSun(s)?'<button class="plus" data-a="otx" data-v="start">▶</button>':'<button class="plus" data-a="gow">+</button>';
  if(k==='rd')return `<input type="number" class="tm" inputmode="numeric" min="0" placeholder="pages" data-pg="1" data-d="${s}" value="${d.pg||''}" ${isLocked(s)?'disabled':''}>`;
  if(rest)return '';
  return `<input type="number" class="tm" inputmode="decimal" min="0" placeholder="min" data-t="${k}" data-d="${s}" value="${(d.t&&d.t[k])||''}" ${isLocked(s)?'disabled':''}>`}
@@ -436,10 +437,10 @@ async function aiAct(a){const v=st.vt;
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='aians'){e.preventDefault();aiAct('aians')}});
 const chipsOf=(ws,c)=>ws.length?`<div class="chips">${ws.map(w=>`<span style="--c:${c}">${E(w.word)}</span>`).join('')}</div>`:'<div class="mu">None 🎉</div>';
 function vocabCard(s){const n=st.words.filter(w=>w.date===s).length;
- if(isSun(s)){const c=wkWords(s).length,v=st.vt,go=v&&v.wk===mon(s)&&v.ph!=='fin';
-  return `<div class="card hero w"><div style="font-weight:700">🧠 AI Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">${c} words • 5 question types</div><div class="mu">Test → Revise → Retest</div><button data-a="aistart" style="background:#fff;color:#7c3aed;margin-top:12px">${go?'Continue AI Test':'Start AI Test'}</button></div>`}
+ if(isSun(s)){const c=wkWords(s).length,o=st.ot,same=o&&o.wk===mon(s),go=same&&!o.done,dn=same&&o.done;
+  return `<div class="card hero w"><div style="font-weight:700">📝 Sunday Vocabulary Test</div><div class="big2">${c} words</div><div class="mu">Write answers • see mistakes • copy to AI</div><button data-a="otx" data-v="start" style="background:#fff;color:#7c3aed;margin-top:12px">${dn?'See result':go?'Continue test':'Start test'}</button></div>`}
  return `<div class="card"><b>📚 Vocabulary</b><div class="mu">10 new words</div><div class="mu">Today's progress: ${n} / 10</div><div class="mu">This week: ${wkWords(s).length} / ${wkTarget(s)}</div><div class="bar" style="margin:8px 0"><i style="width:${Math.min(n,10)*10}%"></i></div>${n&&!(st.wp||{})[today()]?`<div class="warn" style="margin:8px 0">⏳ You added ${n} word${n===1?'':'s'} today but did not practise. Practise for 5 minutes now.</div>`:(st.wp||{})[today()]?'<div class="mu">✅ Practised today</div>':''}<div class="two"><button class="sec" data-a="gow">Add words</button><button data-a="spstart" data-v="rec">🔊 Practice now</button></div></div>`}
-function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Test → Review → Weak word revision → Retest.</div><button data-a="aistart">🧠 Start AI Test</button></div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
+function addBox(){return isSun()?`<div class="card"><h2 style="margin-top:0">🔒 Sunday = test day</h2><div class="mu">No new words on Sunday. Write the test, see your mistakes, then check them with AI.</div><button data-a="otx" data-v="start">📝 Start test</button>${aiReady()?'<button class="sec" data-a="aistart">🧠 AI test (optional)</button>':''}</div><button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`:`<div class="card"><h2 style="margin-top:0">✨ Add words</h2><div class="mu">Write only the word. AI writes the meaning and example. Many words? Use commas: ability, deadline, confirm</div><input type="text" id="nw" placeholder="Word (or many, with commas)" autocomplete="off" autocapitalize="off" spellcheck="false"><button data-a="addw" ${fillBusy?'disabled':''}>${fillBusy?'✨ AI is writing…':'Add word'}</button></div>${pendingN()&&!fillBusy?`<button class="sec" data-a="fillai">✨ Fill meaning with AI (${pendingN()} words)</button>`:''}<button class="sec" data-a="spstart">🔊 Spelling check (listen &amp; write)</button>${wTools()}`}
 function geminiCard(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.status==='fail'?'🔴 Connection failed':'⚪ Not configured';
  return `<div class="mu">API key (Google AI Studio)</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div>`}
 function aiHub(){const p=aiGet().prov==='openai'?'openai':'gemini';
@@ -462,14 +463,63 @@ function vRev(v){const c=cats(v),ws=[...c.K,...c.N];
  return `<h1>Weak Word Revision</h1><div class="mu">Read each word. Then say or write one new sentence with it.</div>`+ws.map(w=>`<div class="card wcard"><b>${E(w.word)}</b><div>${E(w.mean)}</div><div class="mu">Spelling: <b>${E(w.word)}</b></div><div class="mu">Example: ${E(w.sent||'-')}</div><input type="text" placeholder="✍️ Now use it in your own sentence"></div>`).join('')+`<button data-a="aiq2">Start Weak Word Retest</button>`}
 function vFin(v){const T=v.log.length,n=v.rev.length,imp=v.log2.filter(e=>e.r==='c'&&!e.sp).length,still=v.log2.filter(e=>!(e.r==='c'&&!e.sp)).map(e=>gw(e.id)).filter(Boolean),sp=v.log2.filter(e=>e.sp).length;
  return `<h1>Final Revision Result</h1><div class="card hero w"><div class="mu">🏁 Final score</div><div class="big2">${Math.round((T-n+imp)/T*100)}%</div></div><div class="stats"><div><b>${n}</b>Weak before revision</div><div><b>${imp}</b>Words improved</div><div><b>${still.length}</b>Still weak</div><div><b>${sp}</b>Spelling mistakes left</div></div><h2>Still weak</h2>${chipsOf(still,'#fb7185')}<button style="margin-top:16px" data-a="aiquit">Back to Today</button><button class="sec" data-a="aireset">Restart test</button>`}
+/* ===== SUNDAY WRITTEN TEST (no AI needed) ===== */
+const OTN={spell:'🔊 Listen and spell',sent:'✍️ Write a sentence',mean:'💬 Write the meaning'};
+const otKey=q=>q.id+q.t,otAns=(o,q)=>String((o.ans||{})[otKey(q)]||'').trim();
+function otRows(o){return o.q.map(q=>({q,w:gw(q.id),a:otAns(o,q)})).filter(r=>r.w)}
+function otStart(){const ws=wkWords(today());if(!ws.length){toast('No words this week yet. Add words Monday to Saturday.');return}
+ const TY=['spell','sent','mean'];st.ot={wk:mon(today()),q:shuf(ws).map((w,i)=>({id:w.id,t:(st.sm&&st.sm[w.id])?'spell':TY[i%3]})),i:0,ans:{},done:false};
+ save();view='ot';animNext=true;render()}
+function otGrab(){const o=st.ot,el=$('#otin');if(!o||o.done||!el)return;const q=o.q[o.i];if(q){o.ans=o.ans||{};o.ans[otKey(q)]=el.value.trim()}}
+function otFinish(){const o=st.ot;o.done=true;st.sm=st.sm||{};
+ otRows(o).forEach(r=>{if(r.q.t==='spell'&&r.a){if(nm(r.a)===nm(r.w.word))clearSp(r.w);else markSp(r.w,r.a)}});
+ st.wp=st.wp||{};st.wp[today()]=(st.wp[today()]||0)+1;save();animNext=true;render()}
+function otMistakes(o){return otRows(o).filter(r=>r.q.t==='spell'&&r.a&&nm(r.a)!==nm(r.w.word)).map(r=>r.a+' → '+r.w.word)}
+function otAllText(o){const L=['Please check my English vocabulary test. For each item say Correct, Partly correct or Wrong. Show the corrected answer and one short reason in very simple English.',''];
+ otRows(o).forEach((r,i)=>{const n=(i+1)+') Word: '+r.w.word+' | ';
+  if(!r.a)L.push(n+'Task: '+OTN[r.q.t].replace(/^\S+\s/,'')+' | My answer: (skipped)');
+  else if(r.q.t==='spell')L.push(n+'Task: spell the word I heard | My spelling: '+r.a+' | '+(nm(r.a)===nm(r.w.word)?'(correct)':'Correct spelling: '+r.w.word));
+  else if(r.q.t==='sent')L.push(n+'Task: write a sentence using the word | My sentence: '+r.a);
+  else L.push(n+'Task: write the meaning | My meaning: '+r.a+(r.w.mean?' | Saved meaning: '+r.w.mean:''))});return L.join('\n')}
+function copyText(t){const done=()=>toast('✅ Copied. Paste it in ChatGPT or Gemini');
+ const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Copy failed. Press and hold the text below to copy.')}ta.remove()};
+ if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb()}
+function otAct(v){const o=st.ot;
+ if(v==='start'){if(o&&o.wk===mon(today())){view='ot';animNext=true;render()}else otStart();return}
+ if(v==='restart'){if(confirm('Start a new test? Your answers so far will be removed.'))otStart();return}
+ if(!o)return;
+ if(v==='next'||v==='skip'){if(v==='next')otGrab();else{const q=o.q[o.i];if(q&&o.ans)delete o.ans[otKey(q)]}o.i++;if(o.i>=o.q.length)return otFinish();save();render();return}
+ if(v==='back'){otGrab();o.i=Math.max(0,o.i-1);save();render();return}
+ if(v==='fin'){otGrab();if(confirm('Finish now? Questions you did not answer are skipped.'))otFinish();return}
+ if(v==='exit'){otGrab();save();view='today';animNext=true;render();return}
+ if(v==='cp1'){copyText(otMistakes(o).join('\n')||'No spelling mistakes');return}
+ if(v==='cp2'){copyText(otAllText(o));return}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='otin'&&e.target.tagName==='INPUT'){e.preventDefault();otAct('next')}});
+function otHome(){const c=wkWords(today()).length;
+ return `<h1>Sunday Test</h1><div class="card hero w"><div class="big2">${c} words</div><div class="mu">Write your answers. See your mistakes at the end. Copy them to ChatGPT or Gemini to check.</div></div>`+(c?`<button data-a="otx" data-v="start">▶ Start test</button>`:'<div class="warn">No words this week yet. Add words Monday to Saturday.</div>')+`<button class="sec" data-a="nav" data-v="today">Back</button>`}
+function vOT(){const o=st.ot;if(!o||o.wk!==mon(today()))return otHome();if(o.done)return otRes(o);
+ const q=o.q[o.i],w=q&&gw(q.id),n=o.q.length;if(!w)return `<h1>Sunday Test</h1><div class="card">This word was removed.</div><button data-a="otx" data-v="skip">Next</button>`;
+ const val=otAns(o,q),long=q.t!=='spell',ans=o.q.filter(x=>otAns(o,x)).length;
+ let body='';
+ if(q.t==='spell')body=(canSay?`<button class="say" data-a="say" data-v="w">🔊</button><div class="mu">Tap to hear the word</div><div class="two" style="margin-top:10px"><button class="sec" data-a="say" data-v="s">💬 In a sentence</button><button class="sec" data-a="say" data-v="slow">🐢 Slow</button></div>`:`<div class="mu">Your browser cannot speak. Starts with "${E(w.word[0])}".</div>`)+`<div class="mu" style="margin:8px 0">${w.word.length} letters${w.mean?' · Meaning: '+E(w.mean):''}</div>`;
+ else body=`<div class="big2">${E(w.word)}</div><div class="mu">${q.t==='sent'?'Write one sentence using this word.':'Write what it means, in your own words.'}</div>`;
+ const inp=long?`<textarea id="otin" rows="3" placeholder="Your answer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="width:100%;margin:8px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--bd);min-height:90px">${E(val)}</textarea>`:`<input type="text" id="otin" placeholder="Type the word" value="${E(val)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">`;
+ return `<h1>Sunday Test</h1><div class="card hero w"><div class="mu">Question ${o.i+1} / ${n} · ${ans} answered</div><div class="bar" style="margin-top:10px"><i style="width:${o.i/n*100}%"></i></div></div><div class="card" style="text-align:center"><div class="mu" style="margin-bottom:6px">${OTN[q.t]}</div>${body}${inp}<button data-a="otx" data-v="next">${o.i+1>=n?'Finish':'Next →'}</button><div class="two"><button class="sec" data-a="otx" data-v="back" ${o.i?'':'disabled'}>← Back</button><button class="sec" data-a="otx" data-v="skip">Skip</button></div></div><div class="two"><button class="sec" data-a="otx" data-v="fin">Finish now</button><button class="sec" data-a="otx" data-v="exit">Save and exit</button></div>`}
+function otRes(o){const R=otRows(o),sp=R.filter(r=>r.q.t==='spell'&&r.a),ok=sp.filter(r=>nm(r.a)===nm(r.w.word)),bad=otMistakes(o),wr=R.filter(r=>r.q.t!=='spell'&&r.a),sk=R.filter(r=>!r.a).length,txt=otAllText(o);
+ let h=`<h1>Test Result</h1><div class="card hero w"><div class="mu">Spelling (checked by the app)</div><div class="big2">${ok.length} / ${sp.length}</div><div class="mu">${wr.length} written answers to check with AI · ${sk} skipped</div></div>`;
+ h+=bad.length?`<h2>✍️ Spelling mistakes</h2><div class="mu">Wrong → correct. They are saved on your Words page.</div>`+sp.filter(r=>nm(r.a)!==nm(r.w.word)).map(r=>`<div class="rule" style="--c:#fb7185"><p>${E(r.a)} → <b style="display:inline">${E(r.w.word)}</b></p></div>`).join('')+`<button data-a="otx" data-v="cp1">📋 Copy my mistakes</button>`:(sp.length?'<div class="card">🎉 All spelling answers are correct!</div>':'');
+ if(wr.length)h+=`<h2>📝 Your written answers</h2><div class="mu">The app cannot judge these. Check them with AI.</div>`+wr.map(r=>`<div class="rule" style="--c:#38bdf8"><p><b style="display:inline">${E(r.w.word)}</b> · ${r.q.t==='sent'?'sentence':'meaning'}<br>${E(r.a)}${r.q.t==='mean'&&r.w.mean?`<br><span class="mu">Saved meaning: ${E(r.w.mean)}</span>`:''}${r.q.t==='sent'&&r.w.sent?`<br><span class="mu">Saved example: ${E(r.w.sent)}</span>`:''}</p></div>`).join('');
+ h+=`<button data-a="otx" data-v="cp2">📋 Copy everything for AI check</button><div class="two"><a class="btn sec" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT</a><a class="btn sec" href="https://gemini.google.com/app" target="_blank" rel="noopener">Open Gemini</a></div><details class="card how"><summary>Show the text (press and hold to copy)</summary><textarea readonly rows="8" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--bd)">${E(txt)}</textarea></details>`;
+ if(bad.length)h+=`<button class="sec" data-a="spstart" data-v="">🔁 Practise spelling mistakes</button>`;
+ return h+`<button class="sec" data-a="otx" data-v="restart">New test</button><button class="sec" data-a="nav" data-v="today">Back to Today</button>`}
 function vAI(){const v=st.vt;if(!v||v.wk!==mon(today()))return aiHome();return v.ph==='res'?vRes(v):v.ph==='rev'?vRev(v):v.ph==='fin'?vFin(v):vQ(v)}
 /* ===== SPELLING CHECK (listen and write) ===== */
 const NOSUG='autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" enterkeyhint="done" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"';
 const canSay='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';let lastSay='',sp=null;
 function say(t,rate){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.8;const v=speechSynthesis.getVoices().find(x=>/^en[-_](US|GB|IN)/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
-function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
+function curWord(){if(view==='spell'&&sp&&!sp.done)return gw(sp.q[sp.i]);if(view==='ot'&&st.ot&&!st.ot.done){const q=st.ot.q[st.ot.i];if(q&&q.t==='spell')return gw(q.id)}const v=st.vt;if(view==='ai'&&v&&(v.ph==='q'||v.ph==='q2')){const q2=v.ph==='q2',q=(q2?v.q2:v.q)[q2?v.i2:v.i];if(q&&q.t==='spell')return gw(q.id)}return null}
 function sayWord(m){const w=curWord();if(!w)return;if(m==='s'&&w.sent)say(w.word+'. '+w.sent+'. '+w.word,.85);else say(w.word,m==='slow'?.5:.75)}
-function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
+function autoSay(){const w=curWord(),v=st.vt,f=view==='spell'?sp&&sp.fb:v&&v.fb;if(w&&!f){const k=view+(sp?sp.i:'')+(v?v.ph+v.i+v.i2:'')+(st.ot?st.ot.i:'');if(k!==lastSay){lastSay=k;say(w.word,.75)}}else if(!w)lastSay=''}
 function markSp(w,a){st.sm=st.sm||{};st.sm[w.id]=1;w.mistake=true;w.wrong=a}
 function clearSp(w){if(st.sm)delete st.sm[w.id];w.mistake=false;delete w.wrong}
 async function fillAI(ids){const ws=ids.map(gw).filter(Boolean);if(!ws.length||fillBusy)return;
@@ -555,7 +605,7 @@ const isLocked=s=>!!s&&s<today()&&!calUnlock[s];
 const lockBar=s=>s>=today()?'':isLocked(s)?`<div class="card lockbar"><div class="mu">🔒 This day is over, so it is locked. Your history stays true.</div><button class="sec" data-a="unl" data-v="${s}">🔓 Unlock to fix a mistake</button></div>`:`<div class="card lockbar"><div class="mu">🔓 Unlocked for now. It locks again when you leave.</div></div>`;
 function editor(s){
  const m=!!(st.days[s]&&st.days[s].min),sun=dow(s)===0,lk=isLocked(s);
- const L={wo:['Workout','10 min workout'],wd:sun?['AI Vocabulary Test','AI Vocabulary Test']:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
+ const L={wo:['Workout','10 min workout'],wd:sun?['Vocabulary Test','Vocabulary Test']:['10 words','5 words'],sp:['Speaking (15 min)','5 min speaking'],
   fr:['Frappe ('+(sun?90:70)+' min)','20 min coding'],rd:['Reading (8 pages)','5 pages']};
  let h=lockBar(s)+`<label class="row t-min"><input type="checkbox" data-a="min" data-d="${s}" ${m?'checked':''} ${lk?'disabled':''}><span><b>Minimum day</b><br><span class="mu">Bad day? Do the small version. It still counts.</span></span></label>`;
  T.forEach(k=>{const rest=k==='wo'&&isRest(s);
@@ -566,12 +616,12 @@ function editor(s){
 /* ===== DESIGN V2: groups, progress, habit cards ===== */
 let learnTab='syl',progTab='prog';
 const SEG={learn:[['syl','Syllabus'],['words','Words'],['rules','Rules']],prog:[['prog','Overview'],['week','Weekly']]};
-const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',stats:'stats',coach:'coach'}[v]||'');
+const grpOf=v=>({today:'today',cal:'cal',prog:'prog',week:'prog',syl:'learn',words:'learn',rules:'learn',spell:'learn',ai:'learn',ot:'today',stats:'stats',coach:'coach'}[v]||'');
 function withSeg(v,h){const g=['syl','words','rules'].includes(v)?'learn':['prog','week'].includes(v)?'prog':'';if(!g)return h;
  return '<div class="seg">'+SEG[g].map(x=>`<button class="${x[0]===v?'on':''}" data-a="vw" data-v="${x[0]}">${x[1]}</button>`).join('')+'</div>'+h}
-function rowText(k,s,m,sun,rest){const N={wo:'Workout',wd:sun?'AI Vocabulary Test':'English words',sp:'Speaking',fr:'Frappe',rd:'Reading'},d=st.days[s]||{},t=d.t||{};let sub='',p=-1;
+function rowText(k,s,m,sun,rest){const N={wo:'Workout',wd:sun?'Vocabulary Test':'English words',sp:'Speaking',fr:'Frappe',rd:'Reading'},d=st.days[s]||{},t=d.t||{};let sub='',p=-1;
  if(k==='wo')sub=rest?'Rest day · counts as done ✓':m?'Minimum: 10 min workout':'Do your workout';
- else if(k==='wd'){if(sun)sub='Test your week of words';else{const n=st.words.filter(w=>w.date===s).length,g=m?5:10;sub='Target '+g+' words · '+n+' added';p=n/g}}
+ else if(k==='wd'){if(sun)sub='Written test of your week of words';else{const n=st.words.filter(w=>w.date===s).length,g=m?5:10;sub='Target '+g+' words · '+n+' added';p=n/g}}
  else if(k==='sp'){const g=m?5:15,x=+t.sp||0;sub='Target '+g+' min'+(x?' · '+x+' logged':'');p=x/g}
  else if(k==='fr'){const g=m?20:(sun?90:70),x=+t.fr||0;sub='Target '+g+' min'+(x?' · '+x+' logged':'');p=x/g}
  else{const g=m?5:8,x=+d.pg||0;sub='Target '+g+' pages'+(x?' · '+x+' read':'');p=x/g}
@@ -952,7 +1002,7 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
+ if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===grpOf(view)));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
@@ -1025,6 +1075,7 @@ document.addEventListener('click',e=>{
  else if(a==='motgo'){motGo(true);return}
  else if(a==='say'){sayWord(v);return}
  else if(/^sp(start|again|chk|next|quit)$/.test(a)){spAct(a,v);return}
+ else if(a==='otx'){otAct(v);return}
  else if(/^ai|^keyeye/.test(a)){aiAct(a);return}
  else if(a==='th'){st.theme=v;save()}
  else if(a==='snd'){st.mute=v==='0';save()}
