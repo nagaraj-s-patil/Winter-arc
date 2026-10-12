@@ -94,3 +94,21 @@ A 90-day habit tracker (1 Oct 2026 to 31 Dec 2026) in **one HTML file**. No libr
 
 ## Daily 10 practice
 Every day: 5 words you got wrong + 5 known words (if nothing is wrong, 10 known words). Spelling is auto-checked; sentences you write are copied and checked manually with AI. A wrong word leaves the wrong list after one correct spelling.
+
+## Cloud sync (Firebase, private)
+Settings → Cloud sync → Sign in with Google. Data is saved to Firestore at `users/{your uid}`.
+One-time Firebase setup:
+1. Authentication → Sign-in method → Google → Enable. Settings → Authorized domains → add `nagaraj-s-patil.github.io`.
+2. Firestore Database → Create database (Production mode).
+3. Firestore → Rules → paste this and Publish:
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
+```
+AI keys, chat history and the device push subscription are never uploaded. Export backup still works.

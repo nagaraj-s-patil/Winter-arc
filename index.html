@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-12.1" data-note="Daily 10 practice: 5 wrong + 5 known words (or 10 known if nothing is wrong)."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-12.2" data-note="Cloud sync: save your data to your own Google account (Settings)."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -240,7 +240,7 @@ const SY={
 const blank=()=>({days:{},weeks:{},words:[],syl:{}});
 let st=blank();
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.days)st=Object.assign(blank(),s)}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){alert('Could not save. Browser storage is blocked or full.')}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){alert('Could not save. Browser storage is blocked or full.');return}try{clMark()}catch(e){}}
 
 /* ===== HELPERS ===== */
 const $=q=>document.querySelector(q);
@@ -448,7 +448,7 @@ function geminiCard(){const c=aiGet(),b=c.status==='ok'?'🟢 Connected':c.statu
  return `<div class="mu">API key (Google AI Studio)</div><div style="display:flex;gap:8px"><input type="password" id="aik" placeholder="${c.key?'•••••••• saved (leave empty to keep)':'Paste your Gemini API key'}" autocomplete="off"><button class="sec" data-a="keyeye" style="width:84px;margin:5px 0">Show</button></div><div class="mu" style="margin-top:8px">Model</div><input type="text" id="aim" value="${E(c.model)}"><div class="two" style="margin-top:10px"><button data-a="aisave">Save API Settings</button><button class="sec" data-a="aitest">Test API Connection</button></div><div class="mu" style="margin-top:10px" id="aist">Status: ${b}</div>`}
 function aiHub(){const p=aiGet().prov==='openai'?'openai':'gemini';
  return `<div class="card"><h2 style="margin-top:0">🤖 AI settings</h2><div class="warn">Keys are stored only in this browser, in their own place, never in your backup file. Do not use a personal key on a public website such as GitHub Pages.</div><div class="seg"><button class="${p==='gemini'?'on':''}" data-a="aprov" data-v="gemini">Google Gemini</button><button class="${p==='openai'?'on':''}" data-a="aprov" data-v="openai">OpenAI</button></div><div class="mu" style="margin-bottom:6px">The selected AI is used for everything: coach chat, daily message, vocabulary test, quizzes and word help.</div>${p==='openai'?openaiCard():geminiCard()}</div>`+(p==='gemini'?`<button class="sec" data-a="aistart">🧪 Open AI test (this week's words)</button>`+usePanel():'')}
-function vSet(){return `<h1>Settings</h1>${uiCard()}<div class="card"><h2 style="margin-top:0">🤖 AI</h2><div class="mu">Gemini and OpenAI are now in one place.</div><button data-a="nav" data-v="coach">Open AI settings</button></div>`+dataCard()}
+function vSet(){return `<h1>Settings</h1>${cloudCard()}${uiCard()}<div class="card"><h2 style="margin-top:0">🤖 AI</h2><div class="mu">Gemini and OpenAI are now in one place.</div><button data-a="nav" data-v="coach">Open AI settings</button></div>`+dataCard()}
 function aiHome(){const c=aiGet(),n=wkWords(today()).length;
  return `<h1>AI Vocabulary Test</h1><div class="card hero w"><div class="big2">${n} words</div><div class="mu">5 question types • Test → Revise → Retest</div></div>`+(!aiReady()?`<div class="warn">⚠️ Add an AI key in Coach → AI settings.</div><button data-a="aigoset">Open AI settings</button>`:!n?`<div class="card">No words this week yet. Add words Monday to Saturday first.</div>`:`<button data-a="aibegin">🧠 Start AI Test</button>`)}
 function vQ(v){const q2=v.ph==='q2',L=q2?v.q2:v.q,i=q2?v.i2:v.i,lg=q2?v.log2:v.log,q=L[i],w=gw(q.id),b=bld(q,w),n=k=>lg.filter(e=>e.r===k).length,f=v.fb;
@@ -1103,6 +1103,68 @@ function render(){
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
  const a=$('#ans');if(a)a.focus();const nw=$('#nw');if(nw&&focusNw){nw.focus();focusNw=false}if(view==='ai'||view==='spell'){const x=$('#aians')||$('#spans');if(x)x.focus()}if(view==='coach'){const l=$('#chat');if(l)l.scrollTop=l.scrollHeight;const x=$('#cin');if(x&&chatFocus&&!chatBusy)x.focus();chatFocus=false}autoSay();checkAch()}
 
+
+/* ===== CLOUD SYNC: Firebase (Google login, private, your account only) ===== */
+const FBC={apiKey:"AIzaSyAm_T-xv_CVI3kMjH1uC0NVugiCU3r1XTU",authDomain:"winter-arc-3c3a6.firebaseapp.com",projectId:"winter-arc-3c3a6",storageBucket:"winter-arc-3c3a6.firebasestorage.app",messagingSenderId:"224352836597",appId:"1:224352836597:web:45576c6affe73584249ebc"};
+var CK='winterArc.cloud.v1',FBV='10.14.1',CL={fb:null,user:null,busy:false,msg:'',timer:0,quiet:false,last:0};
+function clGet(){try{return JSON.parse(localStorage.getItem(CK))||{}}catch(e){return{}}}
+function clSet(o){try{localStorage.setItem(CK,JSON.stringify(Object.assign(clGet(),o)))}catch(e){}}
+function clStatus(m){CL.msg=m;const e=document.getElementById('clst');if(e)e.textContent=m}
+function clMark(){if(!CL||CL.quiet||!clGet().on)return;clSet({dirty:true});clearTimeout(CL.timer);CL.timer=setTimeout(()=>clSync(),3000)}
+async function clLoad(){
+ if(CL.fb)return CL.fb;
+ if(window.__fbMock)return CL.fb=window.__fbMock;
+ const B='https://www.gstatic.com/firebasejs/'+FBV+'/';
+ const [a,au,fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+ const app=a.initializeApp(FBC);
+ return CL.fb={au,fs,auth:au.getAuth(app),db:fs.getFirestore(app)}}
+async function clInit(){
+ if(!clGet().on)return;
+ try{const f=await clLoad();clStatus('Connecting…');
+  f.au.onAuthStateChanged(f.auth,u=>{CL.user=u||null;if(u){clSet({email:u.email||'',uid:u.uid});clSync()}else{clStatus('Signed out. Sign in to sync.');if(view==='set')render()}})
+ }catch(e){clStatus('Cloud not reachable (offline?). Your data is safe on this device.')}}
+async function clSignIn(){
+ try{clStatus('Opening Google sign-in…');const f=await clLoad();clSet({on:true});
+  if(!CL.user){await f.au.signInWithPopup(f.auth,new f.au.GoogleAuthProvider())}
+  CL.user=f.auth.currentUser;if(CL.user)clSet({email:CL.user.email||'',uid:CL.user.uid});
+  await clSync();clInit();render()
+ }catch(e){const c=(e&&e.code)||'';clStatus(/dynamically imported|Failed to fetch|import/i.test((e&&e.message)||'')?'Could not load Google sign-in. Check your internet and try again.':c==='auth/popup-blocked'?'Popup blocked. Allow popups for this site and try again.':c==='auth/unauthorized-domain'?'This site is not in Firebase Authorized domains. Add nagaraj-s-patil.github.io there.':c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'?'Sign-in cancelled.':'Sign-in failed: '+(c||e.message||e));if(!CL.user)clSet({on:false});if(view==='set')render()}}
+async function clOut(){
+ if(!confirm('Sign out and stop syncing? Your data stays on this device and in the cloud.'))return;
+ try{const f=await clLoad();await f.au.signOut(f.auth)}catch(e){}
+ CL.user=null;clSet({on:false,dirty:false});clStatus('Not signed in.');render()}
+const clTime=()=>new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+function clPayload(){const o=Object.assign({},st);delete o.notify;return JSON.stringify(o)}
+async function clSync(){
+ if(CL.busy||!clGet().on)return;
+ if(!CL.user){return}
+ CL.busy=true;
+ try{
+  const f=await clLoad(),ref=f.fs.doc(f.db,'users',CL.user.uid),snap=await f.fs.getDoc(ref),c=clGet(),dirty=!!c.dirty;
+  const cd=snap.exists()?snap.data():null;
+  const push=async()=>{const d=clPayload();if(d.length>900000){clStatus('Data is too big to sync (over 900 KB). Use Export backup and tell me.');return}
+   const u=Date.now();await f.fs.setDoc(ref,{d,u,v:1});clSet({last:u,dirty:false});clStatus('Synced '+clTime())};
+  const pull=()=>{try{localStorage.setItem('winterArc.prev',JSON.stringify(st))}catch(e){}
+   const o=JSON.parse(cd.d);if(!o||!o.days)throw new Error('bad cloud data');
+   CL.quiet=true;const nt=st.notify;st=Object.assign(blank(),o);if(nt)st.notify=nt;save();CL.quiet=false;
+   clSet({last:cd.u,dirty:false});clStatus('Synced '+clTime()+' (loaded from cloud)');render()};
+  if(!cd){await push()}
+  else if(cd.u===c.last){if(dirty)await push();else clStatus('Synced '+clTime())}
+  else if(!dirty){pull()}
+  else{
+   if(confirm('Cloud has data from another device, and this device also has changes.\n\nOK = use the CLOUD data (this device is replaced; a safety copy is kept).\nCancel = keep THIS device (cloud is overwritten).'))pull();
+   else if(confirm('Overwrite the cloud copy with this device\'s data?'))await push();
+   else clStatus('Sync paused. Nothing changed.')}
+ }catch(e){const c=(e&&e.code)||'';clStatus(c==='permission-denied'?'Cloud refused: set the Firestore rules (see README), then tap Sync now.':'Sync failed ('+(c||e.message||e)+'). Will retry.')}
+ CL.busy=false}
+const cloudCard=()=>{const c=clGet(),on=!!(c.on&&CL.user);
+ return '<div class="card"><h2 style="margin-top:0">☁️ Cloud sync</h2><div class="mu">Saves your data to your own Google account (Firebase, free). Only you can read it. AI keys stay on this device.</div>'
+ +(on?'<div class="mu" style="margin-top:8px">Signed in: <b>'+E(c.email||'')+'</b></div><div class="mu" id="clst" style="margin-top:4px">'+E(CL.msg||'Connecting…')+'</div><div class="two" style="margin-top:12px"><button data-a="clnow">Sync now</button><button class="sec" data-a="clout">Sign out</button></div>'
+  :'<div class="mu" id="clst" style="margin-top:8px">'+E(CL.msg||'Not signed in. Your data is only on this device.')+'</div><button style="margin-top:12px" data-a="clin">Sign in with Google</button>')+'</div>'};
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(clGet().dirty){clearTimeout(CL.timer);clSync()}}else if(clGet().on&&Date.now()-CL.last>20000){CL.last=Date.now();clSync()}});
+window.addEventListener('online',()=>{if(clGet().on)clSync()});
+setTimeout(clInit,0);
+
 /* ===== EVENTS ===== */
 document.addEventListener('click',e=>{
  const b=e.target.closest('button[data-a]');if(!b)return;
@@ -1189,7 +1251,10 @@ document.addEventListener('click',e=>{
   l.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,2)],{type:'application/json'}));
   l.download='winter-arc-backup-'+today()+'.json';l.click();return}
  else if(a==='imp'){$('#file').click();return}
- else if(a==='rst'){if(!confirm('Delete ALL data? This cannot be undone.'))return;st=blank();localStorage.removeItem(KEY)}
+ else if(a==='clin'){clSignIn();return}
+ else if(a==='clnow'){clStatus('Syncing…');clSync();return}
+ else if(a==='clout'){clOut();return}
+ else if(a==='rst'){if(!confirm('Delete ALL data? This cannot be undone.'+(clGet().on?'\nCloud sync is ON: the cloud copy will also be emptied.':'')))return;st=blank();localStorage.removeItem(KEY);if(clGet().on)save()}
  render()});
 
 document.addEventListener('change',e=>{                     // checkboxes + week select
