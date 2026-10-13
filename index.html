@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-12.2" data-note="Cloud sync: save your data to your own Google account (Settings)."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-13.1" data-note="Cloud data is now stored as readable fields (days, words, weeks) in Firebase."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -1135,6 +1135,8 @@ async function clOut(){
  CL.user=null;clSet({on:false,dirty:false});clStatus('Not signed in.');render()}
 const clTime=()=>new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 function clPayload(){const o=Object.assign({},st);delete o.notify;return JSON.stringify(o)}
+function clOk(v,dp){if(dp>15)return false;if(Array.isArray(v)){for(const x of v){if(Array.isArray(x)||!clOk(x,dp+1))return false}return true}
+ if(v&&typeof v==='object'){for(const k of Object.keys(v)){if(!k||/^__.*__$/.test(k)||!clOk(v[k],dp+1))return false}}return true}
 async function clSync(){
  if(CL.busy||!clGet().on)return;
  if(!CL.user){return}
@@ -1142,10 +1144,10 @@ async function clSync(){
  try{
   const f=await clLoad(),ref=f.fs.doc(f.db,'users',CL.user.uid),snap=await f.fs.getDoc(ref),c=clGet(),dirty=!!c.dirty;
   const cd=snap.exists()?snap.data():null;
-  const push=async()=>{const d=clPayload();if(d.length>900000){clStatus('Data is too big to sync (over 900 KB). Use Export backup and tell me.');return}
-   const u=Date.now();await f.fs.setDoc(ref,{d,u,v:1});clSet({last:u,dirty:false});clStatus('Synced '+clTime())};
+  const push=async()=>{const d=clPayload();if(d.length>800000){clStatus('Data is too big to sync (over 800 KB). Use Export backup and tell me.');return}
+   const u=Date.now();const o=JSON.parse(d);await f.fs.setDoc(ref,clOk(o,0)?{data:o,u,v:2}:{d,u,v:1});clSet({last:u,dirty:false});clStatus('Synced '+clTime())};
   const pull=()=>{try{localStorage.setItem('winterArc.prev',JSON.stringify(st))}catch(e){}
-   const o=JSON.parse(cd.d);if(!o||!o.days)throw new Error('bad cloud data');
+   const o=cd.data?JSON.parse(JSON.stringify(cd.data)):JSON.parse(cd.d);if(!o||!o.days)throw new Error('bad cloud data');
    CL.quiet=true;const nt=st.notify;st=Object.assign(blank(),o);if(nt)st.notify=nt;save();CL.quiet=false;
    clSet({last:cd.u,dirty:false});clStatus('Synced '+clTime()+' (loaded from cloud)');render()};
   if(!cd){await push()}
