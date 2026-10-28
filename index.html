@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-13.1" data-note="Cloud data is now stored as readable fields (days, words, weeks) in Firebase."><title>Winter Arc Tracker</title>
+<meta name="theme-color" content="#0d0f14"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon-64.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="app-version" content="2026-10-28.1" data-note="New Lavender look: pastel cards, week strip and a + button. Change it anytime in Settings > Theme."><title>Winter Arc Tracker</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--wo:#ff5a4d;--wd:#d65bff;--sp:#4da3ff;--fr:#34d27b;--rd:#ffc933;--bg:#0a0b1a;--card:rgba(24,27,56,.72);--card2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.11);--tx:#f4f5ff;--mu:#9ba4cc;--ac:#22d3ee;--gr:#34d399;--ye:#fbbf24;--re:#fb7185;--gy:rgba(255,255,255,.1);--g1:linear-gradient(135deg,#06b6d4,#7c3aed 60%,#ec4899);color-scheme:dark}
 html{min-height:100%;background:radial-gradient(620px 400px at 90% -90px,rgba(139,92,246,.5),transparent 70%),radial-gradient(520px 380px at 0% 0,rgba(34,211,238,.3),transparent 70%),radial-gradient(520px 420px at 50% 100%,rgba(236,72,153,.2),transparent 70%),var(--bg);background-attachment:fixed}
@@ -220,9 +220,66 @@ a.btn{display:flex;align-items:center;justify-content:center;min-height:50px;bor
 .seg{overflow:hidden}.seg button{flex:1 1 0;min-width:0;padding:0 6px;font-size:13px;white-space:nowrap}.rule.nbrow{display:block}
 .ta{width:100%;margin:8px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--bd);min-height:90px;font:inherit;color:inherit;outline:0}
 .wnl{margin:8px 0 0;font-size:14px;text-align:left}.wnl .two{margin-top:6px}.wnl>button.sec{width:auto;min-height:36px;margin:2px 0;padding:0 14px;font-size:13px}.wnl button[aria-label]{width:auto;min-height:30px;margin:0 0 0 6px;padding:0 10px;font-size:12px}
+html[data-theme=lavender]{--bg:#f4f6fb;--card:#fff;--card2:#eef1f7;--bd:#dde2ee;--tx:#14172a;--mu:#6b7390;--ac:#4f46e5;--g1:linear-gradient(135deg,#4f46e5,#6366f1);--gy:#e3e7f1;color-scheme:light;background:#f4f6fb}
+html[data-theme=lavender] h1{background:none;-webkit-text-fill-color:var(--tx)}html[data-theme=lavender] h2{color:#6366f1}
+html[data-theme=lavender] input[type=text],html[data-theme=lavender] input[type=number],html[data-theme=lavender] select,html[data-theme=lavender] .row input.tm{background:#fff}
+html[data-theme=lavender] nav{background:rgba(255,255,255,.92)}html[data-theme=lavender] summary{background:#fff}
+html[data-theme=lavender] .row:has(input[type=checkbox]:checked){background:color-mix(in srgb,var(--c) 14%,#fff)}
+html[data-theme=lavender] .row:has(input[type=checkbox]:checked)>span,html[data-theme=lavender] .rule p,html[data-theme=lavender] .rule p b{color:var(--tx)}
+html[data-theme=lavender] .warn{color:#9f1239}html[data-theme=lavender] .warn.ok{color:#065f46}html[data-theme=lavender] .wcard>b{color:#6d28d9}
+html[data-theme=lavender] .tli::before{box-shadow:0 0 0 4px #f4f6fb}html[data-theme=lavender] .mo{color:var(--tx)}
+html[data-theme=lavender]{--bg:#e4defb;--card:#fff;--card2:#f1eefc;--bd:transparent;--tx:#1d1b3b;--mu:#7a789c;--ac:#5b5ef0;--g1:linear-gradient(135deg,#5b5ef0,#6d62f5);--gy:#e6e2f8;color-scheme:light;background:#e4defb}
+html[data-theme=lavender] body{font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif}
+html[data-theme=lavender] h1{font-size:22px;margin:0;color:var(--tx)}
+html[data-theme=lavender] h2{color:#7a789c;letter-spacing:.06em}
+html[data-theme=lavender] .hd{background:#fff;border-radius:24px;padding:10px 12px 10px 18px;box-shadow:0 6px 24px rgba(91,94,240,.1);margin-bottom:14px}
+html[data-theme=lavender] .gear{background:#f1eefc;border:0}
+html[data-theme=lavender] .card{border:0;border-radius:26px;box-shadow:0 8px 28px rgba(91,94,240,.09)}
+html[data-theme=lavender] .card .row{background:#f6f4fe}
+html[data-theme=lavender] button{border-radius:999px;box-shadow:0 8px 20px rgba(91,94,240,.28);color:#fff}
+html[data-theme=lavender] button.sec{background:#fff;color:var(--ac);border:1.5px solid #d9d4f7;box-shadow:none}
+html[data-theme=lavender] button.dng{background:#fff;color:#e0426a;border:1.5px solid #f3c2cf}
+html[data-theme=lavender] .hero{background:linear-gradient(135deg,#d7d1fb,#efeaff);color:var(--tx);box-shadow:0 8px 28px rgba(91,94,240,.12)}
+html[data-theme=lavender] .hero::before{display:none}html[data-theme=lavender] .hero::after{opacity:.12;color:#5b5ef0}
+html[data-theme=lavender] .hero .mu{color:#5f5d88}html[data-theme=lavender] .hero .big2,html[data-theme=lavender] .hero .big{color:var(--tx);-webkit-text-fill-color:var(--tx)}
+html[data-theme=lavender] .hero .bar{background:rgba(91,94,240,.18)}html[data-theme=lavender] .hero .bar i{background:#5b5ef0}
+html[data-theme=lavender] .bar i{background:linear-gradient(90deg,#5b5ef0,#8b7bf7)}
+html[data-theme=lavender] .row{border:0;border-radius:24px;box-shadow:0 6px 18px rgba(91,94,240,.07);background:#fff;--c:#5b5ef0}
+html[data-theme=lavender] .row[class*=" t-"]{border-left:0}
+html[data-theme=lavender] .row.t-wo{background:#ffe6ec;--c:#ef5b7e}html[data-theme=lavender] .row.t-wd{background:#ece6ff;--c:#8b5cf6}
+html[data-theme=lavender] .row.t-sp{background:#def0ff;--c:#3b9cf0}html[data-theme=lavender] .row.t-fr{background:#dcf6e7;--c:#27ae6b}
+html[data-theme=lavender] .row.t-rd{background:#fff0dc;--c:#f09a2b}html[data-theme=lavender] .row.t-min{background:#eceaf6;--c:#7a789c}
+html[data-theme=lavender] .row:has(input[type=checkbox]:checked){background:color-mix(in srgb,var(--c) 26%,#fff)}
+html[data-theme=lavender] input[type=checkbox]{border-color:var(--c);background:#fff}
+html[data-theme=lavender] input[type=checkbox]::after{border-color:#fff}
+html[data-theme=lavender] input[type=checkbox]:checked{background:var(--c)}
+html[data-theme=lavender] .row input.tm{background:rgba(255,255,255,.8);border:0;border-radius:14px}
+html[data-theme=lavender] input[type=text],html[data-theme=lavender] input[type=number],html[data-theme=lavender] select,html[data-theme=lavender] textarea{background:#f1eefc;border:0;border-radius:16px}
+html[data-theme=lavender] summary{border:0;border-radius:22px;box-shadow:0 6px 18px rgba(91,94,240,.07)}
+html[data-theme=lavender] nav{left:12px;right:12px;bottom:10px;max-width:536px;border:0;border-radius:30px;background:rgba(255,255,255,.96);box-shadow:0 10px 34px rgba(91,94,240,.22);padding-bottom:0}
+html[data-theme=lavender] nav button{color:#8d8bb0;background:none;box-shadow:none;border-radius:0}
+html[data-theme=lavender] nav .on{color:var(--ac)}html[data-theme=lavender] nav .on .ic{background:#e9e6fd;filter:none}
+html[data-theme=lavender] body{padding-bottom:116px}
+html[data-theme=lavender] .chips span{background:#fff}
+.wkstrip{display:none}
+html[data-theme=lavender] .wkstrip{display:flex;justify-content:space-between;gap:4px;background:#fff;border-radius:26px;padding:12px 10px;margin:12px 0;box-shadow:0 8px 28px rgba(91,94,240,.09)}
+.wkstrip div{flex:1;text-align:center;font-size:12px;font-weight:600;color:#8d8bb0}
+.wkstrip b{display:grid;place-items:center;width:36px;height:36px;margin:6px auto 4px;border-radius:50%;font-size:16px;color:var(--tx)}
+.wkstrip .tdy b{background:#5b5ef0;color:#fff;box-shadow:0 6px 14px rgba(91,94,240,.4)}
+.wkstrip i{display:block;width:6px;height:6px;margin:0 auto;border-radius:50%;background:transparent}
+.wkstrip .y i{background:#f09a2b}.wkstrip .g i{background:#27ae6b}.wkstrip .r i{background:#ef5b7e}
+html[data-theme=lavender] button.stn{background:none;box-shadow:none;border-radius:0;color:#8d8bb0}
+html[data-theme=lavender] button.stn.cur{color:var(--ac)}html[data-theme=lavender] button.stn span{box-shadow:none}
+html[data-theme=lavender] :is(button.tp,button.qchip,button.rb,button.qo){box-shadow:none;border:0;color:var(--tx);background:#fff}
+html[data-theme=lavender] button.tp{box-shadow:0 6px 18px rgba(91,94,240,.07)}
+html[data-theme=lavender] :is(.gear,.row button.plus){box-shadow:none}
+.fab{display:none}
+html[data-theme=lavender][data-view=today] .fab{display:grid;place-items:center;position:fixed;right:max(18px,calc(50% - 262px));bottom:96px;width:58px;min-height:58px;height:58px;margin:0;padding:0;font-size:32px;line-height:1;border-radius:50%;z-index:20;box-shadow:0 10px 26px rgba(91,94,240,.45)}
+html[data-theme=lavender] .fab:active{transform:scale(.93)}
 </style></head><body>
 <div id="app"></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
+<button class="fab" data-a="gow" aria-label="Add a word">+</button>
 <nav>
 <button data-a="nav" data-v="today"><span class="ic">✅</span>Today</button><button data-a="nav" data-v="cal"><span class="ic">🗓</span>Calendar</button><button data-a="nav" data-v="prog"><span class="ic">📊</span>Progress</button><button data-a="nav" data-v="learn"><span class="ic">📚</span>Learn</button><button data-a="nav" data-v="coach"><span class="ic">🤖</span>Coach</button><button data-a="nav" data-v="stats"><span class="ic">🏆</span>Stats</button>
 </nav>
@@ -355,7 +412,7 @@ function vStats0(){
  [...new Set(B.map(b=>b[6]))].forEach(gn=>{const A=B.filter(b=>b[6]===gn),c=A[0][4];h+=`<div class="mu" style="margin:14px 0 6px"><b style="color:${c}">${A[0][0]} ${gn}</b> · ${A.filter(b=>b[2]>=b[3]).length}/${A.length}</div><div class="bd">`+A.map(x=>`<div class="bg ${x[2]>=x[3]?'on':''}" style="--c:${x[4]}"><em>${MED[x[5]]}</em><span>${x[0]}</span><b>${E(x[1])}</b><i class="bgb"><u style="width:${Math.min(100,x[2]/x[3]*100)}%"></u></i><small>${x[2]>=x[3]?'Unlocked ✓':Math.min(x[2],x[3])+'/'+x[3]}</small></div>`).join('')+'</div>'});
  
 const th=st.theme||'dark';
- return h+`<h2>🎨 Theme</h2><div class="tabs">`+[['dark','🌙 Dark'],['cyber','⚡ Cyber'],['minimal','☀️ Minimal']].map(([k,l])=>`<button class="${th===k?'on':''}" data-a="th" data-v="${k}">${l}</button>`).join('')+'</div>'+`<h2>🔊 Sound</h2><div class="tabs"><button class="${st.mute?'':'on'}" data-a="snd" data-v="1">🔊 On</button><button class="${st.mute?'on':''}" data-a="snd" data-v="0">🔇 Off</button></div>`}
+ return h+`<h2>🎨 Theme</h2><div class="tabs">`+[['lavender','💜 Lavender'],['dark','🌙 Dark'],['cyber','⚡ Cyber'],['minimal','☀️ Minimal']].map(([k,l])=>`<button class="${th===k?'on':''}" data-a="th" data-v="${k}">${l}</button>`).join('')+'</div>'+`<h2>🔊 Sound</h2><div class="tabs"><button class="${st.mute?'':'on'}" data-a="snd" data-v="1">🔊 On</button><button class="${st.mute?'on':''}" data-a="snd" data-v="0">🔇 Off</button></div>`}
 /* ===== AI VOCABULARY (Gemini) ===== */
 const AIK='winterArc.ai.v1',TN={mean:'📖 Meaning',spell:'✍️ Spelling',blank:'🧩 Fill in the blank',sent:'💬 Sentence making',work:'💼 Workplace usage'};
 const SC=['Your manager asks you to finish a task by Friday. Reply to your manager.','A customer calls and is angry about a late delivery. Reply to the customer.','You are on a sales call and the client asks about the price. Reply.','In a team meeting your lead asks for your update. Give your update.','Write one or two lines of an email to a client about a new meeting time.','A user asks for help with an IT ticket. Reply to the user.','A friend asks what you did yesterday. Answer in a daily conversation.'];
@@ -797,9 +854,10 @@ function checkNotify(){
  const h=new Date().getHours();if(h>=6&&h<23)showN('Winter Arc','2 hours are up. Check your tasks and keep going.');
  st.notify.next=Date.now()+72e5;save();if(view==='today')render()}
 let tStep=0,sOpen='';
+function wkStrip(s){const m=mon(s);return '<div class="wkstrip">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((n,i)=>{const d=add(m,i),dn=d<=today()&&inPlan(d)?cnt(d):0;return `<div class="${d===s?'tdy':''} ${dn>=5?'g':dn>=3?'y':dn>0?'r':''}">${n}<b>${+d.slice(8)}</b><i></i></div>`}).join('')+'</div>'}
 function vToday(){const r=today(),s=clamp(r),n=r<S0?0:Math.round((pd(s)-pd(S0))/864e5)+1,y=add(r,-1),sk=streaks();
  const bump=sk.cur>(st.ls||0);st.ls=sk.cur;const top='<div class="hd"><h1>Winter Arc Tracker</h1><button class="gear" data-a="nav" data-v="set">⚙️</button></div>',
- hero=`<div class="card hero hr"><div style="flex:1;min-width:0"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big2">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar" style="margin:8px 0"><i style="width:${n/92*100}%"></i></div><div class="mu"><span class="flame ${bump?'pop':''}">🔥</span> ${sk.cur} day streak · best ${sk.best}</div></div><div class="rw"><div class="ring" style="--p:${Math.round(cnt(s)/T.length*100)}"></div><div class="rt">${cnt(s)}/${T.length}</div></div></div>`+(inPlan(y)&&!ok(y)?'<div class="warn">You missed yesterday. Never miss twice in a row.</div>':''),
+ hero=wkStrip(s)+`<div class="card hero hr"><div style="flex:1;min-width:0"><div class="mu">${pd(s).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="big2">${n?'Day '+n+' of 92':'Starts Oct 1'}</div><div class="bar" style="margin:8px 0"><i style="width:${n/92*100}%"></i></div><div class="mu"><span class="flame ${bump?'pop':''}">🔥</span> ${sk.cur} day streak · best ${sk.best}</div></div><div class="rw"><div class="ring" style="--p:${Math.round(cnt(s)/T.length*100)}"></div><div class="rt">${cnt(s)}/${T.length}</div></div></div>`+(inPlan(y)&&!ok(y)?'<div class="warn">You missed yesterday. Never miss twice in a row.</div>':''),
  xp=UI('xp')?playerCard(s,sk):'',nb=UI('badge')?nbCard():'',co=UI('coach')?aiMotiv(s,sk):'',fo=UI('focus')?focusCard():'';
  if(!UI('train'))return top+hero+xp+nb+co+vocabCard(s)+bookCard()+mission(s)+editor(s)+pwCard(s)+fo;
  const S=[['Tasks',hero+mission(s)+editor(s)],['Words',vocabCard(s)],['Proof',bookCard()+pwCard(s)]],ex=xp+nb+co+fo;if(ex)S.push(['Coach',ex]);
@@ -1097,7 +1155,7 @@ function vTest(){
 
 /* ===== RENDER ===== */
 function render(){
- if(!['dark','cyber','minimal'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules','nb'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,nb:vNB,dp:vDP,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
+ if(!st.lv){st.lv=1;st.theme='lavender';save()}if(!['dark','cyber','minimal','lavender'].includes(st.theme))st.theme='dark';document.documentElement.dataset.theme=st.theme;document.documentElement.dataset.view=view;const app=$('#app');app.classList.remove('enter');if(['syl','words','rules','nb'].includes(view))learnTab=view;if(['prog','week'].includes(view))progTab=view;document.documentElement.classList.toggle('noanim',!UI('anim'));app.innerHTML=withSeg(view,{today:vToday,cal:vCal,prog:vProg,ot:vOT,nb:vNB,dp:vDP,week:vWeek,rules:vRules,syl:vSyl,words:vWords,stats:vStats,coach:vCoach,set:vSet,ai:vAI,spell:vSpell}[view]());
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===grpOf(view)));
  if(popK){const el=document.querySelector('input[data-a="tk"][data-d="'+popD+'"][data-k="'+popK+'"]');if(el)el.closest('.row').classList.add('pop');popK=null}
  if(animNext){[...app.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,14)));app.classList.add('enter');animNext=false}
